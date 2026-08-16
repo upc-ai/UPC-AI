@@ -3043,3 +3043,21 @@ This database architecture is designed to be the **durable, consistent, and audi
 3. **Time-partitioned, cache-layered, replica-distributed** — the schema is designed for 50K+ users from day one, with partitioning for time-series growth, read replicas for query distribution, and a four-layer caching strategy that keeps the primary fast.
 
 A senior database engineering team can implement UPC AI's entire data layer — from schema creation to indexing to partitioning to backup configuration — directly from this document, entity by entity, section by section.
+
+---
+
+## Changelog — v1.1 (supersedes conflicting values in the body above)
+
+Where any body text above conflicts with this changelog, **this changelog wins** — it matches the shipped schema in `packages/db/src/schema.ts`.
+
+1. **Enum unification (DB↔UI):** `study_mode` = `learn | practice | explain_simply | challenge_me`; `ai_response_length` = `concise | detailed | exhaustive`; language preferences = `en | hi | en_hi | auto`; `font_size` replaced by `font_scale smallint CHECK (font_scale BETWEEN 80 AND 120)` default 100; `otp_records.purpose` adds `password_reset`.
+2. **New tables (v1.1 additions):** `student_subjects` (UNIQUE(user_id, subject_id) — enrolled subjects from onboarding); `highlights` (document workspace highlights, index (user_id, document_id)); `user_memory` (opt-in personalization memory, 1:1 with users); `daily_study_activity` (UNIQUE(user_id, activity_date) — powers streaks/heatmap/weak areas).
+3. **user_roles uniqueness:** the unique index requires `UNIQUE NULLS NOT DISTINCT (user_id, role_id, department_id)` (PostgreSQL 15+) — plain UNIQUE permits duplicate college-wide (NULL dept) assignments.
+4. **Embedding model authority:** `documents.embedding_model` and `chunks.embedding_model` are informational only; the `embeddings` table (`embedding_model` + version) is the single source of truth.
+5. **Filtered vector search:** vectors live in the separate `embeddings` table (DBD-07); filtered search JOINs embeddings⟷chunks on chunk_id with metadata filters on chunks (PK-indexed, cheap). Earlier "no cross-table join" claims are retired.
+6. **Redis keys (namespace collision resolved):** `auth:sess:{session_id}` (user auth session), `chat:ctx:{session_id}` (chat working context), `acad:current` (academic session), `stream:{message_id}` (stream status), `stream:chat:{session_id}` (pub/sub), `stream:buf:{message_id}` (resume buffer, TTL 120s).
+7. **AuditLogs sequence:** bigserial is monotonic **with gaps allowed** (gap-free is impossible under concurrent inserts); hash-chain order = append order via a single-writer advisory-lock path per partition.
+8. **Retention:** superseded raw files retained **3 years** (was 90 days) — citations link to source document versions; archival moves to cold storage class, not deletion.
+9. **Compliance naming:** "GDPR-style export" → **DPDP-compliant export**.
+10. **Migrations:** Drizzle Kit (`generate` + `migrate`), applied in CI/CD by the `upcai_migrations` DB user, expand-then-contract.
+11. **Admin bootstrap:** first Super Admin is seeded via `pnpm seed:admin`; appoints all other admins via the portal.

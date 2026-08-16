@@ -1419,3 +1419,11 @@ Every other decision — async ingestion, hybrid retrieval, two-tier OCR, type-a
 
 
 
+
+---
+
+## Changelog — v2.1
+
+1. **§1.7 v1 Deployment Reality — Modular Monolith.** v1 ships as ONE Next.js app + ONE worker process; the service decomposition above is the *scale target*, not the launch topology. Mapping: Chat Service + BFF + Admin Portal + Auth → `modules/auth`, `modules/chat`, `modules/portal` inside the app; AI Orchestrator + Provider Gateway → `modules/orchestrator`, `modules/providers` (pure TS packages, no HTTP hop); Retrieval + Embedding + Vector Search → `modules/retrieval`; Ingestion API → in-app route; Document Workers + OCR → separate BullMQ worker. **Split triggers:** (a) chat p95 degrades >20% for 7 days from ingestion CPU → extract workers; (b) gateway needs isolated rate-limit key management → extract; (c) sustained >200 RPS or team >4 engineers → split retrieval; (d) otherwise stay monolith. Module boundaries enforced by ESLint import rules (public interfaces only).
+2. **Model names in examples** (claude-3.5-sonnet, gpt-4o, gemini-1.5-pro) are illustrative-only; routing speaks in tiers (`tier:fast`, `tier:standard`, `tier:frontier`) resolved by the Provider Gateway config.
+3. **SLOs:** the canonical table lives in Backend Architecture v1.1 (TTFT p50 <800ms / p95 <1.5s); conflicting absolute numbers elsewhere in this doc defer to it.

@@ -3091,3 +3091,14 @@ This backend architecture is designed around three structural principles that ru
 3. **Security at every boundary** — JWT with rotating refresh tokens and reuse detection; rate limiting at multiple tiers; input validation at gateway and service; file uploads that never transit app servers; RBAC enforced at both API and data layers; audit logging of every privileged action.
 
 A backend engineering team can implement UPC AI's entire API layer — from authentication to streaming to admin portal — directly from this document, endpoint by endpoint, service by service.
+
+---
+
+## Changelog — v1.1 (supersedes conflicting values in the body above)
+
+1. **Warnings channel:** `OCR_LOW_CONFIDENCE` is removed from the error catalog (it was HTTP 200 — not an error). Non-failure advisories travel in a top-level `warnings: [{ code, message, detail? }]` array on normal responses; `OCR_LOW_CONFIDENCE` is the first warning code.
+2. **Tracing:** `X-Request-Id` is the request correlation ID; distributed tracing uses W3C `traceparent` headers (trace_id/span_id) via OpenTelemetry. The two are cross-referenced as span attributes — never the same value.
+3. **SSE resume protocol (§3.5, replaces the Last-Event-ID approach):** every token event carries a `sequence`; the server buffers in-flight streams in Redis `stream:buf:{message_id}` (TTL 120s); on reconnect the client calls `GET /v1/chat/sessions/{sessionId}/messages/{messageId}/stream?after={lastSequence}` which replays buffered events, or returns the finalized message; if the buffer is gone → REST fetch fallback.
+4. **Added endpoints:** highlights CRUD (`POST/GET /v1/documents/{document_id}/highlights`, `DELETE /v1/highlights/{highlight_id}`); `GET/PUT /v1/students/me/subjects` (body `{ subject_ids: uuid[] }`); `GET /v1/users/me/export` (DPDP export of profile, chats, quizzes, flashcards, bookmarks).
+5. **Canonical SLO table (single source; reconcile all other numbers to this):** Chat TTFT p50 < 800ms / p95 < 1.5s · non-AI API p95 < 500ms · retrieval stage p95 < 300ms.
+6. **OTP purpose enum** on `/v1/auth/otp/request` includes `password_reset`.
