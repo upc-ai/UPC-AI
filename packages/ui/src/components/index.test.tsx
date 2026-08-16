@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { Button } from "./Button";
 import { Spinner, Skeleton } from "./misc";
 import { Dialog } from "./Dialog";
-import { LogoMark } from "./brand";
+import { LogoMark, Wordmark } from "./brand";
 
 describe("Button", () => {
   it("renders label and handles clicks", async () => {
@@ -64,13 +64,22 @@ describe("Dialog", () => {
 });
 
 describe("LogoMark", () => {
-  it("is decorative (aria-hidden) and carries the U geometry", () => {
+  it("is decorative, tight-viewboxed, and correctly proportioned", () => {
     const { container } = render(<LogoMark size={24} />);
     const svg = container.querySelector("svg");
     expect(svg).toHaveAttribute("aria-hidden", "true");
-    expect(svg).toHaveAttribute("width", "24");
+    // height = size, width = 0.8×size (mark's 4:5 aspect — no dead padding)
+    expect(svg).toHaveAttribute("height", "24");
+    expect(svg).toHaveAttribute("width", "19");
+    expect(svg).toHaveAttribute("viewBox", "272 212 480 600");
     // three constructed strokes: pillar, floating arm, base
     const rects = container.querySelectorAll("rect");
     expect(rects.length).toBe(3);
+  });
+
+  it("Wordmark sizes the mark at 1.25× the text size", () => {
+    const { container } = render(<Wordmark size={18} />);
+    const svg = container.querySelector("svg");
+    expect(svg).toHaveAttribute("height", "23"); // round(18 × 1.25)
   });
 });

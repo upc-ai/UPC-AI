@@ -41,7 +41,7 @@ export function HeroChatDemo() {
 
         {step === 2 && (
           <div className="mockupStatus">
-            <LogoMark size={14} />
+            <LogoMark size={16} />
             <span className="shimmer">Thinking…</span>
           </div>
         )}
@@ -61,7 +61,7 @@ export function HeroChatDemo() {
 
         {step >= 5 && (
           <div className="mockupSources">
-            <LogoMark size={12} />
+            <LogoMark size={13} />
             Sources: Fee Structure 2025-26 (Official) · Page 1
           </div>
         )}

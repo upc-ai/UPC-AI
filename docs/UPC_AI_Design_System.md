@@ -61,7 +61,7 @@ UPC AI's mark is a **constructed letterform "U"** (Udai Pratap): three rectiline
 
 **Monochrome discipline:** ink (`#141413`/black) on light surfaces · white on dark surfaces · accent orange (`#c96442`) tint only for the streaming/thinking marker. Never gradient, never multi-color.
 
-**Sizing:** comfortable from 20px upward; at 16px favicon scale the air-gaps compress to hairlines and the silhouette carries the mark — acceptable. The mark always travels locked with the "UPC AI" wordmark (Inter 500, 14–18px) until recognition matures. It also serves as the chat greeting marker and the "AI is thinking" marker (may shimmer during generation only).
+**Sizing & lockup (premium convention — the OpenAI/Gemini ratio):** the `LogoMark` component uses a **tight viewBox** (`272 212 480 600` — artwork edge-to-edge, zero dead padding) with `size` = height; width auto-computes at the mark's 4:5 aspect (0.8×). In lockups the mark sits at **1.25× the wordmark text size** with a 10px gap ("UPC AI", Inter 500, tracking 0.01em). The favicon variant (`icon.svg`) is the square, padded enlargement: letterform scaled to 70% of canvas height (strokes 144, air-gaps 72, centered) so it reads at 16px. The mark always travels locked with the wordmark until recognition matures. It also serves as the chat greeting marker and the "AI is thinking" marker (may shimmer during generation only).
 
 **Source of truth:** runtime = `LogoMark` component (`packages/ui`, currentColor SVG); assets = `packages/ui/src/assets/logo-black-on-white.svg` and `logo-white-on-black.svg`; favicon = `apps/web/src/app/icon.svg`.
 
