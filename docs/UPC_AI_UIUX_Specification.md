@@ -83,7 +83,7 @@ flowchart TD
 - **Step 2 (academic details)** pre-populates available options based on previous selections (selecting "Computer Science" department shows only CS courses). This reduces cognitive load.
 - **Step 3 (subjects)** shows a grid of subject cards with checkboxes. Pre-checked based on the standard curriculum for their year/semester. The student confirms or adjusts.
 - **Step 4 (preferences)** shows four choices: theme (light/dark/system), response language (English/Hindi/auto-detect), response length (concise/detailed/exhaustive), and difficulty level (beginner/intermediate/advanced). Defaults to light, English, detailed, intermediate. Each option is a visual toggle, not a dropdown.
-- **Welcome screen** is a single screen with the UPC AI sparkle mark, a serif display headline ("Welcome to UPC AI, Rahul"), a brief 2-line explanation in body sans, and a "Start Exploring" coral button. This screen exists for one purpose: to make the student feel welcomed before entering the product.
+- **Welcome screen** is a single screen with the UPC AI U mark, a serif display headline ("Welcome to UPC AI, Rahul"), a brief 2-line explanation in body sans, and a "Start Exploring" coral button. This screen exists for one purpose: to make the student feel welcomed before entering the product.
 - **Product tour** uses a spotlight overlay (dims everything except the highlighted element). Each step has a tooltip with a short sentence and a "Next" button. The user can skip the tour at any time.
 
 **Time from signup to first chat: under 3 minutes.**
@@ -240,7 +240,7 @@ The landing page follows the warm-editorial marketing structure: a cream top-nav
 │  "Ready to study smarter?"  ← display-sm serif, on-primary     │
 │  [ Get Started Free ]  ← cream button (canvas bg, ink text)    │
 ├────────────────────────────────────────────────────────────────┤
-│  FOOTER — dark navy, sparkle + "UPC AI" wordmark, 4 columns    │
+│  FOOTER — dark navy, U mark + "UPC AI" wordmark, 4 columns    │
 │  Product / College / Resources / Legal · © 2025 UPC AI         │
 └────────────────────────────────────────────────────────────────┘
 ```
@@ -257,7 +257,7 @@ The landing page follows the warm-editorial marketing structure: a cream top-nav
 
 **Navigation bar:**
 - Solid `canvas` background with a 1px `hairline` bottom border — always solid, never transparent or blurred. Sticky on scroll.
-- Left: sparkle mark + "UPC AI" wordmark. Links in `nav-link`. Right: "Sign in" text-link + "Try UPC AI" coral button — the CTA is never more than one click away.
+- Left: U mark + "UPC AI" wordmark. Links in `nav-link`. Right: "Sign in" text-link + "Try UPC AI" coral button — the CTA is never more than one click away.
 - `<768px`: hamburger opens a full-screen cream sheet with the links stacked.
 
 **Features section:**
@@ -333,11 +333,11 @@ The landing page follows the warm-editorial marketing structure: a cream top-nav
 **Purpose:** Authenticate the user with minimum friction.
 
 **Layout:**
-- **Desktop:** Split-screen. Left 60%: warm brand panel — `surface-soft` cream with the UPC AI sparkle mark, a pull-quote set in `display-md` serif ("AI that knows your college as well as you do."), and a faint line-art illustration in coral/ink strokes. No gradients, no glow, no blue.
+- **Desktop:** Split-screen. Left 60%: warm brand panel — `surface-soft` cream with the UPC AI U mark, a pull-quote set in `display-md` serif ("AI that knows your college as well as you do."), and a faint line-art illustration in coral/ink strokes. No gradients, no glow, no blue.
 - **Mobile:** Full screen — brand panel hidden. Logo at top, form below.
 
 **Components:**
-- UPC AI sparkle mark + wordmark (top of form panel).
+- UPC AI U mark + wordmark (top of form panel).
 - Headline: "Welcome back" (returning) or "Create your account" (signup) — `title-lg`, `ink`.
 - Google SSO button (secondary — canvas bg, 1px `hairline` border, full width) — most students have college Google accounts; this is the fastest path.
 - Divider: "— or —" in `muted-soft` between hairlines.
@@ -706,7 +706,7 @@ This is the signature UX of UPC AI:
 
 1. **User sends message** → message appears immediately in the chat. Send button disables.
 
-2. **Thinking indicator** (0–2 seconds): Below the user message, the sparkle glyph appears with "Thinking…" set in *italic serif* (display face, 16px, `muted`) and a slow shimmer sweep (opacity 0.5→1→0.5, 1.8s ease-in-out):
+2. **Thinking indicator** (0–2 seconds): Below the user message, the U mark appears with "Thinking…" set in *italic serif* (display face, 16px, `muted`) and a slow shimmer sweep (opacity 0.5→1→0.5, 1.8s ease-in-out):
    ```
    ✳ Thinking…
    ```
@@ -769,7 +769,7 @@ After certain AI responses, context-aware suggestions appear:
 
 | State | Behaviour |
 |-------|-----------|
-| **New chat (empty)** | Centre of the screen: orange sparkle glyph + "How can I help you today?" in `display-md` serif + the four study-mode chips (Learn / Practice / Explain Simply / Challenge Me) + 4 suggested starter questions as `category-tab` pills (context-aware based on user's subjects). Composer pinned at the bottom with the disclaimer beneath it. |
+| **New chat (empty)** | Centre of the screen: orange U mark + "How can I help you today?" in `display-md` serif + the four study-mode chips (Learn / Practice / Explain Simply / Challenge Me) + 4 suggested starter questions as `category-tab` pills (context-aware based on user's subjects). Composer pinned at the bottom with the disclaimer beneath it. |
 | **Loading chat history** | Skeleton shimmer for messages. |
 | **Streaming** | Thinking indicator → retrieval status → token streaming → sources. |
 | **Stream error** | "Something went wrong. [Try again]" below the last message. |
@@ -790,7 +790,7 @@ After certain AI responses, context-aware suggestions appear:
 The universal search-and-action surface, opened from anywhere in the app.
 
 - **Trigger:** `⌘/Ctrl+K`, or clicking the sidebar search field.
-- **Presentation:** centered dialog (640px max) on `app-card`, radius 16, overlay rgba(20,20,19,0.5). A single search field at top, `text-input` styling with an orange sparkle prefix.
+- **Presentation:** centered dialog (640px max) on `app-card`, radius 16, overlay rgba(20,20,19,0.5). A single search field at top, `text-input` styling with an U mark prefix.
 - **Results, grouped:** Actions (New chat, Generate quiz, New flashcard deck, Toggle theme, Open settings) · Chats (title + last-message preview) · Knowledge (notices/documents with type badges) · Subjects (jump to subject-scoped chat).
 - **Keyboard:** ↑/↓ move, Enter open, Esc close. Selection highlight: `bubble-user`.
 - Debounced 150ms; on open with no query, recent chats and common actions list immediately.
@@ -1454,7 +1454,7 @@ Every screen has a designed empty state. Empty states are NOT blank screens — 
 |---------|----------------|
 | **Full page** | Skeleton shimmer matching the page layout. Appears after 300ms delay (prevents flash on fast loads). |
 | **Chat messages** | Skeleton bubbles: 3 alternating left/right rectangles with shimmer. |
-| **AI thinking** | Sparkle + italic-serif "Thinking…" with shimmer sweep |
+| **AI thinking** | U mark + italic-serif "Thinking…" with shimmer sweep |
 | **AI retrieval** | Italic-serif status: "Searching college documents..." |
 | **AI streaming** | Token-by-token fade-in with blinking cursor. |
 | **Document upload** | Progress bar on the file chip (percentage). |
@@ -1642,7 +1642,7 @@ Everything else moves directly from default to pressed: primary buttons darken t
 ```
 ✳ Thinking…
 ```
-- The sparkle glyph in `accent` + "Thinking…" in italic serif (display face, 16px, `muted`).
+- The U mark in `accent` + "Thinking…" in italic serif (display face, 16px, `muted`).
 - A slow shimmer sweep crosses the text: opacity 0.5 → 1 → 0.5, 1.8s ease-in-out, looping until streaming begins.
 - When retrieval is running, the text reads "Searching college documents…".
 - Reduced motion: static text, no shimmer.
@@ -1715,3 +1715,4 @@ A senior product design team can create UPC AI's complete Figma design system �
 - Mobile bottom tab bar fixed to 5 tabs (Notifications added); source panel standardized at 360px; user bubble max-width 80%.
 - Micro-interactions rewritten: hover is opacity-reveal only (no lifts/scales/color shifts); confetti palette warmed; GDPR-style export renamed DPDP-compliant.
 - Study heatmap intensity ramp defined in warm tones; quiz selected-option styling defined; onboarding preference defaults updated.
+- **v2.0.1:** all sparkle references replaced with the UPC AI "U" brand mark (greeting marker, thinking indicator, sources marker, empty states, welcome screen, wordmark lockups, favicon).

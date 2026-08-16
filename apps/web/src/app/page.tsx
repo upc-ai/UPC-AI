@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
-import { Sparkle } from "@upc/ui";
+import { LogoMark } from "@upc/ui";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
@@ -99,7 +99,7 @@ export default function LandingPage() {
         <div className={styles.navInner}>
           <Link href="/" style={{ textDecoration: "none" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--ink)", fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 500 }}>
-              <Sparkle size={20} />
+              <LogoMark size={20} />
               UPC&nbsp;AI
             </span>
           </Link>
@@ -335,7 +335,7 @@ export default function LandingPage() {
           <div className={styles.footerGrid}>
             <div className={styles.footerBrand}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--on-dark)", fontSize: 18, fontWeight: 500 }}>
-                <Sparkle size={20} /> UPC&nbsp;AI
+                <LogoMark size={20} /> UPC&nbsp;AI
               </span>
               <span className={styles.footerCollege}>
                 The official AI assistant of<br />Udai Pratap College, Varanasi

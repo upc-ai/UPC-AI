@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { Button } from "./Button";
 import { Spinner, Skeleton } from "./misc";
 import { Dialog } from "./Dialog";
-import { Sparkle } from "./brand";
+import { LogoMark } from "./brand";
 
 describe("Button", () => {
   it("renders label and handles clicks", async () => {
@@ -41,8 +41,9 @@ describe("Spinner / Skeleton", () => {
 });
 
 describe("Dialog", () => {
-  it("closes on Escape and traps focus attributes", async () => {
-    const onClose = vi.fn();    render(
+  it("closes on Escape and has modal attributes", async () => {
+    const onClose = vi.fn();
+    render(
       <Dialog open onClose={onClose} title="Confirm">
         <p>Body</p>
       </Dialog>,
@@ -62,11 +63,14 @@ describe("Dialog", () => {
   });
 });
 
-describe("Sparkle", () => {
-  it("is decorative (aria-hidden)", () => {
-    const { container } = render(<Sparkle size={24} />);
+describe("LogoMark", () => {
+  it("is decorative (aria-hidden) and carries the U geometry", () => {
+    const { container } = render(<LogoMark size={24} />);
     const svg = container.querySelector("svg");
     expect(svg).toHaveAttribute("aria-hidden", "true");
     expect(svg).toHaveAttribute("width", "24");
+    // three constructed strokes: pillar, floating arm, base
+    const rects = container.querySelectorAll("rect");
+    expect(rects.length).toBe(3);
   });
 });

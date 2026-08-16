@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Sparkle } from "@upc/ui";
+import { LogoMark } from "@upc/ui";
 
 /**
  * Hero chat demo — a looping, CSS-light recreation of the real streaming UX:
  * user question → thinking shimmer → streamed answer lines with citations → source line.
+ * The UPC AI "U" mark is the greeting/thinking marker (accent-tinted per design system §7.1).
  */
 export function HeroChatDemo() {
   const [step, setStep] = useState(0);
@@ -40,7 +41,7 @@ export function HeroChatDemo() {
 
         {step === 2 && (
           <div className="mockupStatus">
-            <Sparkle size={14} />
+            <LogoMark size={14} />
             <span className="shimmer">Thinking…</span>
           </div>
         )}
@@ -60,7 +61,7 @@ export function HeroChatDemo() {
 
         {step >= 5 && (
           <div className="mockupSources">
-            <Sparkle size={12} />
+            <LogoMark size={12} />
             Sources: Fee Structure 2025-26 (Official) · Page 1
           </div>
         )}

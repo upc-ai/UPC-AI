@@ -57,7 +57,13 @@ Coral (`#cc785c`) is the **voltage** — scarce on individual elements, generous
 
 ### 1.4 Brand Mark
 
-UPC AI uses its **own** mark — a four-pointed sparkle/star glyph rendered as inline SVG (stroke or fill in ink or coral), geometrically distinct from any third-party brand mark — paired with the wordmark "UPC AI" set in Inter 500 (14–18px). The sparkle glyph also serves as the chat greeting marker and the "AI is thinking" marker. Logo lockup: sparkle + "UPC AI" left-aligned; the sparkle may animate (gentle 2s shimmer) during AI generation only.
+UPC AI's mark is a **constructed letterform "U"** (Udai Pratap): three rectilinear strokes — a full-height pillar stem, a **floating right arm** raised above the base with an even air-gap, and a base bar tucked flush under the right edge. Uniform 120px strokes, even 60px air-gaps, optically centered in a 1024 viewBox. Strictly rectilinear — sharp corners, no rounding, one fill color.
+
+**Monochrome discipline:** ink (`#141413`/black) on light surfaces · white on dark surfaces · accent orange (`#c96442`) tint only for the streaming/thinking marker. Never gradient, never multi-color.
+
+**Sizing:** comfortable from 20px upward; at 16px favicon scale the air-gaps compress to hairlines and the silhouette carries the mark — acceptable. The mark always travels locked with the "UPC AI" wordmark (Inter 500, 14–18px) until recognition matures. It also serves as the chat greeting marker and the "AI is thinking" marker (may shimmer during generation only).
+
+**Source of truth:** runtime = `LogoMark` component (`packages/ui`, currentColor SVG); assets = `packages/ui/src/assets/logo-black-on-white.svg` and `logo-white-on-black.svg`; favicon = `apps/web/src/app/icon.svg`.
 
 ### 1.5 Typeface Licensing Note
 
@@ -84,7 +90,7 @@ If a licensed serif (e.g., Tiempos Headline) is ever acquired, it drops into the
 | `primary` (Coral) | `#cc785c` | Primary CTAs, brand moments, full-bleed callout cards, citation accents (large text only) |
 | `primary-active` | `#a9583e` | Pressed/hover state of coral; **also the AA-safe small-text link color** |
 | `primary-disabled` | `#e6dfd8` | Disabled primary buttons |
-| `accent` (Product orange) | `#c96442` | In-product accents: send button, greeting sparkle, focus rings, thinking marker, mode-chip selection |
+| `accent` (Product orange) | `#c96442` | In-product accents: send button, greeting U mark, focus rings, thinking marker, mode-chip selection |
 | `accent-teal` | `#5db8a6` | Status dots, "indexed/available" indicators, terminal chrome (sparing) |
 | `accent-amber` | `#e8a55a` | Small warm highlights, category badges (sparing) |
 
@@ -239,9 +245,9 @@ canvas hero → cream feature cards → dark product mockup → canvas compariso
 
 ### 5.1 Marketing Components
 
-**Top Nav** — 64px, `canvas`, hairline bottom. Left: sparkle mark + "UPC AI" wordmark. Center-left links (Features, Knowledge, Study Tools, For Faculty, FAQ) in `nav-link`. Right: "Sign in" text-link + **button-primary** "Try UPC AI". `<768px`: hamburger → full-screen cream sheet.
+**Top Nav** — 64px, `canvas`, hairline bottom. Left: U mark + "UPC AI" wordmark. Center-left links (Features, Knowledge, Study Tools, For Faculty, FAQ) in `nav-link`. Right: "Sign in" text-link + **button-primary** "Try UPC AI". `<768px`: hamburger → full-screen cream sheet.
 
-**Hero Band** — 96px vertical padding on `canvas`. Left: `display-xl` serif headline, `body-lg` sub-head, button row (primary + secondary). Right: `hero-illustration-card` — a real UPC AI chat mockup on `surface-dark` (cream text, orange sparkle greeting, citation chips), radius 16.
+**Hero Band** — 96px vertical padding on `canvas`. Left: `display-xl` serif headline, `body-lg` sub-head, button row (primary + secondary). Right: `hero-illustration-card` — a real UPC AI chat mockup on `surface-dark` (cream text, U mark greeting, citation chips), radius 16.
 
 **Feature Card** — 3-up grid. `surface-card` bg, radius 12, 32px padding, small icon top, `title-md` head, `body-md` description. Icons: Lucide, 24px, `ink`.
 
@@ -257,7 +263,7 @@ canvas hero → cream feature cards → dark product mockup → canvas compariso
 
 **CTA Band (dark)** — alternative pre-footer: `surface-dark`, `on-dark` text, pairs with a code-window or mockup card.
 
-**Footer** — `surface-dark`, 64px vertical padding, 4-column link list (Product / College / Resources / Legal) in `body-sm` on `on-dark` at 70% emphasis, wordmark + sparkle at top. Never inverts.
+**Footer** — `surface-dark`, 64px vertical padding, 4-column link list (Product / College / Resources / Legal) in `body-sm` on `on-dark` at 70% emphasis, wordmark + U mark at top. Never inverts.
 
 **Cookie/Consent Card** — bottom-right floating, `surface-dark`, radius 12, 24px padding.
 
@@ -285,7 +291,7 @@ Buttons darken on press only — no other hover styling exists in this system. O
 
 - **User message** — right-aligned, `bubble-user` bg, radius 16 (4px corner at the tail), max-width 80%, padding 10×14, `body-md`. Hover reveals edit/copy at low opacity.
 - **Assistant message** — **no bubble, no avatar.** Editorial text directly on `app-canvas`, 680px column, `body-lg`. Hover reveals actions row (copy, thumbs, regenerate, bookmark) at low opacity.
-- **Thinking indicator** — the sparkle glyph + "Thinking…" in *italic serif* (display face, 16px) with a slow text shimmer (opacity 0.5→1, 1.8s ease). During retrieval: "Searching college documents…" same treatment. Reduced motion: static text.
+- **Thinking indicator** — the U mark + "Thinking…" in *italic serif* (display face, 16px) with a slow text shimmer (opacity 0.5→1, 1.8s ease). During retrieval: "Searching college documents…" same treatment. Reduced motion: static text.
 - **Citation chip** — inline superscript `[1]` in `accent`; sources panel card: numbered chip + `title-sm` doc title + page + 2-line snippet + relevance bar (visual only, never a number).
 - **Sources panel** — 360px right slide-in (mobile bottom sheet). Cards on `app-card`, radius 12, 16px padding.
 - **Mode chips** — study modes (Learn / Practice / Explain Simply / Challenge Me) as `category-tab` pills under the greeting and in the composer toolbar; active = `surface-cream-strong` bg + `ink` text.
@@ -305,7 +311,7 @@ Buttons darken on press only — no other hover styling exists in this system. O
 | **tooltip** | `surface-dark` bg, `on-dark` 12px text, radius 6, 400ms delay |
 | **skeleton** | `app-card-soft` blocks, opacity pulse 0.55→0.8, 1.5s; appears only after 300ms |
 | **spinner** | 20px, 2px `muted` border, `accent` top arc |
-| **empty state** | sparkle glyph 40px in `muted-soft`, `title-md` heading, `body-sm` hint, optional secondary action |
+| **empty state** | U mark 40px in `muted-soft`, `title-md` heading, `body-sm` hint, optional secondary action |
 
 ---
 
@@ -324,7 +330,7 @@ Buttons darken on press only — no other hover styling exists in this system. O
 ### 7.1 Signature: AI Streaming
 
 1. User message appears instantly (no animation).
-2. Sparkle + italic-serif "Thinking…" shimmer (0–2s).
+2. U mark + italic-serif "Thinking…" shimmer (0–2s).
 3. Status line: "Searching college documents…" (builds trust that answers are grounded).
 4. Tokens stream in batches appended at ~60fps (rAF), each batch fading in over **80ms** — no slide, no bounce.
 5. Blinking caret (1s interval) at the stream head; disappears on completion.
@@ -542,3 +548,9 @@ Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large 
 4. When in doubt about emphasis: **bigger serif before bolder weight.**
 5. Never introduce a fourth surface tone, a cool gray, or a pure white floor.
 6. Never document hover states — this system defines default and pressed only.
+
+---
+
+## Changelog — v2.1
+
+- **Brand mark adopted (§1.4 rewritten):** the founder-created constructed "U" mark (pillar stem + floating right arm + base bar; uniform 120px strokes, even 60px air-gaps, optically centered) replaces the placeholder sparkle everywhere — component, nav, footer, mockups, favicon (`apps/web/src/app/icon.svg`), apple-icon, and both assets in `packages/ui/src/assets/`. Monochrome discipline: ink on light, white on dark, accent tint for the streaming marker only. All sparkle references updated to the U mark.

@@ -1,20 +1,35 @@
-/** UPC AI sparkle mark — four-pointed star, rendered as inline SVG. */
-export function Sparkle({ size = 20, className }: { size?: number; className?: string }) {
+/** UPC AI brand — the geometric "U" mark (three constructed strokes, floating right arm). */
+
+export interface LogoMarkProps {
+  size?: number;
+  className?: string;
+}
+
+/**
+ * The UPC AI mark: a built-letter "U" — a full-height pillar stem, a floating
+ * right arm, and a base bar tucked flush under the right edge. Uniform 120px
+ * strokes, even 60px air-gaps, optically centered in a 1024 viewBox.
+ * Renders in currentColor: ink on light surfaces, white on dark, accent when tinted.
+ */
+export function LogoMark({ size = 20, className }: LogoMarkProps) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 1024 1024"
       fill="currentColor"
       className={className}
       aria-hidden="true"
+      focusable="false"
     >
-      <path d="M12 1.5c.35 3.9 1.6 6.9 3.4 8.7 1.8 1.8 4.8 3.05 8.6 3.4v1.8c-3.8.35-6.8 1.6-8.6 3.4-1.8 1.8-3.05 4.8-3.4 8.7h-1.8c-.35-3.9-1.6-6.9-3.4-8.7C5 18.15 2 16.9-1.8 16.55v-1.8c3.8-.35 6.8-1.6 8.6-3.4 1.8-1.8 3.05-4.8 3.4-8.7H12z" transform="translate(1.4 -0.9) scale(0.92)" />
+      <rect x="272" y="212" width="120" height="600" />
+      <rect x="632" y="212" width="120" height="420" />
+      <rect x="452" y="692" width="300" height="120" />
     </svg>
   );
 }
 
-/** Wordmark lockup: sparkle + "UPC AI". */
+/** Lockup: mark + "UPC AI" wordmark. */
 export function Wordmark({ size = 20, dark = false }: { size?: number; dark?: boolean }) {
   return (
     <span
@@ -28,7 +43,7 @@ export function Wordmark({ size = 20, dark = false }: { size?: number; dark?: bo
         color: dark ? "var(--on-dark)" : "var(--ink)",
       }}
     >
-      <Sparkle size={size} />
+      <LogoMark size={size} />
       UPC&nbsp;AI
     </span>
   );
