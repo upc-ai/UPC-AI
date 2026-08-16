@@ -1,0 +1,206 @@
+/**
+ * UPC AI Design Tokens — warm-editorial system (Design System v2.0, §10).
+ * Cream canvas, serif display, coral CTAs, dark navy product surfaces.
+ * This file is the single token source; components reference vars, never hex.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Brand & semantic (theme-independent)                                */
+/* ------------------------------------------------------------------ */
+:root {
+  /* Brand */
+  --primary: #cc785c;
+  --primary-active: #a9583e;
+  --primary-disabled: #e6dfd8;
+  --accent: #c96442;
+  --accent-teal: #5db8a6;
+  --accent-amber: #e8a55a;
+
+  /* Semantic */
+  --success: #5db872;
+  --success-bg: #eaf5ec;
+  --warning: #d4a017;
+  --warning-bg: #faf3dd;
+  --error: #c64545;
+  --error-bg: #faebeb;
+  --info: #5b7fa6;
+  --info-bg: #ecf1f6;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+
+  /* Spacing (4px base) */
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-section: 96px;
+
+  /* Typography */
+  --font-display: "Cormorant Garamond", "Noto Serif Devanagari", Garamond, "Times New Roman", serif;
+  --font-body: "Inter", "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --text-display-xl: 64px;
+  --lh-display-xl: 1.05;
+  --ls-display-xl: -1.5px;
+  --text-display-lg: 48px;
+  --lh-display-lg: 1.1;
+  --ls-display-lg: -1px;
+  --text-display-md: 36px;
+  --lh-display-md: 1.15;
+  --ls-display-md: -0.5px;
+  --text-display-sm: 28px;
+  --lh-display-sm: 1.2;
+  --ls-display-sm: -0.3px;
+  --text-title-lg: 22px;
+  --lh-title-lg: 1.3;
+  --text-title-md: 18px;
+  --lh-title-md: 1.4;
+  --text-title-sm: 16px;
+  --lh-title-sm: 1.4;
+  --text-body-lg: 16px;
+  --lh-body-lg: 1.6;
+  --text-body-md: 16px;
+  --lh-body-md: 1.55;
+  --text-body-sm: 14px;
+  --lh-body-sm: 1.55;
+  --text-caption: 13px;
+  --lh-caption: 1.4;
+  --text-caption-uppercase: 12px;
+  --lh-caption-uppercase: 1.4;
+  --ls-caption-uppercase: 1.5px;
+  --text-code: 14px;
+  --lh-code: 1.6;
+
+  /* Motion */
+  --duration-fast: 100ms;
+  --duration-normal: 150ms;
+  --duration-moderate: 200ms;
+  --duration-slow: 300ms;
+  --ease-default: ease;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Marketing surfaces                                                   */
+/* ------------------------------------------------------------------ */
+:root {
+  --canvas: #faf9f5;
+  --surface-soft: #f5f0e8;
+  --surface-card: #efe9de;
+  --surface-cream-strong: #e8e0d2;
+  --surface-dark: #181715;
+  --surface-dark-elevated: #252320;
+  --surface-dark-soft: #1f1e1b;
+  --hairline: #e6dfd8;
+  --hairline-soft: #ebe6df;
+  --ink: #141413;
+  --body-strong: #252523;
+  --body: #3d3d3a;
+  --muted: #6c6a64;
+  --muted-soft: #8e8b82;
+  --on-primary: #ffffff;
+  --link: #a9583e;
+  --on-dark: #faf9f5;
+  --on-dark-soft: #a09d96;
+  --shadow-soft: 0 1px 3px rgba(20, 20, 19, 0.08);
+}
+
+/* ------------------------------------------------------------------ */
+/* Product surfaces — light (default) / warm dark                      */
+/* ------------------------------------------------------------------ */
+:root,
+[data-theme="light"] {
+  --app-canvas: #f0ece0;
+  --app-sidebar: #f5f0e8;
+  --app-card: #ffffff;
+  --app-card-soft: #f5f0e8;
+  --bubble-user: #e5e0d6;
+  --bubble-user-hover: #dcd5c6;
+  --composer-bg: #ffffff;
+  --composer-border: #e5e0d6;
+  --code-block: #1f1e1b;
+  --app-ink: #1a1a18;
+  --app-body: #3d3d3a;
+  --app-muted: #5b5950;
+  --app-muted-soft: #8e8b82;
+  --app-link: #a9583e;
+  --app-on-dark: #faf9f5;
+  --app-hairline: #e5e0d6;
+}
+
+[data-theme="dark"] {
+  --app-canvas: #2b2a27;
+  --app-sidebar: #1f1e1b;
+  --app-card: #33322e;
+  --app-card-soft: #1f1e1b;
+  --bubble-user: #393937;
+  --bubble-user-hover: #44423c;
+  --composer-bg: #1f1e1b;
+  --composer-border: #3d3a35;
+  --code-block: #141412;
+  --app-ink: #eeeeec;
+  --app-body: #d4d1c7;
+  --app-muted: #a3a098;
+  --app-muted-soft: #8f8c84;
+  --app-link: #e0a188;
+  --app-on-dark: #faf9f5;
+  --app-hairline: #3d3a35;
+}
+
+/* ------------------------------------------------------------------ */
+/* High contrast overrides                                              */
+/* ------------------------------------------------------------------ */
+[data-contrast="high"] {
+  --hairline: #6c6a64;
+  --app-hairline: #5b5950;
+  --muted-soft: #6c6a64;
+  --app-muted-soft: #5b5950;
+  --shadow-soft: none;
+}
+[data-contrast="high"] *:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Syntax highlighting (code blocks, warm dark in both themes)          */
+/* ------------------------------------------------------------------ */
+:root {
+  --code-bg: var(--code-block);
+  --code-text: #e8e6df;
+  --code-keyword: #c65f4a;
+  --code-string: #7d9a6c;
+  --code-number: #d4a017;
+  --code-comment: #8f8c84;
+  --code-function: #e0a188;
+  --code-type: #e8a55a;
+  --code-lineno: #6c6a64;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base element defaults                                                */
+/* ------------------------------------------------------------------ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

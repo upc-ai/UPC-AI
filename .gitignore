@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+
+# testing
+coverage/
+
+# misc
+.DS_Store
+*.log
+.turbo/
+.vercel/
+.zcode/

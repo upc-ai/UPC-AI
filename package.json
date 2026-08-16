@@ -1,0 +1,22 @@
+{
+  "name": "upc-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UPC AI — Official AI-Powered Academic & Campus Assistant for Udai Pratap College, Varanasi",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @upc/web dev",
+    "dev:worker": "pnpm --filter @upc/worker dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @upc/db generate",
+    "db:migrate": "pnpm --filter @upc/db migrate",
+    "db:studio": "pnpm --filter @upc/db studio",
+    "seed:admin": "pnpm --filter @upc/web seed:admin"
+  }
+}
