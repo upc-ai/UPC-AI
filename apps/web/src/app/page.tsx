@@ -93,7 +93,7 @@ function FeatureIcon({ name }: { name: string }) {
 
 export default function LandingPage() {
   return (
-    <>
+    <div className={styles.page}>
       {/* ---------------- Top nav ---------------- */}
       <header className={styles.nav}>
         <div className={styles.navInner}>
@@ -357,7 +357,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
 

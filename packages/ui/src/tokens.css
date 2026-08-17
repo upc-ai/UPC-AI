@@ -117,7 +117,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Product surfaces — light (default) / warm dark                      */
+/* Product surfaces — warm dark (default) / light                      */
 /* ------------------------------------------------------------------ */
 :root,
 [data-theme="light"] {

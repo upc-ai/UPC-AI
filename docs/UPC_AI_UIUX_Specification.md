@@ -82,7 +82,7 @@ flowchart TD
 - **Onboarding is 4 steps maximum.** Each step fits on a single screen. No scrolling required. Progress indicator (4 dots) at the top.
 - **Step 2 (academic details)** pre-populates available options based on previous selections (selecting "Computer Science" department shows only CS courses). This reduces cognitive load.
 - **Step 3 (subjects)** shows a grid of subject cards with checkboxes. Pre-checked based on the standard curriculum for their year/semester. The student confirms or adjusts.
-- **Step 4 (preferences)** shows four choices: theme (light/dark/system), response language (English/Hindi/auto-detect), response length (concise/detailed/exhaustive), and difficulty level (beginner/intermediate/advanced). Defaults to light, English, detailed, intermediate. Each option is a visual toggle, not a dropdown.
+- **Step 4 (preferences)** shows four choices: theme (light/dark/system), response language (English/Hindi/auto-detect), response length (concise/detailed/exhaustive), and difficulty level (beginner/intermediate/advanced). Defaults to dark, English, detailed, intermediate. Each option is a visual toggle, not a dropdown.
 - **Welcome screen** is a single screen with the UPC AI U mark, a serif display headline ("Welcome to UPC AI, Rahul"), a brief 2-line explanation in body sans, and a "Start Exploring" coral button. This screen exists for one purpose: to make the student feel welcomed before entering the product.
 - **Product tour** uses a spotlight overlay (dims everything except the highlighted element). Each step has a tooltip with a short sentence and a "Next" button. The user can skip the tour at any time.
 
@@ -655,7 +655,7 @@ This is the core of UPC AI — the screen where learning happens. It must be:
 - Left-aligned, full width of the 680px conversation column.
 - **No bubble and no avatar** — editorial text sits directly on `app-canvas` (the signature reading surface).
 - Text: `body-lg` (16px/1.6), rendered as Markdown with full support for headings (rendered in the display serif), lists, code blocks (warm-dark `code-block` surface in both themes), tables, math (KaTeX), and images.
-- **Citations**: inline superscript numbers `[1]` in `accent` (#c96442), weight 500. Clickable — opens the source panel on the right.
+- **Citations**: inline superscript numbers `[1]` in `accent` (monochrome — black in light, cream in dark), weight 500. Clickable — opens the source panel on the right.
 - **Sources section** (at the bottom of the AI message): horizontal row of source cards on `app-card` (radius 12, 16px padding). Each card: document icon + title + page number. Click opens the Source Panel.
 
 **Message spacing:** 24px between messages.
@@ -681,7 +681,7 @@ The most critical component in the product.
 - **🎓 Subject selector**: Dropdown showing the user's enrolled subjects. Selecting a subject scopes the AI's knowledge retrieval.
 - **📖 Study mode**: Same dropdown as the header (Learn / Practice / Explain Simply / Challenge Me).
 - **🌐 Language**: Toggle — EN | HI. When Hindi is active, the AI responds in Hindi (Devanagari script). The UI language does NOT change — only the AI's response language.
-- **➤ Send button**: 36px circular, filled `accent` (#c96442), white arrow icon. Disabled when textarea is empty (`muted-soft` fill). While streaming, it morphs into a stop button (square icon, same accent fill). No hover scale.
+- **➤ Send button**: 36px circular, filled `accent` (black in light, cream `#faf9f5` in dark), arrow in the contrasting color. Disabled when textarea is empty (`muted-soft` fill). While streaming, it morphs into a stop button (square icon, same accent fill). No hover scale.
 
 **Keyboard:**
 - `Enter` — send message.
@@ -1321,7 +1321,7 @@ The admin dashboard provides institutional oversight: document management, AI qu
 - Read-only fields: email, enrollment number, department, course (admin-managed).
 
 **Appearance:**
-- Theme: Light | Dark | System (three cards with previews). Default: Light — the warm cream identity is the brand default.
+- Theme: Light | Dark | System (three cards with previews). Default: Dark — the warm charcoal identity; Light remains available.
 - Compact mode: Toggle (reduces spacing for power users).
 - (OLED mode removed in v2.0 — the single warm dark theme already reads softly at night; one dark theme, done perfectly.)
 
@@ -1716,3 +1716,4 @@ A senior product design team can create UPC AI's complete Figma design system �
 - Micro-interactions rewritten: hover is opacity-reveal only (no lifts/scales/color shifts); confetti palette warmed; GDPR-style export renamed DPDP-compliant.
 - Study heatmap intensity ramp defined in warm tones; quiz selected-option styling defined; onboarding preference defaults updated.
 - **v2.0.1:** all sparkle references replaced with the UPC AI "U" brand mark (greeting marker, thinking indicator, sources marker, empty states, welcome screen, wordmark lockups, favicon).
+- **v2.1:** monochrome accent everywhere the product accent appears — `#000000` on light, `#faf9f5` on dark (citations and send-button specs updated; was orange `#c96442`). Default theme flipped from Light to Dark — onboarding step-4 preferences and Appearance settings defaults updated.

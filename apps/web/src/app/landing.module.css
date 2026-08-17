@@ -1,5 +1,10 @@
 /* UPC AI landing — warm-editorial structure (UIUX Spec v2.0 §2) */
 
+.page {
+  /* The landing is always cream and theme-independent — keep the accent ink even under the dark default. */
+  --accent: #000000;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -198,7 +203,8 @@
 
 .mockupAnswer em {
   font-style: normal;
-  color: var(--accent);
+  /* Always-dark mockup surface — cream accent regardless of app theme. */
+  color: #faf9f5;
   font-weight: 500;
   cursor: default;
 }

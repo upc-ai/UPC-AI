@@ -59,7 +59,7 @@ Coral (`#cc785c`) is the **voltage** — scarce on individual elements, generous
 
 UPC AI's mark is a **constructed letterform "U"** (Udai Pratap): three rectilinear strokes — a full-height pillar stem, a **floating right arm** raised above the base with an even air-gap, and a base bar tucked flush under the right edge. Uniform 120px strokes, even 60px air-gaps, optically centered in a 1024 viewBox. Strictly rectilinear — sharp corners, no rounding, one fill color.
 
-**Monochrome discipline:** ink (`#141413`/black) on light surfaces · white on dark surfaces · accent orange (`#c96442`) tint only for the streaming/thinking marker. Never gradient, never multi-color.
+**Monochrome discipline:** ink (`#141413`/black) on light surfaces · white on dark surfaces · the streaming/thinking marker uses the same monochrome accent (`#000000` light / `#faf9f5` dark). Never gradient, never multi-color.
 
 **Sizing & lockup (premium convention — the OpenAI/Gemini ratio):** the `LogoMark` component uses a **tight viewBox** (`272 212 480 600` — artwork edge-to-edge, zero dead padding) with `size` = height; width auto-computes at the mark's 4:5 aspect (0.8×). In lockups the mark sits at **1.25× the wordmark text size** with a 10px gap ("UPC AI", Inter 500, tracking 0.01em). The favicon variant (`icon.svg`) is the square, padded enlargement: letterform scaled to 70% of canvas height (strokes 144, air-gaps 72, centered) so it reads at 16px. The mark always travels locked with the wordmark until recognition matures. It also serves as the chat greeting marker and the "AI is thinking" marker (may shimmer during generation only).
 
@@ -90,7 +90,7 @@ If a licensed serif (e.g., Tiempos Headline) is ever acquired, it drops into the
 | `primary` (Coral) | `#cc785c` | Primary CTAs, brand moments, full-bleed callout cards, citation accents (large text only) |
 | `primary-active` | `#a9583e` | Pressed/hover state of coral; **also the AA-safe small-text link color** |
 | `primary-disabled` | `#e6dfd8` | Disabled primary buttons |
-| `accent` (Product orange) | `#c96442` | In-product accents: send button, greeting U mark, focus rings, thinking marker, mode-chip selection |
+| `accent` (Product black) | `#000000` (`#faf9f5` on dark surfaces) | In-product accents: send button, greeting U mark, focus rings, thinking marker, mode-chip selection |
 | `accent-teal` | `#5db8a6` | Status dots, "indexed/available" indicators, terminal chrome (sparing) |
 | `accent-amber` | `#e8a55a` | Small warm highlights, category badges (sparing) |
 
@@ -149,8 +149,8 @@ Semantic colors never carry meaning alone — always paired with icon + text (Se
 
 ### 2.6 Themes
 
-- **Light (default).** The cream system above. UPC AI is light-first — the warm-editorial identity IS light mode.
-- **Dark (warm).** A warm charcoal mirror (`#2b2a27` family, per 2.3). Dark mode is warm — never cool gray, never pure black. The previous OLED-black theme is dropped (one dark theme, done perfectly).
+- **Dark warm (default).** A warm charcoal mirror (`#2b2a27` family, per 2.3). Dark mode is warm — never cool gray, never pure black. The previous OLED-black theme is dropped (one dark theme, done perfectly).
+- **Light.** The cream system above — the warm-editorial identity in its light form, fully supported.
 - **High contrast.** `data-contrast="high"` overrides: borders 2px, `muted-soft`→`muted`, 3px focus rings, semantic colors darkened one step, card↔canvas contrast strengthened. Token overrides in Section 10.4.
 
 ---
@@ -277,7 +277,7 @@ canvas hero → cream feature cards → dark product mockup → canvas compariso
 | **button-secondary-on-dark** | bg `surface-dark-elevated`, text `on-dark` — never inverts to light on dark surfaces |
 | **button-text-link** | transparent, `ink`; press → `link` |
 | **button-icon-circular** | 36px circle, `canvas` bg, hairline border, ink icon |
-| **send-button** | 36px circle, bg `accent` (#c96442), white arrow icon; disabled `muted-soft`; becomes stop (square icon) while streaming |
+| **send-button** | 36px circle, bg `accent` (black in light, cream `#faf9f5` in dark), arrow in the contrasting color; disabled `muted-soft`; becomes stop (square icon) while streaming |
 
 Buttons darken on press only — no other hover styling exists in this system. One primary button per context. Minimum touch target 44×44 (visual size may stay 40 — padding extends the hit area).
 
@@ -370,13 +370,13 @@ UI transitions: sidebar 200ms, dialogs 250ms fade+rise, dropdowns 150ms scale+fa
 | `on-primary` on `primary-active` #a9583e | 4.6:1 | AA for all text sizes |
 | `link` #a9583e on `canvas` | 4.6:1 | Inline links (all sizes) |
 | `on-dark` on `surface-dark` | 14.9:1 | Dark surfaces |
-| `accent` #c96442 on `app-canvas` | 3.6:1 | Citations/UI accents ≥18.66px bold or non-text |
+| `accent` #000000/#faf9f5 on `app-canvas` | 17.8:1 (light) / 13.6:1 (dark) | AAA — citations/UI accents at all text sizes |
 
 ### 8.2 The Coral Rule
 
 Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large text and non-text UI**. Therefore:
 - Marketing primary buttons use coral (14px/500 labels — accepted trade-off, documented); any context demanding strict AA (compliance surfaces, legal text) uses `button-primary-accessible` (#a9583e).
-- **In-product** primary actions and all inline links use `accent`/`link` (#c96442/#a9583e) per the table above.
+- **In-product** primary actions and all inline links use `accent` (black/cream per theme)/`link` (#a9583e) per the table above.
 - Body-size text is never set in coral.
 
 ### 8.3 Requirements
@@ -423,7 +423,8 @@ Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large 
   --primary: #cc785c;
   --primary-active: #a9583e;
   --primary-disabled: #e6dfd8;
-  --accent: #c96442;
+  /* Accent: monochrome like the logo — black on light surfaces, cream on dark (see 10.3). */
+  --accent: #000000;
   --accent-teal: #5db8a6;
   --accent-amber: #e8a55a;
 
@@ -481,7 +482,7 @@ Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large 
 }
 ```
 
-### 10.3 Product Tokens (light default / warm dark)
+### 10.3 Product Tokens (warm dark default / light)
 
 ```css
 :root, [data-theme="light"] {
@@ -508,6 +509,8 @@ Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large 
   --app-link: #e0a188;
   --app-on-dark: #faf9f5;
   --app-hairline: #3d3a35;
+  /* Accent inverts on dark surfaces (black would be invisible) — the logo's white-on-black colorway. */
+  --accent: #faf9f5;
 }
 ```
 
@@ -554,3 +557,10 @@ Coral `#cc785c` is 3.2:1 against white text — it passes WCAG only for **large 
 ## Changelog — v2.1
 
 - **Brand mark adopted (§1.4 rewritten):** the founder-created constructed "U" mark (pillar stem + floating right arm + base bar; uniform 120px strokes, even 60px air-gaps, optically centered) replaces the placeholder sparkle everywhere — component, nav, footer, mockups, favicon (`apps/web/src/app/icon.svg`), apple-icon, and both assets in `packages/ui/src/assets/`. Monochrome discipline: ink on light, white on dark, accent tint for the streaming marker only. All sparkle references updated to the U mark.
+
+---
+
+## Changelog — v2.2
+
+- **Monochrome accent (was orange `#c96442`):** `--accent` is now `#000000` on light surfaces and `#faf9f5` on dark surfaces — the logo's two colorways. Applies everywhere the accent is used: send button (§5.2), greeting U mark, focus rings, thinking marker, mode-chip selection, citations, Spinner. Contrast row (§8.1) updated to 17.8:1 light / 13.6:1 dark — AAA at all text sizes. Token blocks updated (§10.1 accent value; §10.3 gains the dark `--accent` override).
+- **Dark is the default theme (§2.6):** `data-theme="dark"` ships as the app default; Light remains fully available. Marketing/landing surfaces stay cream regardless of theme (theme-independent marketing tokens) and pin their accent to ink.

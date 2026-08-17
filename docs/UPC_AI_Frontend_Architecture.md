@@ -160,7 +160,7 @@ The provider tree wraps the entire application. Order matters — inner provider
 
 **ThemeProvider:**
 - **Single source of truth:** the persisted Zustand `UserPreferencesStore.theme` (v2.0 — resolves the v1.x dual-state conflict). ThemeProvider reads the store and applies it; it holds no theme state of its own.
-- Applies `data-theme="light" | "dark"` on `<html>` (light is the default — the warm cream identity). The `oled` theme was removed in v2.0.
+- Applies `data-theme="light" | "dark"` on `<html>` (dark is the default — the warm charcoal identity; light fully supported). The `oled` theme was removed in v2.0.
 - Also applies `data-contrast="high"` when the high-contrast accessibility setting is on.
 - Reads system preference (`prefers-color-scheme`) only when theme = `system`.
 - Exposes `theme`, `setTheme` via context for convenience consumers.
@@ -433,7 +433,7 @@ flowchart TB
 |-------|--------|
 | **Purpose** | Inline clickable citation marker (`[1]`, `[2]`) within AI responses. |
 | **Props** | `index: number`, `citation: Citation`, `onClick: (citation) => void` |
-| **Styling** | Superscript, `accent` (#c96442) colour, weight 500. |
+| **Styling** | Superscript, `accent` colour (black/cream per theme), weight 500. |
 | **Interaction** | Click → opens Source Panel and scrolls to this citation. Hover → tooltip with document title + page number. |
 | **Accessibility** | `role="button"`, `aria-label="Source [n]: [document title], page [p]"`. |
 
@@ -839,7 +839,7 @@ Same as Input but multi-line. Additional props: `minRows`, `maxRows`, `autoResiz
 
 | Field | Detail |
 |-------|--------|
-| **Props** | `size: 'sm' | 'md' | 'lg'` (16px, 24px, 32px), `color?: string` (default: `accent` #c96442) |
+| **Props** | `size: 'sm' | 'md' | 'lg'` (16px, 24px, 32px), `color?: string` (default: `accent` — black/cream per theme) |
 | **Animation** | Rotating circle (1s linear infinite). `prefers-reduced-motion`: static spinner icon (no rotation). |
 | **Accessibility** | `role="status"`, `aria-label="Loading"`. |
 
@@ -1357,3 +1357,7 @@ A senior frontend engineering team can implement UPC AI's entire UI — from the
 - Added components: CommandPalette (3.14) and NotificationPanel (3.15) — previously referenced but unspecified.
 - useAIStream: replaced hand-waved `Last-Event-ID` reconnection with the explicit sequence-based resume protocol (`GET .../stream?after={lastSequence}` + REST fallback), matching Backend Architecture v1.1.
 - BottomTabBar fixed to 5 tabs (Notifications added); Spinner default color `accent`; ContentArea default width 680px.
+
+**v1.2 — Monochrome accent & dark default**
+- Accent colour references updated to the monochrome accent (`#000000` light / `#faf9f5` dark — the logo's two colorways; was orange `#c96442`): CitationBadge (3.10) and Spinner (8.15) specs.
+- ThemeProvider default flipped from light to dark (`data-theme="dark"` on `<html>` at SSR). Marketing landing stays cream regardless of theme (theme-independent tokens) and pins its accent to ink.
