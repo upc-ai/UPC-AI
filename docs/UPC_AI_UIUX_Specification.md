@@ -44,7 +44,7 @@ Throughout this document, screen layouts are described using ASCII wireframes wi
 
 Component names reference the UPC AI Design System (v2.0). Colour references use token names (e.g., `surface-card`, `app-canvas`, `ink`, `accent`). Spacing references use token names (e.g., `space-md` = 16px).
 
-**Design language (v2.0):** warm-editorial — cream canvas (`#faf9f5` marketing / `#F0ECE0` product), serif display headlines (Cormorant Garamond), humanist sans body (Inter), warm coral CTAs (`#cc785c`), product accents in orange (`#c96442`), and dark navy product surfaces (`#181715` family). No cool grays, no pure white floors, no blue accents anywhere.
+**Design language (v2.0):** warm-editorial — cream canvas (`#faf9f5` marketing / `#F0ECE0` product), serif display headlines (Cormorant Garamond), humanist sans body (Inter), warm coral CTAs (`#cc785c`), product accent in monochrome black (`#000000`; `#faf9f5` on dark surfaces), and dark navy product surfaces (`#181715` family). No cool grays, no pure white floors, no blue accents anywhere.
 
 ---
 

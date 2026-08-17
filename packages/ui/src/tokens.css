@@ -12,7 +12,8 @@
   --primary: #cc785c;
   --primary-active: #a9583e;
   --primary-disabled: #e6dfd8;
-  --accent: #c96442;
+  /* Accent: monochrome like the logo — black on light surfaces, cream on dark (see dark override). */
+  --accent: #000000;
   --accent-teal: #5db8a6;
   --accent-amber: #e8a55a;
 
@@ -155,6 +156,8 @@
   --app-link: #e0a188;
   --app-on-dark: #faf9f5;
   --app-hairline: #3d3a35;
+  /* Accent inverts on dark surfaces (black would be invisible) — the logo's white-on-black colorway. */
+  --accent: #faf9f5;
 }
 
 /* ------------------------------------------------------------------ */

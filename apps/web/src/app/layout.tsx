@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#faf9f5",
+  themeColor: "#2b2a27",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +57,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         jetbrains.variable,
         notoDevanagari.variable,
       ].join(" ")}
-      data-theme="light"
+      data-theme="dark"
+      suppressHydrationWarning
     >
       <body>{children}</body>
     </html>

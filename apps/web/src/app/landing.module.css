@@ -183,8 +183,10 @@
   margin-bottom: var(--space-sm);
 }
 
-.mockupStatus svg {
-  color: var(--accent);
+.mockupStatus svg,
+.mockupSources svg {
+  /* Monochrome accent on the always-dark mockup surface = the logo's white-on-black colorway. */
+  color: #faf9f5;
 }
 
 .mockupAnswer {
@@ -214,10 +216,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-}
-
-.mockupSources svg {
-  color: var(--accent-teal);
 }
 
 /* ---------------- Sections ---------------- */
