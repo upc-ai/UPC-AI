@@ -4,7 +4,6 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { Queue } from "bullmq";
 import { getDb } from "@/lib/db";
 import { documents, ingestionJobs, knowledgeCategories, auditLogs } from "@upc/db";
 import { ApiError } from "@upc/core";
@@ -118,10 +117,13 @@ export async function POST(req: NextRequest) {
       .returning({ id: ingestionJobs.id });
 
     // Ingestion queue needs a real Redis (Upstash) — without it, fail clearly
-    // instead of hanging on a localhost connection that can't exist.
+    // instead of hanging on a localhost connection that can't exist. bullmq is
+    // imported lazily here so the bundler never has to resolve it for routes
+    // that don't upload (it's also marked external in next.config).
     if (!process.env.REDIS_URL) {
       throw new ApiError("INTERNAL_ERROR", "Document ingestion is not configured yet (missing REDIS_URL). Please try again later.");
     }
+    const { Queue } = await import("bullmq");
     const queue = new Queue("ingest", { connection: { url: process.env.REDIS_URL } });
     await queue.add("ingest", { documentId: doc!.id }, { jobId: job!.id, attempts: 3, backoff: { type: "exponential", delay: 5000 } });
     await queue.close();

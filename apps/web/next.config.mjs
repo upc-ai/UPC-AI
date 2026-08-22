@@ -5,6 +5,11 @@ const nextConfig = {
   experimental: {
     // SSE streaming endpoints must not be buffered
     proxyTimeout: 120_000,
+    // BullMQ/ioredis must NOT be bundled by webpack — bullmq's ESM build
+    // references an optional platform-specific dependency (@valkey/valkey-glide)
+    // that breaks build resolution on Linux CI/Vercel. They resolve from
+    // node_modules at runtime instead.
+    serverComponentsExternalPackages: ["bullmq", "ioredis"],
   },
   async headers() {
     const securityHeaders = [

@@ -13,7 +13,8 @@ import { retrieve } from "@/modules/retrieval/search";
 import { streamGenerate } from "@/modules/providers/gateway";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+/** 60s = Vercel Hobby plan ceiling (Pro allows up to 300 — raise there). */
+export const maxDuration = 60;
 
 /** GET /v1/chat/sessions/{id}/messages — paginated history with citations + attachments. */
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
