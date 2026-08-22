@@ -1081,6 +1081,68 @@
   }
 }
 
+/* ---------------- Mobile overflow guards (360–430px) ---------------- */
+/* Belt-and-braces so nothing can exceed the viewport on small screens.
+   Additive only — the desktop layout is untouched. */
+.container {
+  width: 100%;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.heroTitle,
+.sectionTitle,
+.sectionSub,
+.heroSub,
+.sectionKicker,
+.quote,
+.featureText,
+.compareCard p,
+.faqQ,
+.faqA,
+.strip {
+  overflow-wrap: break-word;
+}
+
+/* Grid children default to min-width:auto — a wide child can push its track
+   past the viewport. Explicitly allow shrinking. */
+.hero > *,
+.productGrid > *,
+.compareGrid > *,
+.featureGrid > *,
+.tileGrid > *,
+.faqList > * {
+  min-width: 0;
+}
+
+.mockup,
+.codeWindow {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  /* Fluid down to 34px on 360px phones — the fixed 44px minimum clipped the
+     hero heading; this wraps it naturally instead. */
+  .heroTitle {
+    font-size: clamp(34px, 10.5vw, 46px);
+  }
+  .sectionTitle {
+    font-size: clamp(28px, 8.5vw, 36px);
+  }
+  .mockup {
+    border-radius: 14px;
+  }
+  .mobileCta,
+  .mobileSignIn {
+    width: 100%;
+  }
+}
+
 /* ---------------- Dark theme ---------------- */
 /* The marketing system flips with the user's theme choice (tokens.css
    overrides the marketing vars under [data-theme="dark"]). Everything

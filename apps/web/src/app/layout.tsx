@@ -35,16 +35,29 @@ const notoDevanagari = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://upcai.app"),
   title: {
-    default: "UPC AI — Your campus thinking partner | Udai Pratap College",
+    default: "UPC AI — The Smarter Way to Study with AI",
     template: "%s | UPC AI",
   },
-  description:
-    "The official AI assistant of Udai Pratap College. Ask academic questions, get answers grounded in official college documents with citations, and study with AI-generated quizzes and flashcards.",
+  description: "Official AI Study Agent for Udai Pratap College students.",
   openGraph: {
-    title: "UPC AI — Your campus thinking partner",
-    description: "The official AI assistant of Udai Pratap College, Varanasi.",
+    title: "UPC AI — The Smarter Way to Study with AI",
+    description: "Official AI Study Agent for Udai Pratap College students.",
     type: "website",
     url: "https://upcai.app",
+    images: [
+      {
+        url: "https://upcai.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "UPC AI — The Smarter Way to Study with AI",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UPC AI — The Smarter Way to Study with AI",
+    description: "Official AI Study Agent for Udai Pratap College students.",
+    images: ["https://upcai.app/og-image.png"],
   },
 };
 
