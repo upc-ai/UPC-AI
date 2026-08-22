@@ -374,6 +374,24 @@ export const messages = pgTable(
   ],
 );
 
+/** Files a student attached to a chat message (photo of a problem, PDF notes…).
+ *  v1 keeps the bytes inline as base64 text; blob storage is a v1.1 concern. */
+export const chatAttachments = pgTable(
+  "chat_attachments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    messageId: uuid("message_id")
+      .notNull()
+      .references(() => messages.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 255 }).notNull(),
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    data: text("data").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("chat_attachments_message_idx").on(t.messageId)],
+);
+
 export const aiResponses = pgTable(
   "ai_responses",
   {

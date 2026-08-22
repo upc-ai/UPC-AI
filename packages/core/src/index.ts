@@ -23,6 +23,7 @@ export const envSchema = z.object({
   // Google OAuth (college Workspace)
   GOOGLE_CLIENT_ID: z.string().default(""),
   GOOGLE_CLIENT_SECRET: z.string().default(""),
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().default(""),
   COLLEGE_EMAIL_DOMAINS: z.string().default("upc.ac.in"),
 
   // Mail (OTP delivery) — dev mode logs codes instead of sending
@@ -35,6 +36,9 @@ export const envSchema = z.object({
   OPENAI_API_KEY: z.string().default(""),
   ANTHROPIC_API_KEY: z.string().default(""),
   OPENAI_EMBEDDING_KEY: z.string().default(""),
+
+  // Bring-your-own OpenAI-compatible providers — JSON array, see customProviderSchema
+  AI_CUSTOM_PROVIDERS: z.string().default("[]"),
 
   // Object storage
   S3_ENDPOINT: z.string().default(""),
@@ -63,7 +67,87 @@ export function getEnv(): Env {
 }
 
 /* ------------------------------------------------------------------ */
-/* Domain constants                                                     */
+/* Model tiers & public model catalog                                  */
+/* ------------------------------------------------------------------ */
+
+export const MODEL_TIERS = ["fast", "standard", "frontier"] as const;
+export type ModelTier = (typeof MODEL_TIERS)[number];
+
+/**
+ * User-facing model catalog. Students never see vendor names — the gateway
+ * routes each tier to whatever real provider is configured server-side.
+ */
+export interface PublicModel {
+  id: string; // what the client sends
+  label: string; // what users see
+  tier: ModelTier; // gateway routing tier
+  description: string; // one-line blurb for the picker
+}
+
+export const PUBLIC_MODELS: PublicModel[] = [
+  { id: "upc-1", label: "UPC-1", tier: "fast", description: "Fast answers for quick doubts" },
+  { id: "upc-1-plus", label: "UPC-1 Plus", tier: "standard", description: "Balanced for everyday studying" },
+  { id: "upc-1-pro", label: "UPC-1 Pro", tier: "frontier", description: "Deepest reasoning for hard problems" },
+];
+
+export function publicModelById(id: string): PublicModel | undefined {
+  return PUBLIC_MODELS.find((m) => m.id === id);
+}
+
+export function publicModelForTier(tier: ModelTier): PublicModel {
+  return PUBLIC_MODELS.find((m) => m.tier === tier) ?? PUBLIC_MODELS[1]!;
+}
+
+/* ------------------------------------------------------------------ */
+/* Custom (bring-your-own) OpenAI-compatible providers                 */
+/* ------------------------------------------------------------------ */
+
+export const customProviderSchema = z.object({
+  name: z.string().min(1),
+  baseUrl: z.string().url(),
+  apiKey: z.string().min(1),
+  model: z.string().min(1),
+  tier: z.enum(MODEL_TIERS).default("standard"),
+  costPerMTokIn: z.coerce.number().min(0).default(0), // USD / 1M tokens, optional
+  costPerMTokOut: z.coerce.number().min(0).default(0),
+});
+
+export type CustomProviderConfig = z.infer<typeof customProviderSchema>;
+
+/**
+ * Parse AI_CUSTOM_PROVIDERS (JSON array). Throws a readable error when the
+ * whole value is malformed; individual invalid entries are skipped with a
+ * warning so one bad entry can't take down chat.
+ */
+export function getCustomProviders(raw?: string): CustomProviderConfig[] {
+  const value = (raw ?? getEnv().AI_CUSTOM_PROVIDERS).trim();
+  if (!value || value === "[]") return [];
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    throw new Error("Invalid environment: AI_CUSTOM_PROVIDERS is not valid JSON");
+  }
+  if (!Array.isArray(parsed)) {
+    throw new Error("Invalid environment: AI_CUSTOM_PROVIDERS must be a JSON array of provider objects");
+  }
+
+  const valid: CustomProviderConfig[] = [];
+  for (const entry of parsed) {
+    const result = customProviderSchema.safeParse(entry);
+    if (result.success) {
+      valid.push(result.data);
+    } else {
+      const name = typeof entry === "object" && entry !== null && "name" in entry ? String(entry.name) : "unnamed";
+      console.warn(`[custom-providers] skipping "${name}": ${result.error.issues[0]?.message ?? "invalid entry"}`);
+    }
+  }
+  return valid;
+}
+
+/* ------------------------------------------------------------------ */
+/* Domain constants                                                    */
 /* ------------------------------------------------------------------ */
 
 export const STUDY_MODES = ["learn", "practice", "explain_simply", "challenge_me"] as const;

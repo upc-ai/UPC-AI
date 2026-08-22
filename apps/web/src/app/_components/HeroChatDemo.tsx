@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { LogoMark } from "@upc/ui";
+import styles from "../landing.module.css";
 
 /**
  * Hero chat demo — a looping, CSS-light recreation of the real streaming UX:
  * user question → thinking shimmer → streamed answer lines with citations → source line.
- * The UPC AI "U" mark is the greeting/thinking marker (accent-tinted per design system §7.1).
+ * The UPC AI "U" mark is the greeting/thinking marker. Styling + entrance
+ * animations live in landing.module.css (this file consumes them via styles.*).
  */
 export function HeroChatDemo() {
   const [step, setStep] = useState(0);
@@ -25,34 +27,34 @@ export function HeroChatDemo() {
 
   return (
     <div style={{ position: "relative" }}>
-      <div className="mockup" data-testid="hero-mockup">
-        <div className="mockupBar">
-          <span className="mockupDot" />
-          <span className="mockupDot" />
-          <span className="mockupDot" />
-          <span className="mockupTitle">upcai.in</span>
+      <div className={styles.mockup} data-testid="hero-mockup">
+        <div className={styles.mockupBar}>
+          <span className={styles.mockupDot} />
+          <span className={styles.mockupDot} />
+          <span className={styles.mockupDot} />
+          <span className={styles.mockupTitle}>upcai.app</span>
         </div>
 
         {step >= 1 && (
-          <div className="mockupUser">
+          <div className={styles.mockupUser}>
             What is the BSc CS fee structure for 2nd year?
           </div>
         )}
 
         {step === 2 && (
-          <div className="mockupStatus">
+          <div className={styles.mockupStatus}>
             <LogoMark size={16} />
-            <span className="shimmer">Thinking…</span>
+            <span className={styles.shimmer}>Thinking…</span>
           </div>
         )}
 
         {step >= 3 && (
-          <div className="mockupAnswer">
-            <span className="line">
+          <div className={styles.mockupAnswer}>
+            <span className={styles.line}>
               Tuition: <strong>₹15,000</strong> per semester <em>[1]</em>
             </span>
             {step >= 4 && (
-              <span className="line">
+              <span className={styles.line}>
                 Library: ₹2,000 · Lab: ₹3,000 <em>[2]</em>
               </span>
             )}
@@ -60,31 +62,12 @@ export function HeroChatDemo() {
         )}
 
         {step >= 5 && (
-          <div className="mockupSources">
+          <div className={styles.mockupSources}>
             <LogoMark size={13} />
             Sources: Fee Structure 2025-26 (Official) · Page 1
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .shimmer {
-          animation: shimmer 1.8s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-        .mockupUser,
-        .mockupAnswer .line,
-        .mockupSources {
-          animation: fadein 300ms ease;
-        }
-        @keyframes fadein {
-          from { opacity: 0; transform: translateY(4px); }
-          to { opacity: 1; transform: none; }
-        }
-      `}</style>
     </div>
   );
 }

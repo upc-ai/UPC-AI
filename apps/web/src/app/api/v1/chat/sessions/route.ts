@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { chatSessions } from "@upc/db";
 import { STUDY_MODES, LANGUAGES } from "@upc/core";
 import { ok, fail } from "@/lib/api";
 import { requireAuth } from "@/lib/auth/guard";
+
+export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
   title: z.string().max(200).optional(),
@@ -36,13 +38,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/** GET /v1/chat/sessions — list (cursor by created_at desc, 20/page). */
+/** GET /v1/chat/sessions — list (offset pagination, 20/page). */
 export async function GET(req: NextRequest) {
   try {
     const claims = await requireAuth(req);
     const db = getDb();
     const url = new URL(req.url);
-    const cursor = url.searchParams.get("cursor");
+    const limit = Math.min(Number(url.searchParams.get("limit") ?? 20), 50);
+    const offset = Math.max(Number(url.searchParams.get("offset") ?? 0), 0);
 
     const rows = await db
       .select({
@@ -58,17 +61,15 @@ export async function GET(req: NextRequest) {
       })
       .from(chatSessions)
       .where(
-        cursor
-          ? and(eq(chatSessions.userId, claims.sub), eq(chatSessions.isArchived, false))
-          : and(eq(chatSessions.userId, claims.sub), eq(chatSessions.isArchived, false)),
+        and(eq(chatSessions.userId, claims.sub), eq(chatSessions.isArchived, false), isNull(chatSessions.deletedAt)),
       )
       .orderBy(desc(chatSessions.isPinned), desc(chatSessions.lastMessageAt), desc(chatSessions.createdAt))
-      .limit(20);
+      .limit(limit)
+      .offset(offset);
 
     return ok({
       sessions: rows,
-      next_cursor: rows.length === 20 ? rows[rows.length - 1]!.id : null,
-      has_more: rows.length === 20,
+      has_more: rows.length === limit,
     });
   } catch (err) {
     return fail(err);

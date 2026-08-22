@@ -48,6 +48,15 @@ const MAX_BYTES = 50 * 1024 * 1024;
 export async function POST(req: NextRequest) {
   try {
     const claims = await requireAuth(req);
+
+    // Staff-only: students must not feed documents into the knowledge base
+    // (the approver role list matches the review endpoint's).
+    const isStaff =
+      claims.user_type === "faculty" ||
+      claims.user_type === "admin" ||
+      claims.roles.some((r) => ["faculty", "approver", "knowledge_admin", "super_admin"].includes(r));
+    if (!isStaff) throw new ApiError("FORBIDDEN", "Only faculty and admins can upload documents");
+
     const db = getDb();
 
     const form = await req.formData();

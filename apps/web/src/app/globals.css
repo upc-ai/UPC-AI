@@ -9,6 +9,8 @@
 
 html {
   font-size: 16px;
+  /* No gray tap-flash on text/buttons on mobile — static text must read as static */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {

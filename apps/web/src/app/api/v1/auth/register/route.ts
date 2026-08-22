@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { users, userPreferences, students, userRoles, roles } from "@upc/db";
 import { ApiError, USER_TYPES } from "@upc/core";
 import { ok, fail } from "@/lib/api";
-import { hashPassword } from "@/lib/auth/crypto";
+import { hashPassword, verifyPassword } from "@/lib/auth/crypto";
 import { rateLimit } from "@/lib/redis";
 import { createSession, setRefreshCookie } from "@/lib/auth/session";
 import { issueOtp } from "@/lib/auth/otp";
@@ -31,23 +31,45 @@ export async function POST(req: NextRequest) {
 
     const body = bodySchema.parse(await req.json());
 
-    // College email domain check
+    // Allowed signup domains (university has no student email system — gmail only)
     const env = (await import("@upc/core")).getEnv();
     const domains = env.COLLEGE_EMAIL_DOMAINS.split(",").map((d) => d.trim().toLowerCase());
     const emailDomain = body.email.split("@")[1] ?? "";
     if (!domains.includes(emailDomain)) {
-      throw new ApiError("VALIDATION_ERROR", `Email must be a college address (@${domains[0]})`, [
-        { field: "email", message: `Use your ${domains[0]} email` },
+      throw new ApiError("VALIDATION_ERROR", `Sign up with your @${domains.join(" or @")} email`, [
+        { field: "email", message: `Email must end with @${domains.join(" or @")}` },
       ]);
     }
 
     const db = getDb();
-    const [existing] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, body.email))
-      .limit(1);
-    if (existing) throw new ApiError("EMAIL_ALREADY_EXISTS", "An account with this email already exists");
+    const [existing] = await db.select().from(users).where(eq(users.email, body.email)).limit(1);
+    if (existing) {
+      // A previous signup attempt may have created the account even though the
+      // client saw an error (slow network, lost response) — if the password
+      // matches, this is the owner: continue straight into the account instead
+      // of dead-ending them on "already exists".
+      if (existing.passwordHash && (await verifyPassword(body.password, existing.passwordHash))) {
+        if (!existing.isActive) throw new ApiError("FORBIDDEN", "Account disabled. Contact the administrator.");
+        const tokens = await createSession(existing.id, { ipAddress: ip });
+        await setRefreshCookie(tokens.refreshToken);
+        return ok({
+          user_id: existing.id,
+          email: existing.email,
+          display_name: existing.displayName,
+          user_type: existing.userType,
+          is_verified: existing.isVerified,
+          access_token: tokens.accessToken,
+          token_type: "Bearer",
+          expires_in: tokens.expiresIn,
+          already_registered: true,
+          message: "Welcome back — this account already exists, so we signed you in.",
+        });
+      }
+      throw new ApiError(
+        "EMAIL_ALREADY_EXISTS",
+        "An account with this email already exists. Try signing in instead — or use a different email.",
+      );
+    }
 
     const [user] = await db
       .insert(users)

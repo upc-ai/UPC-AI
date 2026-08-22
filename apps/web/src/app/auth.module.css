@@ -1,0 +1,300 @@
+.shell {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  /* Colors come from the global marketing tokens (tokens.css), which flip
+     with the user's theme choice — auth follows dark/light like everywhere
+     else. Theme-specific surfaces are handled per-rule below. */
+}
+
+/* Brand panel — ambient light fields (what glass refracts) */
+.brand {
+  background:
+    radial-gradient(34rem 26rem at 18% 16%, rgba(0, 0, 0, 0.04), transparent 66%),
+    radial-gradient(40rem 30rem at 88% 90%, rgba(0, 0, 0, 0.03), transparent 68%),
+    var(--surface-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  border-right: 1px solid var(--hairline);
+}
+
+:global([data-theme="dark"]) .brand {
+  background:
+    radial-gradient(34rem 26rem at 18% 16%, rgba(255, 255, 255, 0.045), transparent 66%),
+    radial-gradient(40rem 30rem at 88% 90%, rgba(255, 255, 255, 0.03), transparent 68%),
+    var(--surface-soft);
+  border-right: 1px solid #262626;
+}
+
+.brandMark {
+  color: var(--ink);
+}
+
+.quote {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.3;
+  color: var(--ink);
+  max-width: 22ch;
+  margin: 0;
+  text-align: center;
+}
+
+/* Form panel — canvas, form lives on a glass card */
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--canvas);
+  padding: var(--space-lg);
+}
+
+.form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 24px 64px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  padding: var(--space-xl);
+}
+
+:global([data-theme="dark"]) .form {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 24px 64px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.logoLockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0 0 var(--space-md);
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 11px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:global([data-theme="dark"]) .googleBtn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.googleBtn:active {
+  transform: scale(0.98);
+}
+
+.googleBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--muted-soft);
+  font-size: 12px;
+  margin: var(--space-xs) 0;
+}
+
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-top: var(--space-xs);
+}
+
+.input {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 11px 14px;
+  min-height: 44px;
+}
+
+.input::placeholder {
+  color: var(--muted-soft);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.userTypeCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin: var(--space-xs) 0;
+}
+
+.typeCard {
+  background: var(--surface-card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--font-body);
+  color: var(--body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+:global([data-theme="dark"]) .typeCard {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.typeCardActive {
+  background: var(--surface-card);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.strengthBar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  transition: width var(--duration-moderate) var(--ease-default);
+}
+
+.terms {
+  display: flex;
+  gap: var(--space-xs);
+  font-size: 12.5px;
+  color: var(--muted);
+  align-items: flex-start;
+  margin-top: var(--space-xs);
+}
+
+.terms input {
+  margin-top: 2px;
+}
+
+.error {
+  background: var(--error-bg);
+  color: var(--error);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.submit {
+  background: #0d0d0d;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  padding: 12px;
+  min-height: 44px;
+  margin-top: var(--space-sm);
+  cursor: pointer;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1), background 150ms ease;
+}
+
+.submit:active {
+  transform: scale(0.98);
+  background: #282828;
+}
+
+.submit:disabled {
+  background: #e0e0e0;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+/* Dark: the inverse colorway — white submit, black text */
+:global([data-theme="dark"]) .submit {
+  background: #ffffff;
+  color: #0d0d0d;
+}
+
+:global([data-theme="dark"]) .submit:active {
+  background: #dcdcdc;
+}
+
+:global([data-theme="dark"]) .submit:disabled {
+  background: #3a3a3a;
+  color: #8f8f8f;
+}
+
+.footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin: var(--space-sm) 0 0;
+}
+
+.footer a {
+  color: var(--link);
+}
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .brand {
+    display: none;
+  }
+}

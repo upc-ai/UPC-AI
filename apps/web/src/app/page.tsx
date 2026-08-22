@@ -1,15 +1,9 @@
 import Link from "next/link";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
+import { LandingNav } from "./_components/LandingNav";
+import { Reveal } from "./_components/Reveal";
 import { Wordmark } from "@upc/ui";
-
-const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Knowledge", href: "#knowledge" },
-  { label: "Study Tools", href: "#study" },
-  { label: "For Faculty", href: "#faculty" },
-  { label: "FAQ", href: "#faq" },
-];
 
 const FEATURES = [
   {
@@ -94,110 +88,69 @@ function FeatureIcon({ name }: { name: string }) {
 export default function LandingPage() {
   return (
     <div className={styles.page}>
-      {/* ---------------- Top nav ---------------- */}
-      <header className={styles.nav}>
-        <div className={styles.navInner}>
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <Wordmark size={18} />
-          </Link>
-          <nav className={styles.navLinks} aria-label="Main">
-            {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href} className={styles.navLink}>
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className={styles.navActions}>
-            <Link href="/login" className={styles.signIn}>Sign in</Link>
-            <Link
-              href="/signup"
-              style={{
-                background: "var(--primary)",
-                color: "var(--on-primary)",
-                borderRadius: "var(--radius-md)",
-                padding: "12px 20px",
-                fontSize: 14,
-                fontWeight: 500,
-                fontFamily: "var(--font-body)",
-                textDecoration: "none",
-                minHeight: 40,
-                display: "inline-flex",
-                alignItems: "center",
-              }}
-            >
-              Try UPC AI
-            </Link>
-          </div>
-          <button className={styles.hamburger} aria-label="Open menu">
-            <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
-          </button>
-        </div>
-      </header>
+      <LandingNav />
 
       <main id="main">
-        {/* ---------------- Hero ---------------- */}
+        {/* ---------------- Hero (staggered entrance) ---------------- */}
         <section className={`${styles.container} ${styles.hero}`}>
           <div>
-            <span className={styles.heroBadge}>OFFICIAL · UDAI PRATAP COLLEGE</span>
-            <h1 className={styles.heroTitle}>Meet your thinking partner for campus.</h1>
-            <p className={styles.heroSub}>
+            <span className={`${styles.heroItem} ${styles.d1} ${styles.heroBadge}`}>
+              OFFICIAL · UDAI PRATAP COLLEGE
+            </span>
+            <h1 className={`${styles.heroItem} ${styles.d2} ${styles.heroTitle}`}>
+              Meet your thinking partner for campus.
+            </h1>
+            <p className={`${styles.heroItem} ${styles.d3} ${styles.heroSub}`}>
               The official AI assistant that knows your courses, your campus, and your
               curriculum — inside and out. Answers with citations, in English and Hindi.
             </p>
-            <div className={styles.heroCtas}>
-              <Link
-                href="/signup"
-                style={{
-                  background: "var(--primary)",
-                  color: "var(--on-primary)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "14px 24px",
-                  fontSize: 14,
-                  fontWeight: 500,
-                  fontFamily: "var(--font-body)",
-                  textDecoration: "none",
-                  minHeight: 48,
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
+            <div className={`${styles.heroItem} ${styles.d4} ${styles.heroCtas}`}>
+              <Link href="/signup" className={styles.btnPrimary}>
                 Get Started Free
               </Link>
               <a href="#product" className={styles.heroSecondary}>See it in action →</a>
             </div>
           </div>
-          <HeroChatDemo />
+          <div className={`${styles.heroItem} ${styles.d5}`}>
+            <HeroChatDemo />
+          </div>
         </section>
 
         {/* ---------------- Trust strip ---------------- */}
-        <div className={styles.strip}>
-          Used by 5,000+ students across 12 departments at Udai Pratap College, Varanasi
-        </div>
+        <Reveal>
+          <div className={styles.strip}>
+            Used by 5,000+ students across 12 departments at Udai Pratap College, Varanasi
+          </div>
+        </Reveal>
 
-        {/* ---------------- Features (cream cards) ---------------- */}
-        <section id="features" className={`${styles.container} ${styles.section} ${styles.bandCream}`}>
-          <p className={styles.sectionKicker}>Everything in one place</p>
-          <h2 className={styles.sectionTitle}>Three tools. One assistant.</h2>
-          <p className={styles.sectionSub}>
-            Students shouldn't need five apps and a WhatsApp group to study and stay informed.
-          </p>
+        {/* ---------------- Features (glass cards over ambient) ---------------- */}
+        <section id="features" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
+          <Reveal>
+            <p className={styles.sectionKicker}>Everything in one place</p>
+            <h2 className={styles.sectionTitle}>Three tools. One assistant.</h2>
+            <p className={styles.sectionSub}>
+              Students shouldn't need five apps and a WhatsApp group to study and stay informed.
+            </p>
+          </Reveal>
           <div className={styles.featureGrid}>
-            {FEATURES.map((f) => (
-              <article key={f.title} className={styles.featureCard}>
-                <div className={styles.featureIcon}>
-                  <FeatureIcon name={f.icon} />
-                </div>
-                <h3 className={styles.featureTitle}>{f.title}</h3>
-                <p className={styles.featureText}>{f.text}</p>
-              </article>
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delay={i * 70}>
+                <article className={styles.featureCard}>
+                  <div className={styles.featureIcon}>
+                    <FeatureIcon name={f.icon} />
+                  </div>
+                  <h3 className={styles.featureTitle}>{f.title}</h3>
+                  <p className={styles.featureText}>{f.text}</p>
+                </article>
+              </Reveal>
             ))}
           </div>
         </section>
 
-        {/* ---------------- Product band (dark) ---------------- */}
+        {/* ---------------- Product band (dark glass) ---------------- */}
         <section id="product" className={`${styles.bandDark} ${styles.section}`}>
           <div className={`${styles.container} ${styles.productGrid}`}>
-            <div>
+            <Reveal>
               <p className={styles.sectionKicker}>Grounded in official documents</p>
               <h2 className={styles.sectionTitle}>Every answer shows its source.</h2>
               <p className={styles.sectionSub}>
@@ -206,64 +159,76 @@ export default function LandingPage() {
                 the evidence isn't there.
               </p>
               <button className={styles.darkLink}>See how retrieval works →</button>
-            </div>
-            <div className={styles.codeWindow} aria-label="Example of UPC AI solving a question">
-              <div><span className="ln">1</span><span className="com">// Asked: Solve the integral</span></div>
-              <div><span className="ln">2</span>∫ x²·eˣ dx</div>
-              <div><span className="ln">3</span><span className="com">// By parts, u = x², dv = eˣdx</span></div>
-              <div><span className="ln">4</span>= x²eˣ − ∫ 2x·eˣ dx</div>
-              <div><span className="ln">5</span>= x²eˣ − 2(xeˣ − eˣ) + C</div>
-              <div><span className="ln">6</span><span className="kw">return</span> eˣ(x² − <span className="num">2x</span> + <span className="num">2</span>) + C <span className="fn">✓ verified</span></div>
-            </div>
+            </Reveal>
+            <Reveal delay={90}>
+              <div className={styles.codeWindow} aria-label="Example of UPC AI solving a question">
+                <div><span className="ln">1</span><span className="com">// Asked: Solve the integral</span></div>
+                <div><span className="ln">2</span>∫ x²·eˣ dx</div>
+                <div><span className="ln">3</span><span className="com">// By parts, u = x², dv = eˣdx</span></div>
+                <div><span className="ln">4</span>= x²eˣ − ∫ 2x·eˣ dx</div>
+                <div><span className="ln">5</span>= x²eˣ − 2(xeˣ − eˣ) + C</div>
+                <div><span className="ln">6</span><span className="kw">return</span> eˣ(x² − <span className="num">2x</span> + <span className="num">2</span>) + C <span className="fn">✓ verified</span></div>
+              </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ---------------- Comparison ---------------- */}
         <section className={`${styles.container} ${styles.section}`}>
-          <p className={styles.sectionKicker}>Two kinds of answers</p>
-          <h2 className={styles.sectionTitle}>Ask anything. Or ask officially.</h2>
-          <div className={styles.compareGrid} style={{ marginTop: "var(--space-xxl)" }}>
-            <article className={styles.compareCard}>
-              <h3>Academic AI</h3>
-              <p>An open tutor for reasoning and problem-solving:</p>
-              <ul>
-                <li>Step-by-step math, physics, chemistry solutions</li>
-                <li>Code help with explanations</li>
-                <li>Ask in English, Hindi, or both</li>
-                <li>Explain Simply &amp; Challenge Me study modes</li>
-              </ul>
-            </article>
-            <article className={styles.compareCard}>
-              <h3>Official answers</h3>
-              <p>College facts, grounded and cited:</p>
-              <ul>
-                <li>Fee structures for every course and year</li>
-                <li>Exam schedules, notices, timetables</li>
-                <li>Hostel, library, scholarship rules</li>
-                <li>Every claim linked to its source document</li>
-              </ul>
-            </article>
+          <Reveal>
+            <p className={styles.sectionKicker}>Two kinds of answers</p>
+            <h2 className={styles.sectionTitle}>Ask anything. Or ask officially.</h2>
+          </Reveal>
+          <div className={styles.compareGrid}>
+            <Reveal>
+              <article className={styles.compareCard}>
+                <h3>Academic AI</h3>
+                <p>An open tutor for reasoning and problem-solving:</p>
+                <ul>
+                  <li>Step-by-step math, physics, chemistry solutions</li>
+                  <li>Code help with explanations</li>
+                  <li>Ask in English, Hindi, or both</li>
+                  <li>Explain Simply &amp; Challenge Me study modes</li>
+                </ul>
+              </article>
+            </Reveal>
+            <Reveal delay={70}>
+              <article className={styles.compareCard}>
+                <h3>Official answers</h3>
+                <p>College facts, grounded and cited:</p>
+                <ul>
+                  <li>Fee structures for every course and year</li>
+                  <li>Exam schedules, notices, timetables</li>
+                  <li>Hostel, library, scholarship rules</li>
+                  <li>Every claim linked to its source document</li>
+                </ul>
+              </article>
+            </Reveal>
           </div>
         </section>
 
         {/* ---------------- Knowledge tiles ---------------- */}
         <section id="knowledge" className={`${styles.bandSoft} ${styles.section}`}>
           <div className={styles.container}>
-            <p className={styles.sectionKicker}>College knowledge</p>
-            <h2 className={styles.sectionTitle}>The whole campus, searchable.</h2>
-            <p className={styles.sectionSub}>
-              Browse the knowledge base directly, or let the AI find it for you.
-            </p>
+            <Reveal>
+              <p className={styles.sectionKicker}>College knowledge</p>
+              <h2 className={styles.sectionTitle}>The whole campus, searchable.</h2>
+              <p className={styles.sectionSub}>
+                Browse the knowledge base directly, or let the AI find it for you.
+              </p>
+            </Reveal>
             <div className={styles.tileGrid}>
-              {KNOWLEDGE_TILES.map((t) => (
-                <div key={t.name} className={styles.tile}>
-                  <span className={styles.tileMono}>{t.mono}</span>
-                  <span>
-                    <span className={styles.tileName}>{t.name}</span>
-                    <br />
-                    <span className={styles.tileCount}>{t.count}</span>
-                  </span>
-                </div>
+              {KNOWLEDGE_TILES.map((t, i) => (
+                <Reveal key={t.name} delay={(i % 4) * 60}>
+                  <div className={styles.tile}>
+                    <span className={styles.tileMono}>{t.mono}</span>
+                    <span>
+                      <span className={styles.tileName}>{t.name}</span>
+                      <br />
+                      <span className={styles.tileCount}>{t.count}</span>
+                    </span>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -271,58 +236,55 @@ export default function LandingPage() {
 
         {/* ---------------- Study tools ---------------- */}
         <section id="study" className={`${styles.container} ${styles.section}`}>
-          <p className={styles.sectionKicker}>Study tools</p>
-          <h2 className={styles.sectionTitle}>Quizzes that know your syllabus.</h2>
-          <p className={styles.sectionSub}>
-            Generate a quiz on any topic in seconds. Flashcards schedule themselves with spaced
-            repetition — review what you're about to forget, skip what you know.
-          </p>
+          <Reveal>
+            <p className={styles.sectionKicker}>Study tools</p>
+            <h2 className={styles.sectionTitle}>Quizzes that know your syllabus.</h2>
+            <p className={styles.sectionSub}>
+              Generate a quiz on any topic in seconds. Flashcards schedule themselves with spaced
+              repetition — review what you're about to forget, skip what you know.
+            </p>
+          </Reveal>
         </section>
 
         {/* ---------------- Testimonial ---------------- */}
         <section className={`${styles.container} ${styles.section}`} style={{ paddingTop: 0 }}>
-          <blockquote className={styles.quote}>
-            “I found the exact revised fee structure in seconds — with the official document
-            attached. No WhatsApp groups, no rumours.”
-          </blockquote>
-          <div className={styles.quoteBy}>
-            <span className={styles.quoteAvatar}>RS</span>
-            <span className={styles.quoteName}>Rahul Sharma · BSc CS, 2nd Year</span>
-          </div>
+          <Reveal>
+            <blockquote className={styles.quote}>
+              “I found the exact revised fee structure in seconds — with the official document
+              attached. No WhatsApp groups, no rumours.”
+            </blockquote>
+            <div className={styles.quoteBy}>
+              <span className={styles.quoteAvatar}>RS</span>
+              <span className={styles.quoteName}>Rahul Sharma · BSc CS, 2nd Year</span>
+            </div>
+          </Reveal>
         </section>
 
         {/* ---------------- FAQ ---------------- */}
         <section id="faq" className={`${styles.container} ${styles.section}`} style={{ paddingTop: 0 }}>
-          <h2 className={styles.sectionTitle} style={{ textAlign: "center" }}>Questions, answered.</h2>
-          <div className={styles.faqList} style={{ marginTop: "var(--space-xxl)" }}>
+          <Reveal>
+            <h2 className={styles.sectionTitle} style={{ textAlign: "center" }}>Questions, answered.</h2>
+          </Reveal>
+          <div className={styles.faqList}>
             {FAQS.map((f, i) => (
-              <FaqItem key={f.q} q={f.q} a={f.a} defaultOpen={i === 0} />
+              <Reveal key={f.q} delay={Math.min(i * 50, 200)}>
+                <FaqItem q={f.q} a={f.a} defaultOpen={i === 0} />
+              </Reveal>
             ))}
           </div>
         </section>
 
-        {/* ---------------- Coral CTA ---------------- */}
-        <section id="faculty" className={styles.ctaBand}>
-          <h2>Ready to study smarter?</h2>
-          <p>Free for every UPC student. Sign up with your college email.</p>
-          <Link
-            href="/signup"
-            style={{
-              background: "var(--canvas)",
-              color: "var(--ink)",
-              borderRadius: "var(--radius-md)",
-              padding: "14px 24px",
-              fontSize: 14,
-              fontWeight: 500,
-              fontFamily: "var(--font-body)",
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              minHeight: 48,
-            }}
-          >
-            Get Started Free
-          </Link>
+        {/* ---------------- CTA band (dark glass panel) ---------------- */}
+        <section id="faculty" className={`${styles.container} ${styles.ctaSection}`}>
+          <Reveal>
+            <div className={styles.ctaBand}>
+              <h2>Ready to study smarter?</h2>
+              <p>Free for every UPC student. Sign up with your college email.</p>
+              <Link href="/signup" className={styles.ctaBtn}>
+                Get Started Free
+              </Link>
+            </div>
+          </Reveal>
         </section>
       </main>
 
@@ -331,10 +293,30 @@ export default function LandingPage() {
         <div className={styles.container}>
           <div className={styles.footerGrid}>
             <div className={styles.footerBrand}>
-              <Wordmark size={18} dark />
+              <Wordmark size={18} />
               <span className={styles.footerCollege}>
                 The official AI assistant of<br />Udai Pratap College, Varanasi
               </span>
+              <div className={styles.footerSocial}>
+                <a href="https://instagram.com/upc.ai" target="_blank" rel="noreferrer" aria-label="UPC AI on Instagram (@upc.ai)" title="@upc.ai on Instagram">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4.2" /><circle cx="17.4" cy="6.6" r="0.6" fill="currentColor" />
+                  </svg>
+                  @upc.ai
+                </a>
+                <a href="https://x.com/upc_ai" target="_blank" rel="noreferrer" aria-label="UPC AI on X (@upc_ai)" title="@upc_ai on X">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.65l-5.21-6.81-5.96 6.81H1.68l7.74-8.84L1.25 2.25h6.82l4.71 6.23 5.46-6.23Zm-1.16 17.52h1.84L7.02 4.13H5.04l12.04 15.64Z" />
+                  </svg>
+                  @upc_ai
+                </a>
+                <a href="mailto:hello@helloupcai.app" aria-label="Email UPC AI" title="hello@helloupcai.app">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3.5 6.5 8.5 6 8.5-6" />
+                  </svg>
+                  hello@helloupcai.app
+                </a>
+              </div>
             </div>
             {[
               { h: "Product", links: ["Features", "Knowledge", "Study Tools", "Quiz"] },
@@ -353,7 +335,7 @@ export default function LandingPage() {
             ))}
           </div>
           <div className={styles.footerBottom}>
-            © {new Date().getFullYear()} UPC AI · Udai Pratap College, Varanasi · Made with care for students
+            © {new Date().getFullYear()} UPC AI · upcai.app · Udai Pratap College, Varanasi · Made with care for students
           </div>
         </div>
       </footer>

@@ -41,6 +41,8 @@ export function LogoMark({ size = 24, className }: LogoMarkProps) {
 /**
  * Lockup: mark + "UPC AI". Premium ratio — the mark sits at 1.25× the text
  * size (the OpenAI/Gemini convention), 10px gap, optically centered.
+ * Wordmark set tight-tracked semibold — the engineered lockup style of
+ * Linear/Stripe (Apple typography: display text tightens as it grows).
  */
 export function Wordmark({ size = 18, dark = false }: { size?: number; dark?: boolean }) {
   return (
@@ -51,8 +53,8 @@ export function Wordmark({ size = 18, dark = false }: { size?: number; dark?: bo
         gap: 10,
         fontFamily: "var(--font-body)",
         fontSize: size,
-        fontWeight: 500,
-        letterSpacing: "0.01em",
+        fontWeight: 650,
+        letterSpacing: "-0.02em",
         lineHeight: 1,
         color: dark ? "var(--on-dark)" : "var(--ink)",
       }}

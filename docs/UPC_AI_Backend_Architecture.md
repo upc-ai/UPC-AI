@@ -169,6 +169,8 @@ The intelligence engine. Does not persist data — it orchestrates:
 The AI vendor abstraction:
 
 - Manages adapters for OpenAI, Anthropic, Gemini, Groq, DeepSeek, OpenRouter
+- Bring-your-own providers: `AI_CUSTOM_PROVIDERS` (env JSON array) adds **any OpenAI-compatible endpoint** (Kimi, GLM, Qwen, Gemini-compat, DeepSeek, OpenRouter, Ollama…) with just `baseUrl` + `apiKey` + `model` + `tier` — no code changes, no new dependencies; invalid entries are skipped at boot with a warning
+- Public model branding: users only ever see the university model catalog — **UPC-1** (fast tier), **UPC-1 Plus** (standard), **UPC-1 Pro** (frontier). Vendor/model names never reach the client; clients send a public model id (`model` field on message POST), the gateway routes it to whichever real provider is configured for that tier (customs first, built-ins as failover)
 - Streaming normalization (vendor SSE → internal SSE schema)
 - Retry + circuit-breaking + health checks
 - Token counting and cost estimation

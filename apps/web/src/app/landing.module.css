@@ -1,8 +1,27 @@
-/* UPC AI landing — warm-editorial structure (UIUX Spec v2.0 §2) */
+/* ===================================================================
+   UPC AI landing — monochrome liquid glass
+   Craft per: emil-design-eng (curves, stagger, press states),
+   animate (gates: marketing tier, transform/opacity only),
+   apple-design §12 (materials: blur+saturate, bright top edges,
+   thicker glass for bigger surfaces, translucent chrome).
+   =================================================================== */
 
 .page {
-  /* The landing is always cream and theme-independent — keep the accent ink even under the dark default. */
   --accent: #000000;
+  /* Strong ease-out — the one curve this page animates with */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 12px 32px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  /* Ambient neutral light fields — what the glass refracts */
+  background:
+    radial-gradient(52rem 34rem at 88% -6rem, rgba(0, 0, 0, 0.055), transparent 68%),
+    radial-gradient(46rem 40rem at -12% 26%, rgba(0, 0, 0, 0.035), transparent 66%),
+    radial-gradient(60rem 44rem at 108% 78%, rgba(0, 0, 0, 0.03), transparent 70%),
+    #ffffff;
+  overflow-x: clip;
 }
 
 .container {
@@ -11,22 +30,24 @@
   padding: 0 var(--space-lg);
 }
 
-/* ---------------- Top nav ---------------- */
+/* ---------------- Nav — floating glass chrome ---------------- */
 
 .nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--canvas);
-  border-bottom: 1px solid var(--hairline);
-  height: 64px;
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .navInner {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--space-lg);
-  height: 100%;
+  height: 64px;
   display: flex;
   align-items: center;
   gap: var(--space-lg);
@@ -62,6 +83,33 @@
   background: none;
   border: none;
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navCta {
+  background: var(--ink);
+  color: var(--on-primary);
+  border-radius: 10px;
+  padding: 10px 18px;
+  min-height: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 140ms var(--ease-out-strong), background 150ms ease;
+}
+
+.navCta:hover {
+  background: var(--body-strong);
+}
+
+.navCta:active {
+  transform: scale(0.97);
+  background: var(--body-strong);
 }
 
 .hamburger {
@@ -72,45 +120,165 @@
   cursor: pointer;
   color: var(--ink);
   padding: var(--space-xs);
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile menu — glass sheet, fade + rise */
+
+.mobileMenu {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  padding: var(--space-sm) var(--space-lg) var(--space-lg);
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 250ms var(--ease-out-strong),
+    transform 250ms var(--ease-out-strong),
+    visibility 0s linear 250ms;
+}
+
+.mobileMenuOpen {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 250ms var(--ease-out-strong),
+    transform 250ms var(--ease-out-strong);
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileLink {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  padding: var(--space-sm) var(--space-xs);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.mobileActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.mobileSignIn {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileCta {
+  text-align: center;
+  background: var(--ink);
+  color: var(--on-primary);
+  font-size: 15px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  border-radius: 10px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 140ms var(--ease-out-strong);
+}
+
+.mobileCta:active {
+  transform: scale(0.97);
 }
 
 /* ---------------- Hero ---------------- */
 
 .hero {
-  padding: var(--space-section) 0;
+  padding: clamp(56px, 10vw, 96px) 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-xxl);
   align-items: center;
 }
 
+/* First-view entrance (marketing tier): one CSS animation each,
+   staggered 70ms, 500ms strong ease-out, transform+opacity only. */
+.heroItem {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: heroIn 500ms var(--ease-out-strong) both;
+}
+
+.d1 { animation-delay: 0ms; }
+.d2 { animation-delay: 70ms; }
+.d3 { animation-delay: 140ms; }
+.d4 { animation-delay: 210ms; }
+.d5 { animation-delay: 300ms; }
+
+@keyframes heroIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .heroBadge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 550;
+  letter-spacing: 0.08em;
   border-radius: var(--radius-pill);
-  padding: 4px 12px;
+  padding: 6px 14px;
   margin-bottom: var(--space-lg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .heroTitle {
+  /* Cormorant serif display — the editorial soul, at fluid sizes */
   font-family: var(--font-display);
-  font-size: var(--text-display-xl);
-  line-height: var(--lh-display-xl);
-  letter-spacing: var(--ls-display-xl);
-  font-weight: 400;
+  font-size: clamp(44px, 7vw, 76px);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  font-weight: 500;
   color: var(--ink);
   margin: 0 0 var(--space-md);
+  text-wrap: balance;
 }
 
 .heroSub {
-  font-size: var(--text-body-lg);
-  line-height: var(--lh-body-lg);
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.6;
   color: var(--body);
   margin: 0 0 var(--space-xl);
   max-width: 46ch;
@@ -120,6 +288,31 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  background: var(--ink);
+  color: var(--on-primary);
+  border-radius: 12px;
+  padding: 14px 24px;
+  min-height: 48px;
+  font-size: 14.5px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 140ms var(--ease-out-strong), background 150ms ease;
+}
+
+.btnPrimary:hover {
+  background: var(--body-strong);
+}
+
+.btnPrimary:active {
+  transform: scale(0.97);
+  background: var(--body-strong);
 }
 
 .heroSecondary {
@@ -133,15 +326,22 @@
   padding-bottom: 2px;
 }
 
-/* ---------------- Dark chat mockup ---------------- */
+/* ---------------- Hero chat mockup — dark glass (big = thick) ---------------- */
+/* Entrance fades + shimmer live here; HeroChatDemo consumes via styles.* */
 
 .mockup {
-  background: var(--surface-dark);
-  border-radius: var(--radius-xl);
+  background: rgba(22, 22, 22, 0.86);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: var(--space-lg);
   font-family: var(--font-body);
-  color: var(--on-dark);
-  box-shadow: none;
+  color: #ececec;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    0 32px 72px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .mockupBar {
@@ -155,7 +355,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--surface-dark-elevated);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .mockupTitle {
@@ -165,8 +365,8 @@
 }
 
 .mockupUser {
-  background: var(--surface-dark-elevated);
-  color: var(--on-dark);
+  background: rgba(255, 255, 255, 0.09);
+  color: #ececec;
   border-radius: var(--radius-lg);
   border-bottom-right-radius: var(--radius-xs);
   padding: 10px 14px;
@@ -175,6 +375,7 @@
   max-width: 85%;
   margin-left: auto;
   margin-bottom: var(--space-md);
+  animation: mockupFadeIn 300ms var(--ease-out-strong);
 }
 
 .mockupStatus {
@@ -190,38 +391,53 @@
 
 .mockupStatus svg,
 .mockupSources svg {
-  /* Monochrome accent on the always-dark mockup surface = the logo's white-on-black colorway. */
-  color: #faf9f5;
+  color: #ffffff;
 }
 
 .mockupAnswer {
   font-size: 14px;
   line-height: 1.65;
-  color: var(--on-dark);
+  color: #d4d4d4;
   max-width: 40ch;
 }
 
 .mockupAnswer em {
   font-style: normal;
-  /* Always-dark mockup surface — cream accent regardless of app theme. */
-  color: #faf9f5;
+  color: #ffffff;
   font-weight: 500;
   cursor: default;
 }
 
 .mockupAnswer .line {
   display: block;
+  animation: mockupFadeIn 300ms var(--ease-out-strong);
 }
 
 .mockupSources {
   margin-top: var(--space-md);
-  border-top: 1px solid var(--surface-dark-elevated);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
   padding-top: var(--space-sm);
   font-size: 12px;
   color: var(--on-dark-soft);
   display: flex;
   align-items: center;
   gap: var(--space-xs);
+  animation: mockupFadeIn 300ms var(--ease-out-strong);
+}
+
+/* Thinking shimmer + line entrances */
+.shimmer {
+  animation: mockupShimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes mockupShimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes mockupFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* ---------------- Sections ---------------- */
@@ -229,7 +445,9 @@
 .strip {
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
-  padding: var(--space-lg) 0;
+  /* Horizontal breathing room — this section sits outside .container,
+     so without this its sentence touches the screen edges on phones */
+  padding: var(--space-lg) var(--space-lg);
   text-align: center;
   color: var(--muted);
   font-size: var(--text-body-sm);
@@ -241,33 +459,41 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-size: var(--text-display-lg);
-  line-height: var(--lh-display-lg);
-  letter-spacing: var(--ls-display-lg);
-  font-weight: 400;
+  font-size: clamp(30px, 4.5vw, 48px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 500;
   color: var(--ink);
   margin: 0 0 var(--space-md);
+  text-wrap: balance;
 }
 
 .sectionKicker {
   font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
+  font-weight: 550;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--muted);
   margin: 0 0 var(--space-sm);
 }
 
 .sectionSub {
-  font-size: var(--text-body-lg);
+  font-size: clamp(15px, 1.8vw, 17px);
+  line-height: 1.6;
   color: var(--body);
   max-width: 56ch;
   margin: 0 0 var(--space-xxl);
 }
 
-/* Feature cards — cream band */
-.bandCream {
-  background: var(--canvas);
+/* Feature band — glass cards over a soft ambient field */
+
+.bandSoft {
+  background:
+    radial-gradient(38rem 24rem at 12% 18%, rgba(0, 0, 0, 0.045), transparent 66%),
+    radial-gradient(42rem 30rem at 92% 88%, rgba(0, 0, 0, 0.035), transparent 68%),
+    var(--surface-soft);
+  border-top: 1px solid var(--hairline-soft);
+  border-bottom: 1px solid var(--hairline-soft);
 }
 
 .featureGrid {
@@ -277,21 +503,39 @@
 }
 
 .featureCard {
-  background: var(--surface-card);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
   padding: var(--space-xl);
+  box-shadow: var(--glass-shadow);
+  transition: transform 180ms var(--ease-out-strong), box-shadow 180ms var(--ease-out-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .featureCard:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.03),
+      0 20px 44px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
 }
 
 .featureIcon {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
-  background: var(--canvas);
+  border-radius: 12px;
+  background: var(--ink);
+  /* --canvas tracks the theme: white glyph on the black chip in light,
+     near-black glyph on the white chip in dark */
+  color: var(--canvas);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-active);
   margin-bottom: var(--space-md);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
 .featureTitle {
@@ -308,14 +552,17 @@
   margin: 0;
 }
 
-/* Dark product band */
+/* Dark product band — glass code window over #212121 ambient */
+
 .bandDark {
-  background: var(--surface-dark);
+  background:
+    radial-gradient(40rem 26rem at 8% 12%, rgba(255, 255, 255, 0.045), transparent 66%),
+    radial-gradient(46rem 32rem at 94% 92%, rgba(255, 255, 255, 0.03), transparent 68%),
+    var(--surface-dark);
   color: var(--on-dark);
 }
 
-.bandDark .sectionTitle,
-.bandDark .featureTitle {
+.bandDark .sectionTitle {
   color: var(--on-dark);
 }
 
@@ -335,15 +582,18 @@
 }
 
 .codeWindow {
-  background: var(--surface-dark-soft);
-  border: 1px solid var(--surface-dark-elevated);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.045);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
   padding: var(--space-lg);
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.7;
   color: var(--code-text);
   overflow-x: auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .codeWindow .ln {
@@ -362,28 +612,33 @@
 .fn { color: var(--code-function); }
 
 .darkLink {
-  color: var(--accent-teal);
+  color: var(--on-dark);
   font-size: 14px;
   font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
-  border-bottom: 1px solid currentColor;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Comparison band */
+
 .compareGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
+  margin-top: var(--space-xxl);
 }
 
 .compareCard {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
   padding: var(--space-xl);
+  box-shadow: var(--glass-shadow);
 }
 
 .compareCard h3 {
@@ -407,10 +662,7 @@
   line-height: 1.8;
 }
 
-/* Tiles */
-.bandSoft {
-  background: var(--surface-soft);
-}
+/* Knowledge tiles — glass chips */
 
 .tileGrid {
   display: grid;
@@ -419,14 +671,28 @@
 }
 
 .tile {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
   padding: var(--space-md);
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   cursor: pointer;
+  box-shadow: var(--glass-shadow);
+  transition: transform 160ms var(--ease-out-strong);
+}
+
+.tile:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .tileMono {
@@ -445,7 +711,8 @@
 
 .tileName {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 550;
+  letter-spacing: -0.01em;
   color: var(--ink);
 }
 
@@ -454,15 +721,18 @@
   color: var(--muted);
 }
 
-/* Testimonials */
+/* Testimonial */
+
 .quote {
   font-family: var(--font-display);
-  font-size: var(--text-display-sm);
+  font-size: clamp(24px, 3vw, 32px);
   line-height: 1.35;
+  font-weight: 500;
   color: var(--ink);
-  max-width: 28ch;
+  max-width: 30ch;
   margin: 0 auto var(--space-lg);
   text-align: center;
+  text-wrap: balance;
 }
 
 .quoteBy {
@@ -477,13 +747,13 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--surface-card);
+  background: var(--ink);
+  color: var(--canvas);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--ink);
+  font-weight: 600;
 }
 
 .quoteName {
@@ -492,9 +762,10 @@
 }
 
 /* FAQ */
+
 .faqList {
   max-width: 760px;
-  margin: 0 auto;
+  margin: var(--space-xxl) auto 0;
   border-top: 1px solid var(--hairline);
 }
 
@@ -509,22 +780,25 @@
   text-align: left;
   padding: var(--space-md) 0;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 550;
+  letter-spacing: -0.01em;
   color: var(--ink);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
+  min-height: 56px;
 }
 
 .faqChevron {
-  transition: transform var(--duration-moderate) var(--ease-default);
+  transition: transform 200ms var(--ease-out-strong);
   color: var(--muted);
   flex-shrink: 0;
 }
 
-.faqQ[aria-expanded="true"] .faqChevron {
+.faqQ[aria-expanded="true"] .faqChevron,
+.faqItem[open] .faqChevron {
   transform: rotate(180deg);
 }
 
@@ -536,35 +810,77 @@
   max-width: 64ch;
 }
 
-/* Coral CTA band */
+/* CTA band — dark glass panel over ambient */
+
+.ctaSection {
+  padding: var(--space-section) 0;
+  background:
+    radial-gradient(44rem 26rem at 20% 40%, rgba(0, 0, 0, 0.06), transparent 66%),
+    radial-gradient(44rem 28rem at 85% 70%, rgba(0, 0, 0, 0.05), transparent 68%);
+}
+
 .ctaBand {
-  background: var(--primary);
-  border-radius: var(--radius-lg);
-  margin: 0 var(--space-lg);
-  max-width: calc(1200px - var(--space-lg) * 2);
-  padding: var(--space-xxl) var(--space-section);
+  background: rgba(16, 16, 16, 0.82);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 96px);
   text-align: center;
-  color: var(--on-primary);
+  color: #ececec;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 32px 72px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .ctaBand h2 {
   font-family: var(--font-display);
-  font-size: var(--text-display-sm);
-  font-weight: 400;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 500;
   margin: 0 0 var(--space-sm);
+  text-wrap: balance;
 }
 
 .ctaBand p {
   font-size: var(--text-body-md);
+  line-height: 1.6;
   margin: 0 0 var(--space-xl);
-  opacity: 0.9;
+  color: var(--on-dark-soft);
 }
 
-/* Footer */
+.ctaBtn {
+  background: rgba(255, 255, 255, 0.95);
+  /* Fixed dark text — this button always sits on the dark CTA band,
+     in both themes (var(--ink) would turn light in dark mode) */
+  color: #0d0d0d;
+  border-radius: 12px;
+  padding: 14px 24px;
+  min-height: 48px;
+  font-size: 14.5px;
+  font-weight: 550;
+  font-family: var(--font-body);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 140ms var(--ease-out-strong), background 150ms ease;
+}
+
+.ctaBtn:hover {
+  background: #ffffff;
+}
+
+.ctaBtn:active {
+  transform: scale(0.97);
+}
+
+/* Footer — light, quiet */
+
 .footer {
-  background: var(--surface-dark);
-  color: var(--on-dark-soft);
-  margin-top: var(--space-section);
+  background: var(--surface-soft);
+  border-top: 1px solid var(--hairline);
   padding: var(--space-xxl) 0 var(--space-xl);
 }
 
@@ -575,7 +891,7 @@
 }
 
 .footerBrand {
-  color: var(--on-dark);
+  color: var(--ink);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -583,12 +899,35 @@
 
 .footerCollege {
   font-size: var(--text-body-sm);
+  color: var(--body);
+}
+
+.footerSocial {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-xs);
+}
+
+.footerSocial a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.footerSocial a:hover {
+  color: var(--ink);
 }
 
 .footerCol h4 {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--on-dark);
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  color: var(--ink);
   margin: 0 0 var(--space-sm);
 }
 
@@ -602,16 +941,88 @@
 }
 
 .footerCol a {
-  color: var(--on-dark-soft);
+  color: var(--muted);
   font-size: var(--text-body-sm);
 }
 
+.footerCol a:hover {
+  color: var(--ink);
+}
+
 .footerBottom {
-  border-top: 1px solid var(--surface-dark-elevated);
+  border-top: 1px solid var(--hairline);
   margin-top: var(--space-xl);
   padding-top: var(--space-lg);
   font-size: 12px;
-  color: var(--on-dark-soft);
+  color: var(--muted);
+}
+
+/* ---------------- Accessibility: materials & motion ---------------- */
+
+/* No backdrop-filter support → solid surfaces (legibility first) */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .nav,
+  .mobileMenu,
+  .heroBadge,
+  .featureCard,
+  .compareCard,
+  .tile {
+    background: rgba(255, 255, 255, 0.94);
+  }
+  .mockup,
+  .ctaBand {
+    background: #141414;
+  }
+  .codeWindow {
+    background: #282828;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav,
+  .mobileMenu,
+  .heroBadge,
+  .featureCard,
+  .compareCard,
+  .tile {
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .mockup,
+  .ctaBand {
+    background: #141414;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .codeWindow {
+    background: #282828;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Reduced motion: keep comprehension aids, drop movement.
+   (Reveal handles itself in JS; the hero stagger is CSS-only.) */
+@media (prefers-reduced-motion: reduce) {
+  .heroItem {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .featureCard,
+  .tile,
+  .navCta,
+  .btnPrimary,
+  .ctaBtn,
+  .mobileCta,
+  .mobileMenu,
+  .faqChevron {
+    transition-duration: 0.01ms;
+  }
+  .faqChevron {
+    transform: none;
+  }
 }
 
 /* ---------------- Responsive ---------------- */
@@ -620,10 +1031,6 @@
   .hero {
     grid-template-columns: 1fr;
     padding: var(--space-xxl) 0;
-  }
-  .heroTitle {
-    font-size: var(--text-display-lg);
-    letter-spacing: var(--ls-display-lg);
   }
   .productGrid,
   .compareGrid {
@@ -638,8 +1045,11 @@
   .navLinks {
     display: none;
   }
+  .navActions {
+    display: none;
+  }
   .hamburger {
-    display: block;
+    display: flex;
   }
 }
 
@@ -647,22 +1057,125 @@
   .featureGrid {
     grid-template-columns: 1fr;
   }
-  .heroTitle {
-    font-size: var(--text-display-md);
-    letter-spacing: var(--ls-display-md);
+  .section {
+    padding: 56px 0;
   }
-  .sectionTitle {
-    font-size: var(--text-display-md);
-    letter-spacing: var(--ls-display-md);
+  .heroCtas {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
   }
-  .ctaBand {
-    padding: var(--space-xl);
-    margin: 0 var(--space-md);
+  .btnPrimary {
+    width: 100%;
+    justify-content: center;
+  }
+  .heroSecondary {
+    padding-bottom: 4px;
   }
   .footerGrid {
     grid-template-columns: 1fr;
+    gap: var(--space-lg);
   }
   .quote {
     font-size: 22px;
+  }
+}
+
+/* ---------------- Dark theme ---------------- */
+/* The marketing system flips with the user's theme choice (tokens.css
+   overrides the marketing vars under [data-theme="dark"]). Everything
+   below re-tunes the hardcoded light-glass surfaces: white glass cards
+   become near-black glass, black ambient glows become white ones.
+   Light theme is untouched. */
+
+:global([data-theme="dark"]) .page {
+  --accent: #ffffff;
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(52rem 34rem at 88% -6rem, rgba(255, 255, 255, 0.05), transparent 68%),
+    radial-gradient(46rem 40rem at -12% 26%, rgba(255, 255, 255, 0.035), transparent 66%),
+    radial-gradient(60rem 44rem at 108% 78%, rgba(255, 255, 255, 0.03), transparent 70%),
+    var(--canvas);
+}
+
+:global([data-theme="dark"]) .nav {
+  background: rgba(23, 23, 23, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+:global([data-theme="dark"]) .mobileMenu {
+  background: rgba(23, 23, 23, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+:global([data-theme="dark"]) .heroBadge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+:global([data-theme="dark"]) .featureCard,
+:global([data-theme="dark"]) .compareCard,
+:global([data-theme="dark"]) .tile {
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: var(--glass-shadow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :global([data-theme="dark"]) .featureCard:hover {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 20px 44px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Slightly lighter panel + brighter edge so the dark mockup still reads
+   as a floating object over the dark canvas */
+:global([data-theme="dark"]) .mockup {
+  background: rgba(38, 38, 38, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* Ambient fields: black glows are invisible on dark — use white ones */
+:global([data-theme="dark"]) .bandSoft {
+  background:
+    radial-gradient(38rem 24rem at 12% 18%, rgba(255, 255, 255, 0.04), transparent 66%),
+    radial-gradient(42rem 30rem at 92% 88%, rgba(255, 255, 255, 0.03), transparent 68%),
+    var(--surface-soft);
+}
+
+:global([data-theme="dark"]) .ctaSection {
+  background:
+    radial-gradient(44rem 26rem at 20% 40%, rgba(255, 255, 255, 0.04), transparent 66%),
+    radial-gradient(44rem 28rem at 85% 70%, rgba(255, 255, 255, 0.03), transparent 68%);
+}
+
+/* Material fallbacks must stay opaque-legible in dark too */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :global([data-theme="dark"]) .nav,
+  :global([data-theme="dark"]) .mobileMenu,
+  :global([data-theme="dark"]) .heroBadge,
+  :global([data-theme="dark"]) .featureCard,
+  :global([data-theme="dark"]) .compareCard,
+  :global([data-theme="dark"]) .tile {
+    background: #212121;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :global([data-theme="dark"]) .nav,
+  :global([data-theme="dark"]) .mobileMenu,
+  :global([data-theme="dark"]) .heroBadge,
+  :global([data-theme="dark"]) .featureCard,
+  :global([data-theme="dark"]) .compareCard,
+  :global([data-theme="dark"]) .tile {
+    background: #212121;
   }
 }

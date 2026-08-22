@@ -2,7 +2,8 @@
  * Seed: first Super Admin (MASTER_PLAN §6 week 7 / DB doc v1.1 §11).
  * Usage: pnpm seed:admin -- --email admin@upc.ac.in --name "Admin"
  */
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" }); // app env lives in .env.local, not .env
 import { eq } from "drizzle-orm";
 import { createDb, users, userPreferences, userRoles, roles, admins } from "@upc/db";
 import { hashPassword } from "../src/lib/auth/crypto";

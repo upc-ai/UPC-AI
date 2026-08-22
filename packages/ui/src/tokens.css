@@ -92,72 +92,106 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Marketing surfaces                                                   */
+/* Marketing surfaces — neutral monochrome (ChatGPT-style)             */
+/* Light is the :root default; [data-theme="dark"] flips the whole     */
+/* marketing system (landing + auth) to the product's #171717-family   */
+/* dark so the user's theme choice applies everywhere.                 */
 /* ------------------------------------------------------------------ */
 :root {
-  --canvas: #faf9f5;
-  --surface-soft: #f5f0e8;
-  --surface-card: #efe9de;
-  --surface-cream-strong: #e8e0d2;
-  --surface-dark: #181715;
-  --surface-dark-elevated: #252320;
-  --surface-dark-soft: #1f1e1b;
-  --hairline: #e6dfd8;
-  --hairline-soft: #ebe6df;
-  --ink: #141413;
-  --body-strong: #252523;
-  --body: #3d3d3a;
-  --muted: #6c6a64;
-  --muted-soft: #8e8b82;
+  color-scheme: light;
+  --canvas: #ffffff;
+  --surface-soft: #f7f7f7;
+  --surface-card: #f5f5f5;
+  --surface-cream-strong: #ebebeb;
+  --surface-dark: #212121;
+  --surface-dark-elevated: #303030;
+  --surface-dark-soft: #262626;
+  --hairline: #ececec;
+  --hairline-soft: #f2f2f2;
+  --ink: #0d0d0d;
+  --body-strong: #282828;
+  --body: #4d4d4d;
+  --muted: #6e6e6e;
+  --muted-soft: #999999;
   --on-primary: #ffffff;
-  --link: #a9583e;
-  --on-dark: #faf9f5;
-  --on-dark-soft: #a09d96;
-  --shadow-soft: 0 1px 3px rgba(20, 20, 19, 0.08);
-}
-
-/* ------------------------------------------------------------------ */
-/* Product surfaces — warm dark (default) / light                      */
-/* ------------------------------------------------------------------ */
-:root,
-[data-theme="light"] {
-  --app-canvas: #f0ece0;
-  --app-sidebar: #f5f0e8;
-  --app-card: #ffffff;
-  --app-card-soft: #f5f0e8;
-  --bubble-user: #e5e0d6;
-  --bubble-user-hover: #dcd5c6;
-  --composer-bg: #ffffff;
-  --composer-border: #e5e0d6;
-  --code-block: #1f1e1b;
-  --app-ink: #1a1a18;
-  --app-body: #3d3d3a;
-  --app-muted: #5b5950;
-  --app-muted-soft: #8e8b82;
-  --app-link: #a9583e;
-  --app-on-dark: #faf9f5;
-  --app-hairline: #e5e0d6;
+  --link: #0d0d0d;
+  --on-dark: #ececec;
+  --on-dark-soft: #b4b4b4;
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
+  /* Elevation shadows — per-theme so light stays airy, dark stays deep */
+  --shadow-composer:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.08);
+  --shadow-menu: 0 16px 48px rgba(0, 0, 0, 0.12);
 }
 
 [data-theme="dark"] {
-  --app-canvas: #2b2a27;
-  --app-sidebar: #1f1e1b;
-  --app-card: #33322e;
-  --app-card-soft: #1f1e1b;
-  --bubble-user: #393937;
-  --bubble-user-hover: #44423c;
-  --composer-bg: #1f1e1b;
-  --composer-border: #3d3a35;
-  --code-block: #141412;
-  --app-ink: #eeeeec;
-  --app-body: #d4d1c7;
-  --app-muted: #a3a098;
-  --app-muted-soft: #8f8c84;
-  --app-link: #e0a188;
-  --app-on-dark: #faf9f5;
-  --app-hairline: #3d3a35;
+  color-scheme: dark;
+  --canvas: #171717;
+  --surface-soft: #1f1f1f;
+  --surface-card: #212121;
+  --surface-cream-strong: #262626;
+  /* --surface-dark family unchanged: dark bands keep #212121 in both themes */
+  --hairline: #2e2e2e;
+  --hairline-soft: #262626;
+  --ink: #ececec;
+  --body-strong: #d4d4d4;
+  --body: #b4b4b4;
+  --muted: #8f8f8f;
+  --muted-soft: #6e6e6e;
+  --on-primary: #0d0d0d;
+  --link: #e8e8e8;
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-composer:
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.22);
+  --shadow-menu: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+/* ------------------------------------------------------------------ */
+/* Product surfaces — neutral monochrome, dark default                 */
+/* (ChatGPT-style darks: #212121 canvas, #171717 chrome, #323232       */
+/* user bubbles; light: white canvas, #ececec bubbles)                 */
+/* ------------------------------------------------------------------ */
+:root,
+[data-theme="light"] {
+  --app-canvas: #ffffff;
+  --app-sidebar: #f9f9f9;
+  --app-card: #ffffff;
+  --app-card-soft: #f4f4f4;
+  --bubble-user: #ececec;
+  --bubble-user-hover: #e0e0e0;
+  --composer-bg: #ffffff;
+  --composer-border: #e5e5e5;
+  --code-block: #1a1a1a;
+  --app-ink: #0d0d0d;
+  --app-body: #4d4d4d;
+  --app-muted: #6e6e6e;
+  --app-muted-soft: #a6a6a6;
+  --app-link: #0d0d0d;
+  --app-on-dark: #ececec;
+  --app-hairline: #e5e5e5;
+}
+
+[data-theme="dark"] {
+  --app-canvas: #212121;
+  --app-sidebar: #171717;
+  --app-card: #2f2f2f;
+  --app-card-soft: #2a2a2a;
+  --bubble-user: #323232;
+  --bubble-user-hover: #3a3a3a;
+  --composer-bg: #2f2f2f;
+  --composer-border: #3d3d3d;
+  --code-block: #1a1a1a;
+  --app-ink: #ececec;
+  --app-body: #d4d4d4;
+  --app-muted: #a6a6a6;
+  --app-muted-soft: #8f8f8f;
+  --app-link: #e8e8e8;
+  --app-on-dark: #ececec;
+  --app-hairline: #3d3d3d;
   /* Accent inverts on dark surfaces (black would be invisible) — the logo's white-on-black colorway. */
-  --accent: #faf9f5;
+  --accent: #ffffff;
 }
 
 /* ------------------------------------------------------------------ */

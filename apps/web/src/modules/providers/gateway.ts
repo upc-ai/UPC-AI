@@ -8,9 +8,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGroq } from "@ai-sdk/groq";
 import type { CoreMessage } from "ai";
-import { getEnv } from "@upc/core";
+import { getEnv, getCustomProviders, type ModelTier } from "@upc/core";
 
-export type ModelTier = "fast" | "standard" | "frontier";
+export type { ModelTier };
 
 interface ProviderConfig {
   name: string;
@@ -19,13 +19,26 @@ interface ProviderConfig {
   client: () => ReturnType<typeof createOpenAI | typeof createAnthropic | typeof createGroq>;
   model: string;
   costPerMTokIn: number; // USD
-  costPerMTokOut: number;
+  costPerMTokOut: number; // USD
 }
 
 /** Pricing (USD / 1M tokens) — approximate, used for cost dashboards only. */
 function providers(): ProviderConfig[] {
   const env = getEnv();
-  const chain: ProviderConfig[] = [
+
+  // Bring-your-own OpenAI-compatible providers (Kimi, GLM, Qwen, Gemini-compat,
+  // DeepSeek, OpenRouter, Ollama, …) — any endpoint speaking the OpenAI wire format.
+  const customs: ProviderConfig[] = getCustomProviders().map((c) => ({
+    name: c.name,
+    tier: c.tier,
+    enabled: () => true,
+    client: () => createOpenAI({ baseURL: c.baseUrl, apiKey: c.apiKey }),
+    model: c.model,
+    costPerMTokIn: c.costPerMTokIn,
+    costPerMTokOut: c.costPerMTokOut,
+  }));
+
+  const builtIns: ProviderConfig[] = [
     {
       name: "groq",
       tier: "fast",
@@ -54,7 +67,10 @@ function providers(): ProviderConfig[] {
       costPerMTokOut: 15,
     },
   ];
-  return chain.filter((p) => p.enabled());
+
+  // Customs first within each tier: an explicitly added provider is the one
+  // the operator wants serving traffic; built-ins stay as failover.
+  return [...customs, ...builtIns.filter((p) => p.enabled())];
 }
 
 export interface GenerateOptions {
@@ -91,7 +107,9 @@ export async function* streamGenerate(opts: GenerateOptions): AsyncGenerator<Str
       const result = await streamText({
         model: p.client()(p.model),
         messages: opts.messages,
-        maxTokens: opts.maxTokens ?? 2048,
+        // 4096 not 2048: thinking models (Gemini -latest) share this budget
+        // between reasoning and visible text — 2048 could starve the answer.
+        maxTokens: opts.maxTokens ?? 4096,
         temperature: opts.temperature ?? 0.4,
       });
 
@@ -102,9 +120,12 @@ export async function* streamGenerate(opts: GenerateOptions): AsyncGenerator<Str
       }
 
       const usage = await result.usage;
-      const tokensIn = usage?.promptTokens ?? 0;
-      const tokensOutFinal = usage?.completionTokens ?? tokensOut;
-      const cost = (tokensIn / 1e6) * p.costPerMTokIn + (tokensOutFinal / 1e6) * p.costPerMTokOut;
+      // Some OpenAI-compatible providers omit/NaN usage — never persist NaN (Postgres rejects it)
+      const safeInt = (n: number | undefined | null) => (Number.isFinite(n as number) ? (n as number) : 0);
+      const tokensIn = safeInt(usage?.promptTokens);
+      const tokensOutFinal = safeInt(usage?.completionTokens) || tokensOut;
+      const cost =
+        (tokensIn / 1e6) * p.costPerMTokIn + (tokensOutFinal / 1e6) * p.costPerMTokOut;
 
       yield {
         type: "done",
@@ -112,17 +133,19 @@ export async function* streamGenerate(opts: GenerateOptions): AsyncGenerator<Str
         model: p.model,
         tokensIn,
         tokensOut: tokensOutFinal,
-        costUsd: Number(cost.toFixed(6)),
+        costUsd: Number.isFinite(cost) ? Number(cost.toFixed(6)) : 0,
         finishReason: "stop",
       };
       return;
     } catch (err) {
       const isLast = i === chain.length - 1;
+      // Provider detail stays in server logs only — the yielded message goes
+      // to the student and must never name the provider or model (identity policy).
       console.error(`[gateway] ${p.name} failed:`, err instanceof Error ? err.message : err);
       yield {
         type: "error",
         code: "AI_PROVIDER_ERROR",
-        message: `Provider ${p.name} failed`,
+        message: "UPC AI is temporarily experiencing high demand. Please try again shortly.",
         retrying: !isLast,
       };
       if (isLast) return;

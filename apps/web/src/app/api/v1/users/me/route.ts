@@ -6,6 +6,8 @@ import { ApiError } from "@upc/core";
 import { ok, fail } from "@/lib/api";
 import { requireAuth } from "@/lib/auth/guard";
 
+export const dynamic = "force-dynamic";
+
 /** GET /v1/users/me */
 export async function GET(req: NextRequest) {
   try {

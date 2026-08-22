@@ -1,0 +1,176 @@
+/* Settings — warm-editorial cards on the product surface tokens */
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--space-md) var(--space-xxl);
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+.column {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  line-height: var(--lh-display-sm);
+  letter-spacing: var(--ls-display-sm);
+  font-weight: 500;
+  color: var(--app-ink);
+  margin: 0 0 var(--space-xs);
+}
+
+.card {
+  background: color-mix(in srgb, var(--app-card) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--app-ink) 4%, transparent);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card {
+    background: var(--app-card);
+  }
+}
+
+.cardTitle {
+  font-size: var(--text-caption-uppercase);
+  font-weight: 500;
+  letter-spacing: var(--ls-caption-uppercase);
+  text-transform: uppercase;
+  color: var(--app-muted);
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 40px;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 14px;
+  color: var(--app-ink);
+}
+
+.rowHint {
+  font-size: 12px;
+  color: var(--app-muted-soft);
+}
+
+/* Segmented control (matches the composer's language toggle) */
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--app-hairline);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.segBtn {
+  background: none;
+  border: none;
+  color: var(--app-muted);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.segActive {
+  background: var(--bubble-user);
+  color: var(--app-ink);
+}
+
+/* Selects */
+
+.select {
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  border-radius: var(--radius-sm);
+  color: var(--app-ink);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  padding: 8px 10px;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--app-muted-soft);
+  margin: 0;
+}
+
+/* Account */
+
+.accountRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.accountValue {
+  font-size: 14px;
+  color: var(--app-body);
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.logout {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--app-hairline);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-top: var(--space-xs);
+}
+
+.logout:active {
+  background: var(--error-bg);
+}
+
+.loading {
+  text-align: center;
+  color: var(--app-muted-soft);
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+}
