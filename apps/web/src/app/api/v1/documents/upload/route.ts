@@ -117,7 +117,12 @@ export async function POST(req: NextRequest) {
       .values({ documentId: doc!.id, jobType: "ingest_document", status: "queued" })
       .returning({ id: ingestionJobs.id });
 
-    const queue = new Queue("ingest", { connection: { url: process.env.REDIS_URL ?? "redis://localhost:6379" } });
+    // Ingestion queue needs a real Redis (Upstash) — without it, fail clearly
+    // instead of hanging on a localhost connection that can't exist.
+    if (!process.env.REDIS_URL) {
+      throw new ApiError("INTERNAL_ERROR", "Document ingestion is not configured yet (missing REDIS_URL). Please try again later.");
+    }
+    const queue = new Queue("ingest", { connection: { url: process.env.REDIS_URL } });
     await queue.add("ingest", { documentId: doc!.id }, { jobId: job!.id, attempts: 3, backoff: { type: "exponential", delay: 5000 } });
     await queue.close();
 

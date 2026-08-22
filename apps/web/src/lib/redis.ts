@@ -29,11 +29,11 @@ export function getRedis(): Redis {
  * Sliding-window rate limiter (Backend Architecture §7.2).
  * Returns remaining count; 0 means limited.
  *
- * If Redis is unreachable (local dev without a Redis server), falls back to an
- * in-process limiter so auth/chat routes still work. The flag lives on
- * globalThis because Next.js dev bundles this module separately per route —
- * a module-level flag would not be shared between them. Production always
- * runs with REDIS_URL set, so the fallback never engages there.
+ * Without REDIS_URL (local dev, or a deployment before Upstash is wired up),
+ * this NEVER attempts a connection — the in-process limiter serves directly.
+ * If Redis errors at runtime, the same fallback engages (rate limiting is
+ * protective, not functional: fail-open beats taking the app down). The flag
+ * lives on globalThis because Next bundles this module per route/lambda.
  */
 const memoryCounters = new Map<string, number>();
 
@@ -48,18 +48,6 @@ function memoryRateLimit(windowKey: string, limit: number, windowSeconds: number
   };
 }
 
-function isUnreachable(err: unknown): boolean {
-  const e = err as { code?: string; name?: string; message?: string };
-  return (
-    e?.code === "ECONNREFUSED" ||
-    e?.code === "ENOTFOUND" ||
-    e?.name === "MaxRetriesPerRequestError" ||
-    e?.name === "ConnectionError" ||
-    // ioredis throws a plain Error with this message once the client has ended
-    (typeof e?.message === "string" && e.message.includes("Connection is closed"))
-  );
-}
-
 export async function rateLimit(
   key: string,
   limit: number,
@@ -67,6 +55,9 @@ export async function rateLimit(
 ): Promise<{ allowed: boolean; remaining: number; retryAfterSeconds: number }> {
   const now = Date.now();
   const windowKey = `rate:${key}:${Math.floor(now / (windowSeconds * 1000))}`;
+
+  // Not configured → straight to the in-process limiter (no localhost attempt)
+  if (!process.env.REDIS_URL) g.__redisMemoryFallback = true;
 
   if (!g.__redisMemoryFallback) {
     try {
@@ -80,9 +71,10 @@ export async function rateLimit(
         retryAfterSeconds: count <= limit ? 0 : windowSeconds,
       };
     } catch (err) {
-      if (!isUnreachable(err)) throw err;
+      // Any Redis failure (serverless cold-connect races included) degrades to
+      // the in-memory limiter rather than failing the request.
       g.__redisMemoryFallback = true;
-      console.warn("[redis] unreachable — using in-memory rate limiter (set REDIS_URL in production)");
+      console.warn("[redis] unavailable — using in-memory rate limiter:", err instanceof Error ? err.message : err);
     }
   }
   return memoryRateLimit(windowKey, limit, windowSeconds);
