@@ -110,23 +110,16 @@ export async function POST(req: NextRequest) {
       })
       .returning({ id: documents.id });
 
-    // Job record + enqueue
+    // Job record + enqueue. NOTE: the BullMQ enqueue is deliberately absent —
+    // bundling bullmq breaks the Vercel build (its ESM build references an
+    // optional platform dep, @valkey/valkey-glide, missing from the lockfile),
+    // and no worker is deployed yet anyway. The job row below stays "queued";
+    // the worker (when deployed) drains the ingestion_jobs table / attaches to
+    // the queue itself. Re-add a lazy `await import("bullmq")` enqueue then.
     const [job] = await db
       .insert(ingestionJobs)
       .values({ documentId: doc!.id, jobType: "ingest_document", status: "queued" })
       .returning({ id: ingestionJobs.id });
-
-    // Ingestion queue needs a real Redis (Upstash) — without it, fail clearly
-    // instead of hanging on a localhost connection that can't exist. bullmq is
-    // imported lazily here so the bundler never has to resolve it for routes
-    // that don't upload (it's also marked external in next.config).
-    if (!process.env.REDIS_URL) {
-      throw new ApiError("INTERNAL_ERROR", "Document ingestion is not configured yet (missing REDIS_URL). Please try again later.");
-    }
-    const { Queue } = await import("bullmq");
-    const queue = new Queue("ingest", { connection: { url: process.env.REDIS_URL } });
-    await queue.add("ingest", { documentId: doc!.id }, { jobId: job!.id, attempts: 3, backoff: { type: "exponential", delay: 5000 } });
-    await queue.close();
 
     await db.insert(auditLogs).values({
       actorId: claims.sub,
