@@ -26,12 +26,8 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # Non-blocking: package eslint configs need cleanup (core/ui fail with
-      # "No files matching the pattern src", exit 2). Real gates are typecheck
-      # + tests + build.
       - name: Lint
-        run: pnpm lint --if-present
-        continue-on-error: true
+        run: pnpm lint
 
       - name: Unit tests
         run: pnpm test

@@ -12,11 +12,15 @@
     "dev:worker": "pnpm --filter @upc/worker dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
+    "lint": "node scripts/lint.mjs \"packages/core/src/**/*.ts\" \"packages/ui/src/**/*.ts\" \"packages/ui/src/**/*.tsx\" \"apps/worker/src/**/*.ts\" && pnpm --filter @upc/web lint",
     "typecheck": "pnpm -r typecheck",
     "db:generate": "pnpm --filter @upc/db generate",
     "db:migrate": "pnpm --filter @upc/db migrate",
     "db:studio": "pnpm --filter @upc/db studio",
     "seed:admin": "pnpm --filter @upc/web seed:admin"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "typescript-eslint": "^8.67.0"
   }
 }

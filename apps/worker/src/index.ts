@@ -4,7 +4,7 @@
  */
 import "dotenv/config";
 import { Worker } from "bullmq";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { createDb, documents, chunks, embeddings, ingestionJobs } from "@upc/db";
 import { parseDocument } from "./parse";
 import { chunkDocument, approxTokens } from "./chunk";

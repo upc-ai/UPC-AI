@@ -79,7 +79,7 @@ export function VerifyForm() {
     <div className={styles.shell}>
       <aside className={styles.brand}>
         <span className={styles.brandMark}><LogoMark size={44} /></span>
-        <blockquote className={styles.quote}>One code, and you're part of UPC AI.</blockquote>
+        <blockquote className={styles.quote}>One code, and you&apos;re part of UPC AI.</blockquote>
       </aside>
       <main className={styles.panel}>
         <form className={styles.form} onSubmit={submit}>
@@ -131,7 +131,7 @@ export function VerifyForm() {
               </button>
 
               <p className={styles.footer}>
-                Didn't get the code?{" "}
+                Didn&apos;t get the code?{" "}
                 <button type="button" onClick={() => void resend()} style={{ background: "none", border: "none", color: "var(--link)", cursor: "pointer", font: "inherit", padding: 0 }}>
                   Resend
                 </button>

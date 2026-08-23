@@ -54,7 +54,7 @@ export function chunkDocument(
     }
   }
 
-  return chunks.map((c, i) => ({ ...c, content: `[${c.hierarchyPath}]\n${c.content}` }));
+  return chunks.map((c) => ({ ...c, content: `[${c.hierarchyPath}]\n${c.content}` }));
 }
 
 function splitByHeadings(text: string): { path: string; text: string }[] {

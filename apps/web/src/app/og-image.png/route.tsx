@@ -7,9 +7,13 @@ import { ImageResponse } from "next/og";
  * to regenerate when the brand changes.
  */
 export const runtime = "nodejs";
-export const alt = "UPC AI — The Smarter Way to Study with AI";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+// On-request, never prerendered: @vercel/og crashes during Windows builds
+// when Next tries to statically render this route (Invalid URL in its
+// fileURLToPath). Legal config exports only — see note below.
+export const dynamic = "force-dynamic";
+// Note: alt/size/contentType *exports* are opengraph-image.tsx conventions —
+// extra exports are rejected by next build's route type check. Keep local.
+const size = { width: 1200, height: 630 };
 
 export async function GET() {
   return new ImageResponse(

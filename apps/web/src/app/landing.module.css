@@ -1088,9 +1088,9 @@
   width: 100%;
 }
 
-img,
-svg,
-video {
+/* Element selectors aren't allowed bare in CSS modules (webpack rejects
+   them as "not pure") — scope the guard to the page root instead. */
+.page :is(img, svg, video) {
   max-width: 100%;
   height: auto;
 }

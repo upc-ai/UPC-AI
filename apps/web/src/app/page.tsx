@@ -129,7 +129,7 @@ export default function LandingPage() {
             <p className={styles.sectionKicker}>Everything in one place</p>
             <h2 className={styles.sectionTitle}>Three tools. One assistant.</h2>
             <p className={styles.sectionSub}>
-              Students shouldn't need five apps and a WhatsApp group to study and stay informed.
+              Students shouldn&apos;t need five apps and a WhatsApp group to study and stay informed.
             </p>
           </Reveal>
           <div className={styles.featureGrid}>
@@ -154,17 +154,17 @@ export default function LandingPage() {
               <p className={styles.sectionKicker}>Grounded in official documents</p>
               <h2 className={styles.sectionTitle}>Every answer shows its source.</h2>
               <p className={styles.sectionSub}>
-                UPC AI doesn't guess. When you ask about fees, exams or rules, it searches the
-                college's approved documents, cites the exact page, and refuses to answer when
-                the evidence isn't there.
+                UPC AI doesn&apos;t guess. When you ask about fees, exams or rules, it searches the
+                college&apos;s approved documents, cites the exact page, and refuses to answer when
+                the evidence isn&apos;t there.
               </p>
               <button className={styles.darkLink}>See how retrieval works →</button>
             </Reveal>
             <Reveal delay={90}>
               <div className={styles.codeWindow} aria-label="Example of UPC AI solving a question">
-                <div><span className="ln">1</span><span className="com">// Asked: Solve the integral</span></div>
+                <div><span className="ln">1</span><span className="com">{"// Asked: Solve the integral"}</span></div>
                 <div><span className="ln">2</span>∫ x²·eˣ dx</div>
-                <div><span className="ln">3</span><span className="com">// By parts, u = x², dv = eˣdx</span></div>
+                <div><span className="ln">3</span><span className="com">{"// By parts, u = x², dv = eˣdx"}</span></div>
                 <div><span className="ln">4</span>= x²eˣ − ∫ 2x·eˣ dx</div>
                 <div><span className="ln">5</span>= x²eˣ − 2(xeˣ − eˣ) + C</div>
                 <div><span className="ln">6</span><span className="kw">return</span> eˣ(x² − <span className="num">2x</span> + <span className="num">2</span>) + C <span className="fn">✓ verified</span></div>
@@ -241,7 +241,7 @@ export default function LandingPage() {
             <h2 className={styles.sectionTitle}>Quizzes that know your syllabus.</h2>
             <p className={styles.sectionSub}>
               Generate a quiz on any topic in seconds. Flashcards schedule themselves with spaced
-              repetition — review what you're about to forget, skip what you know.
+              repetition — review what you&apos;re about to forget, skip what you know.
             </p>
           </Reveal>
         </section>

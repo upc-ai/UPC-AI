@@ -352,7 +352,7 @@ export function Sidebar({
       </Dialog>
 
       <Dialog open={deleting !== null} onClose={() => setDeleting(null)} title="Delete conversation?">
-        <p className={styles.dialogText}>This can't be undone. The conversation will be removed from your history.</p>
+        <p className={styles.dialogText}>This can&apos;t be undone. The conversation will be removed from your history.</p>
         <div className={styles.dialogActions}>
           <Button variant="secondary" size="sm" onClick={() => setDeleting(null)}>
             Cancel

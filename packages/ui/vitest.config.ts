@@ -7,5 +7,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test-setup.ts"],
+    // userEvent pointer-event sequences are macrotask-heavy; cold-disk dev
+    // machines (and first CI runs) blow past the 5s default.
+    testTimeout: 15_000,
   },
 });
