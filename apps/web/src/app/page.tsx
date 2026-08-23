@@ -5,21 +5,30 @@ import { LandingNav } from "./_components/LandingNav";
 import { Reveal } from "./_components/Reveal";
 import { Wordmark } from "@upc/ui";
 
-const FEATURES = [
+const ABOUT = [
   {
-    title: "Academic AI",
-    text: "Ask doubts from any subject — get step-by-step solutions, derivations, and code with verification. Speaks English and Hindi.",
-    icon: "graduation",
+    label: "Academic help",
+    text: "Step-by-step solutions, derivations and code help for any subject — with Explain Simply and Challenge Me study modes.",
   },
   {
-    title: "College Knowledge",
-    text: "Fees, exams, notices, timetables — answered instantly from official college documents, always with citations.",
-    icon: "landmark",
+    label: "Official answers",
+    text: "Fees, exams, notices, timetables and rules are answered from approved college documents, with the exact source cited. If the evidence isn't there, UPC AI says so instead of guessing.",
   },
   {
-    title: "Study Tools",
-    text: "AI-generated quizzes and spaced-repetition flashcards built from your syllabus. Study smarter, not longer.",
-    icon: "notebook",
+    label: "Images & PDFs",
+    text: "Send a photo of a problem or a PDF — UPC AI reads it and works with it directly in the chat.",
+  },
+  {
+    label: "English & Hindi",
+    text: "Ask in either language, or mix both — answers follow the language you use.",
+  },
+  {
+    label: "Study tools",
+    text: "Quizzes generated from your syllabus and flashcards that schedule themselves with spaced repetition.",
+  },
+  {
+    label: "Free & private",
+    text: "Free for the UPC community. Sign up in seconds — conversations stay private and are never shared.",
   },
 ];
 
@@ -61,30 +70,6 @@ const FAQS = [
   },
 ];
 
-function FeatureIcon({ name }: { name: string }) {
-  const common = { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.75, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-  switch (name) {
-    case "graduation":
-      return (
-        <svg {...common}>
-          <path d="M22 10 12 5 2 10l10 5 10-5Z" /><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" />
-        </svg>
-      );
-    case "landmark":
-      return (
-        <svg {...common}>
-          <path d="M3 22h18" /><path d="M6 18v-7" /><path d="M10 18v-7" /><path d="M14 18v-7" /><path d="M18 18v-7" /><path d="m12 2 9 5H3l9-5Z" />
-        </svg>
-      );
-    default:
-      return (
-        <svg {...common}>
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-        </svg>
-      );
-  }
-}
-
 export default function LandingPage() {
   return (
     <div className={styles.page}>
@@ -123,25 +108,23 @@ export default function LandingPage() {
           </div>
         </Reveal>
 
-        {/* ---------------- Features (glass cards over ambient) ---------------- */}
-        <section id="features" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
+        {/* ---------------- About UPC AI (glass cards over ambient) ---------------- */}
+        <section id="about" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
           <Reveal>
-            <p className={styles.sectionKicker}>Everything in one place</p>
-            <h2 className={styles.sectionTitle}>Three tools. One assistant.</h2>
+            <p className={styles.sectionKicker}>About UPC AI</p>
+            <h2 className={styles.sectionTitle}>One assistant for the whole campus.</h2>
             <p className={styles.sectionSub}>
-              Students shouldn&apos;t need five apps and a WhatsApp group to study and stay informed.
+              The official AI assistant of Udai Pratap College — built for students and faculty,
+              grounded in the college&apos;s own documents, and free for the UPC community.
             </p>
           </Reveal>
-          <div className={styles.featureGrid}>
-            {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 70}>
-                <article className={styles.featureCard}>
-                  <div className={styles.featureIcon}>
-                    <FeatureIcon name={f.icon} />
-                  </div>
-                  <h3 className={styles.featureTitle}>{f.title}</h3>
-                  <p className={styles.featureText}>{f.text}</p>
-                </article>
+          <div className={styles.aboutList}>
+            {ABOUT.map((row) => (
+              <Reveal key={row.label}>
+                <div className={styles.aboutRow}>
+                  <span className={styles.aboutLabel}>{row.label}</span>
+                  <p className={styles.aboutText}>{row.text}</p>
+                </div>
               </Reveal>
             ))}
           </div>
@@ -169,40 +152,6 @@ export default function LandingPage() {
                 <div><span className="ln">5</span>= x²eˣ − 2(xeˣ − eˣ) + C</div>
                 <div><span className="ln">6</span><span className="kw">return</span> eˣ(x² − <span className="num">2x</span> + <span className="num">2</span>) + C <span className="fn">✓ verified</span></div>
               </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ---------------- Comparison ---------------- */}
-        <section className={`${styles.container} ${styles.section}`}>
-          <Reveal>
-            <p className={styles.sectionKicker}>Two kinds of answers</p>
-            <h2 className={styles.sectionTitle}>Ask anything. Or ask officially.</h2>
-          </Reveal>
-          <div className={styles.compareGrid}>
-            <Reveal>
-              <article className={styles.compareCard}>
-                <h3>Academic AI</h3>
-                <p>An open tutor for reasoning and problem-solving:</p>
-                <ul>
-                  <li>Step-by-step math, physics, chemistry solutions</li>
-                  <li>Code help with explanations</li>
-                  <li>Ask in English, Hindi, or both</li>
-                  <li>Explain Simply &amp; Challenge Me study modes</li>
-                </ul>
-              </article>
-            </Reveal>
-            <Reveal delay={70}>
-              <article className={styles.compareCard}>
-                <h3>Official answers</h3>
-                <p>College facts, grounded and cited:</p>
-                <ul>
-                  <li>Fee structures for every course and year</li>
-                  <li>Exam schedules, notices, timetables</li>
-                  <li>Hostel, library, scholarship rules</li>
-                  <li>Every claim linked to its source document</li>
-                </ul>
-              </article>
             </Reveal>
           </div>
         </section>

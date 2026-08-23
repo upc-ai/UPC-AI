@@ -64,7 +64,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#212121",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#171717" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -77,14 +80,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         jetbrains.variable,
         notoDevanagari.variable,
       ].join(" ")}
-      data-theme="dark"
+      data-theme="light"
       suppressHydrationWarning
     >
       <body>
         {/* Pre-paint theme: apply the user's saved choice (settings page,
             localStorage "upcai:theme") before first paint on EVERY page —
             landing and auth included. First-in-body inline script runs
-            before anything renders (next-themes pattern). Default = dark. */}
+            before anything renders (next-themes pattern). Default = light. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("upcai:theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}else if(t==="system"){document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}catch(e){}})();`,

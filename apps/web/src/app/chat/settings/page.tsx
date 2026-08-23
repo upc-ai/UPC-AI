@@ -33,7 +33,7 @@ interface MeResponse {
 }
 
 const DEFAULTS: Preferences = {
-  theme: "dark",
+  theme: "light",
   language: "en",
   response_length: "detailed",
   difficulty: "intermediate",
@@ -165,14 +165,14 @@ export default function SettingsPage() {
 
         <section className={styles.card} aria-label="Appearance">
           <h2 className={styles.cardTitle}>Appearance</h2>
-          <FieldRow title="Theme" hint="Dark is UPC AI's signature look">
+          <FieldRow title="Theme" hint="Light is the default — pick what suits you">
             <Segmented<Theme>
               label="Theme"
               value={prefs.theme}
               onChange={(v) => void save({ theme: v })}
               options={[
-                { value: "dark", label: "Dark" },
                 { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
                 { value: "system", label: "System" },
               ]}
             />

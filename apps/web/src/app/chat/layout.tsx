@@ -45,7 +45,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
   }, [status, splashDone]);
 
-  // Apply the user's saved theme (settings page persists it; dark is the default)
+  // Apply the user's saved theme (settings page persists it; light is the default)
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("upcai:theme");
@@ -57,7 +57,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
           : "light";
       }
     } catch {
-      /* private mode — keep the dark default */
+      /* private mode — keep the current default */
     }
   }, []);
 
