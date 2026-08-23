@@ -1141,6 +1141,18 @@
   .mobileSignIn {
     width: 100%;
   }
+
+  /* Comfortable, equal gutters on phones. The 24px base (--space-lg) reads
+     as flush with the screen edge on small devices; 32px gives text and
+     cards clear air on both sides. Nav, containers, mobile menu and the
+     full-bleed strip all share the same inset so edges stay aligned. */
+  .container,
+  .navInner,
+  .mobileMenu,
+  .strip {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
 }
 
 /* ---------------- Dark theme ---------------- */
