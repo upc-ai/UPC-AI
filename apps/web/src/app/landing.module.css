@@ -699,6 +699,48 @@
   }
 }
 
+/* Subpage header — shared title block for marketing subpages (/about etc.) */
+.pageHeader {
+  padding: clamp(48px, 8vw, 88px) 0 0;
+}
+
+/* Subpage long-form article typography (about, legal pages) */
+.prose {
+  max-width: 68ch;
+}
+
+.prose h3 {
+  font-size: 20px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: var(--space-xl) 0 var(--space-sm);
+}
+
+.prose h3:first-child {
+  margin-top: 0;
+}
+
+.prose p {
+  font-size: var(--text-body-md);
+  line-height: var(--lh-body-md);
+  color: var(--body);
+  margin: 0 0 var(--space-md);
+}
+
+.prose ul {
+  margin: 0 0 var(--space-md);
+  padding-left: 20px;
+  color: var(--body);
+  font-size: var(--text-body-md);
+  line-height: 1.8;
+}
+
+.prose a {
+  color: var(--link);
+  border-bottom: 1px solid var(--hairline);
+}
+
 /* Knowledge tiles — glass chips */
 
 .tileGrid {

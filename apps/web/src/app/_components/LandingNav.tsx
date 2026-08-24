@@ -6,11 +6,11 @@ import { Wordmark } from "@upc/ui";
 import styles from "../landing.module.css";
 
 const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Knowledge", href: "#knowledge" },
-  { label: "Study Tools", href: "#study" },
-  { label: "For Faculty", href: "#faculty" },
-  { label: "FAQ", href: "#faq" },
+  { label: "About", href: "/about" },
+  { label: "Knowledge", href: "/knowledge" },
+  { label: "Study Tools", href: "/study-tools" },
+  { label: "For Faculty", href: "/for-faculty" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 /**
@@ -42,9 +42,9 @@ export function LandingNav() {
         </Link>
         <nav className={styles.navLinks} aria-label="Main">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className={styles.navLink}>
+            <Link key={l.href} href={l.href} className={styles.navLink}>
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className={styles.navActions}>
@@ -75,9 +75,9 @@ export function LandingNav() {
       >
         <nav className={styles.mobileLinks} aria-label="Mobile">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className={styles.mobileLink} onClick={() => setOpen(false)}>
+            <Link key={l.href} href={l.href} className={styles.mobileLink} onClick={() => setOpen(false)}>
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className={styles.mobileActions}>
