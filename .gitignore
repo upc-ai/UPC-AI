@@ -24,3 +24,7 @@ coverage/
 .turbo/
 .vercel/
 .zcode/
+
+# knowledge-base raw files (local-disk storage mode + bulk import staging)
+apps/web/storage/
+to-import/
