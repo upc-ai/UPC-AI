@@ -6,6 +6,7 @@ import { LogoMark } from "@upc/ui";
 import { bootstrapAuth, loginWithPassword, loginWithGoogle, useAuth } from "@/lib/auth-store";
 import { ApiError } from "@/lib/api-client";
 import { GoogleButton, GOOGLE_CLIENT_ID } from "@/components/auth/GoogleButton";
+import { PasswordField } from "@/components/auth/PasswordField";
 import styles from "../auth.module.css";
 
 bootstrapAuth();
@@ -88,15 +89,15 @@ export default function LoginForm() {
             required
           />
 
-          <label className={styles.label} htmlFor="password">Password</label>
-          <input
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <label className={styles.label} htmlFor="password">Password</label>
+            <a href="/forgot-password" className={styles.forgotLink}>Forgot password?</a>
+          </div>
+          <PasswordField
             id="password"
-            className={styles.input}
-            type="password"
-            autoComplete="current-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            onChange={setPassword}
+            inputClassName={styles.input}
           />
 
           {error && <p className={styles.error} role="alert">{error}</p>}

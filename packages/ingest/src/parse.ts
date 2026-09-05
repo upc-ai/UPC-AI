@@ -1,6 +1,10 @@
 /**
  * Document parsing: extract text (+ page boundaries) per format.
  * Strategy table: Architecture doc §3.4 (text-native PDF, DOCX, PPTX, XLSX, images, text).
+ *
+ * NOTE: image/OCR parsing is deliberately NOT here — tesseract.js is a heavy
+ * native dep that must never enter the web bundle. The BullMQ worker keeps its
+ * own OCR path (apps/worker/src/parse.ts); this package serves the web route.
  */
 import type { ParsedDocument } from "./types";
 
@@ -17,16 +21,27 @@ export async function parseDocument(
       return parsePptx(buffer);
     case mimeType.includes("spreadsheetml") || mimeType.includes("ms-excel") || mimeType.includes("csv"):
       return parseSpreadsheet(buffer);
-    case mimeType.startsWith("image/"):
-      return parseImage(buffer);
     default:
-      // text/html, text/plain, text/markdown
+      // text/html, text/plain, text/markdown — and image/ returns a clear
+      // stage error rather than silently indexing nothing (OCR is worker-only).
+      if (mimeType.startsWith("image/")) {
+        return { text: "", pages: null, tables: [], ocrApplied: false, error: "Image OCR is not available on this path — upload a text-native file (PDF/Word/PPT/XLSX/CSV/TXT)" };
+      }
       return { text: buffer.toString("utf-8"), pages: null, tables: [], ocrApplied: false };
   }
 }
 
 async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
-  const { default: pdfParse } = await import("pdf-parse");
+  // pdf-parse's index.js runs debug code when NODE_ENV detection misfires in
+  // bundles; the lib path is the stable entry. The package ships no type
+  // declarations — the local signature types it for every consuming program
+  // (web, worker, ingest itself) without an ambient .d.ts that only the
+  // including tsconfig would see.
+  type PdfParseResult = { text: string };
+  // @ts-expect-error pdf-parse/lib/pdf-parse.js is untyped
+  const { default: pdfParse } = (await import("pdf-parse/lib/pdf-parse.js")) as {
+    default: (buffer: Buffer) => Promise<PdfParseResult>;
+  };
   const result = await pdfParse(buffer);
   // pdf-parse gives total text; approximate page boundaries by form feeds if present
   const pageTexts = result.text.split("\f").filter((p) => p.trim().length > 0);
@@ -48,9 +63,6 @@ async function parseDocx(buffer: Buffer): Promise<ParsedDocument> {
 
 async function parsePptx(buffer: Buffer): Promise<ParsedDocument> {
   // Slides are chunk boundaries — extract per-slide text via unzip of slide XMLs.
-  const { execSync } = await import("node:child_process");
-  void execSync;
-  // Lightweight approach: regex over the raw zip entries is fragile; use xmllike extraction:
   const JSZip = (await import("jszip").catch(() => null)) as typeof import("jszip") | null;
   if (!JSZip) return { text: "", pages: null, tables: [], ocrApplied: false, error: "jszip unavailable" };
   const zip = await JSZip.loadAsync(buffer);
@@ -84,25 +96,6 @@ async function parseSpreadsheet(buffer: Buffer): Promise<ParsedDocument> {
     parts.push(`## ${sheetName}\n` + rows.map((r) => r.join(" | ")).join("\n"));
   }
   return { text: parts.join("\n\n"), pages: null, tables, ocrApplied: false };
-}
-
-async function parseImage(buffer: Buffer): Promise<ParsedDocument> {
-  const { createWorker } = await import("tesseract.js");
-  const worker = await createWorker("eng");
-  try {
-    // Hindi pass added when hin traineddata is available (env-gated later)
-    const { data } = await worker.recognize(buffer);
-    return {
-      text: data.text,
-      pages: 1,
-      pageTexts: [data.text],
-      tables: [],
-      ocrApplied: true,
-      ocrConfidence: data.confidence ?? null,
-    };
-  } finally {
-    await worker.terminate();
-  }
 }
 
 function htmlToText(html: string): string {

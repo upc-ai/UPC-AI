@@ -23,6 +23,7 @@ import {
   customType,
   primaryKey,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /* ------------------------------------------------------------------ */
 /* Custom types                                                         */
@@ -483,6 +484,7 @@ export const documents = pgTable(
     mimeType: varchar("mime_type", { length: 100 }),
     storagePath: text("storage_path").notNull(),
     contentHash: varchar("content_hash", { length: 80 }), // sha256 — idempotent reprocessing
+    sourceUrl: text("source_url"), // web-sync lineage (RAG v2); null for direct uploads
     categoryId: uuid("category_id").references(() => knowledgeCategories.id),
     departmentId: uuid("department_id").references(() => departments.id),
     accessLevel: accessLevelEnum("access_level").notNull().default("public"),
@@ -506,7 +508,12 @@ export const documents = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (t) => [
-    uniqueIndex("documents_active_version_unique").on(t.canonicalId, t.isActiveVersion),
+    // Exactly one ACTIVE version per canonicalId. Partial (WHERE active):
+    // a full unique index would forbid multiple superseded versions of the
+    // same document — every replacement adds one more inactive row.
+    uniqueIndex("documents_active_version_unique")
+      .on(t.canonicalId, t.isActiveVersion)
+      .where(sql`${t.isActiveVersion} = true`),
     index("documents_status_idx").on(t.status),
     index("documents_category_idx").on(t.categoryId),
     index("documents_content_hash_idx").on(t.contentHash),
@@ -709,6 +716,31 @@ export const auditLogs = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("audit_resource_idx").on(t.resourceType, t.resourceId, t.createdAt)],
+);
+
+/**
+ * RAG telemetry (RAG v2, Backend §6.6 coverage gaps at pilot scale): one row
+ * per knowledge-retrieval attempt. Low-score / refused rows are the "unanswered
+ * questions" list that drives what to sync or upload next.
+ */
+export const retrievalLogs = pgTable(
+  "retrieval_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    query: text("query").notNull(), // raw student message
+    rewrittenQuery: text("rewritten_query"),
+    intent: varchar("intent", { length: 20 }).notNull(), // knowledge | mixed
+    topScore: numeric("top_score", { precision: 10, scale: 6 }), // fused RRF score
+    chunkCount: integer("chunk_count").notNull().default(0),
+    refused: boolean("refused").notNull().default(false), // true = grounded refusal fired
+    latencyMs: integer("latency_ms"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("retrieval_recent_idx").on(t.createdAt.desc()),
+    index("retrieval_refused_idx").on(t.refused, t.createdAt.desc()),
+  ],
 );
 
 export const systemSettings = pgTable(

@@ -6,6 +6,7 @@ import { LogoMark } from "@upc/ui";
 import { registerAccount, loginWithGoogle } from "@/lib/auth-store";
 import { ApiError } from "@/lib/api-client";
 import { GoogleButton, GOOGLE_CLIENT_ID } from "@/components/auth/GoogleButton";
+import { PasswordField } from "@/components/auth/PasswordField";
 import styles from "../auth.module.css";
 
 function passwordStrength(pw: string): { score: 0 | 1 | 2 | 3 | 4; label: string; color: string } {
@@ -109,7 +110,14 @@ export default function SignupPage() {
           <input id="email" className={styles.input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@gmail.com" required autoComplete="email" />
 
           <label className={styles.label} htmlFor="password">Password</label>
-          <input id="password" className={styles.input} type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" />
+          <PasswordField
+            id="password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            required
+            inputClassName={styles.input}
+          />
           {password && (
             <>
               <div className={styles.strengthBar} aria-hidden="true">

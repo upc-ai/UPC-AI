@@ -9,6 +9,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createGroq } from "@ai-sdk/groq";
 import type { CoreMessage } from "ai";
 import { getEnv, getCustomProviders, type ModelTier } from "@upc/core";
+import { getManagedConfig, managedKeyIsSet } from "./managed-config";
 
 export type { ModelTier };
 
@@ -22,9 +23,28 @@ interface ProviderConfig {
   costPerMTokOut: number; // USD
 }
 
-/** Pricing (USD / 1M tokens) — approximate, used for cost dashboards only. */
-function providers(): ProviderConfig[] {
+/**
+ * Pricing (USD / 1M tokens) — approximate, used for cost dashboards only.
+ * Chain order (admin-managed first within tier, then env customs, then
+ * built-ins): the admin panel's providers are the operator's live intent —
+ * they outrank the deployment's env config, which becomes the fallback.
+ */
+async function providers(): Promise<ProviderConfig[]> {
   const env = getEnv();
+
+  // Managed (admin panel, system_settings) — key resolved from env at call time
+  const managed = await getManagedConfig();
+  const managedProviders: ProviderConfig[] = managed.providers
+    .filter((p) => p.enabled && managedKeyIsSet(p))
+    .map((p) => ({
+      name: p.name,
+      tier: p.tier,
+      enabled: () => true,
+      client: () => createOpenAI({ baseURL: p.baseUrl, apiKey: process.env[p.apiKeyEnv] ?? "" }),
+      model: p.model,
+      costPerMTokIn: p.costPerMTokIn,
+      costPerMTokOut: p.costPerMTokOut,
+    }));
 
   // Bring-your-own OpenAI-compatible providers (Kimi, GLM, Qwen, Gemini-compat,
   // DeepSeek, OpenRouter, Ollama, …) — any endpoint speaking the OpenAI wire format.
@@ -68,9 +88,7 @@ function providers(): ProviderConfig[] {
     },
   ];
 
-  // Customs first within each tier: an explicitly added provider is the one
-  // the operator wants serving traffic; built-ins stay as failover.
-  return [...customs, ...builtIns.filter((p) => p.enabled())];
+  return [...managedProviders, ...customs, ...builtIns.filter((p) => p.enabled())];
 }
 
 export interface GenerateOptions {
@@ -86,8 +104,8 @@ export type StreamEvent =
   | { type: "error"; code: string; message: string; retrying: boolean };
 
 /** Ordered failover chain for a tier: exact tier first, then the rest. */
-export function chainFor(tier: ModelTier): ProviderConfig[] {
-  const list = providers();
+export async function chainFor(tier: ModelTier): Promise<ProviderConfig[]> {
+  const list = await providers();
   const preferred = list.filter((p) => p.tier === tier);
   const rest = list.filter((p) => p.tier !== tier);
   return [...preferred, ...rest];
@@ -95,7 +113,7 @@ export function chainFor(tier: ModelTier): ProviderConfig[] {
 
 /** Stream with failover. Yields normalized events; retries the chain on failure. */
 export async function* streamGenerate(opts: GenerateOptions): AsyncGenerator<StreamEvent> {
-  const chain = chainFor(opts.tier);
+  const chain = await chainFor(opts.tier);
   if (chain.length === 0) {
     yield { type: "error", code: "AI_PROVIDER_UNAVAILABLE", message: "No AI provider configured", retrying: false };
     return;

@@ -73,7 +73,13 @@ export function buildSystemPrompt(opts: {
     parts.push(
       "OFFICIAL CONTEXT:\n" +
         opts.contextChunks
-          .map((c, i) => `[${i + 1}] (${c.documentTitle}${c.pageNumber ? `, p.${c.pageNumber}` : ""})\n${c.content}`)
+          .map((c, i) => {
+            const section = c.hierarchyPath?.replace(/^[^>]+>\s*/, "").trim();
+            const loc = [c.documentTitle, section || null, c.pageNumber ? `p.${c.pageNumber}` : null]
+              .filter(Boolean)
+              .join(", ");
+            return `[${i + 1}] (${loc})\n${c.content}`;
+          })
           .join("\n\n"),
     );
   }

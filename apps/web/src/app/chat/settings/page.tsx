@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { logout } from "@/lib/auth-store";
-import { useToast } from "@upc/ui";
+import { useToast, Dialog, Input } from "@upc/ui";
+import { PasswordField } from "@/components/auth/PasswordField";
 import styles from "./settings.module.css";
 
 /* ------------------------------------------------------------------ */
@@ -119,6 +120,18 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<Preferences>(DEFAULTS);
   const [me, setMe] = useState<{ email?: string; display_name?: string; user_type?: string }>({});
 
+  // Change-password state
+  const [showChange, setShowChange] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwBusy, setPwBusy] = useState(false);
+
+  // Delete-account state
+  const [showDelete, setShowDelete] = useState(false);
+  const [deletePw, setDeletePw] = useState("");
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
   useEffect(() => {
     let alive = true;
     void (async () => {
@@ -159,6 +172,7 @@ export default function SettingsPage() {
   };
 
   return (
+    <>
     <div className={styles.page}>
       <div className={styles.column}>
         <h1 className={styles.title}>Settings</h1>
@@ -255,8 +269,103 @@ export default function SettingsPage() {
           </button>
         </section>
 
+        <section className={styles.card} aria-label="Security">
+          <h2 className={styles.cardTitle}>Security</h2>
+          <FieldRow title="Password" hint="Change your sign-in password">
+            <button className={styles.changeBtn} onClick={() => setShowChange(true)} type="button">
+              Change password
+            </button>
+          </FieldRow>
+        </section>
+
+        <section className={styles.card} aria-label="Danger zone">
+          <h2 className={styles.cardTitle}>Danger zone</h2>
+          <FieldRow title="Delete account" hint="Permanently anonymizes your data and signs you out everywhere">
+            <button className={styles.deleteBtn} onClick={() => setShowDelete(true)} type="button">
+              Delete account
+            </button>
+          </FieldRow>
+        </section>
+
         {!loaded && <div className={styles.loading}>Loading settings…</div>}
       </div>
     </div>
+
+      <Dialog open={showChange} onClose={() => setShowChange(false)} title="Change password">
+        <div className={styles.pwForm}>
+          <label className={styles.pwLabel} htmlFor="current-pw">Current password</label>
+          <PasswordField id="current-pw" value={currentPw} onChange={setCurrentPw} inputClassName={styles.pwInput} />
+          <label className={styles.pwLabel} htmlFor="new-pw">New password</label>
+          <PasswordField id="new-pw" value={newPw} onChange={setNewPw} autoComplete="new-password" inputClassName={styles.pwInput} />
+          <span className={styles.pwHint}>8+ characters with upper, lower, a digit, and a special character.</span>
+          <label className={styles.pwLabel} htmlFor="confirm-pw">Confirm new password</label>
+          <PasswordField id="confirm-pw" value={confirmPw} onChange={setConfirmPw} autoComplete="new-password" inputClassName={styles.pwInput} />
+        </div>
+        <div className={styles.dialogActions}>
+          <button className={styles.changeBtn} onClick={() => setShowChange(false)} type="button">Cancel</button>
+          <button
+            className={styles.pwSubmit}
+            disabled={pwBusy || !currentPw || !newPw || newPw !== confirmPw}
+            onClick={() => void changePassword()}
+            type="button"
+          >
+            {pwBusy ? "Saving…" : "Save new password"}
+          </button>
+        </div>
+      </Dialog>
+
+      <Dialog open={showDelete} onClose={() => setShowDelete(false)} title="Delete your account?">
+        <p className={styles.deleteText}>
+          This permanently anonymizes your profile, chats stay unlinked from your identity, and you&apos;ll be signed
+          out everywhere. This cannot be undone.
+        </p>
+        <div className={styles.pwForm}>
+          <label className={styles.pwLabel} htmlFor="delete-pw">Confirm with your password</label>
+          <PasswordField id="delete-pw" value={deletePw} onChange={setDeletePw} inputClassName={styles.pwInput} />
+        </div>
+        <div className={styles.dialogActions}>
+          <button className={styles.changeBtn} onClick={() => setShowDelete(false)} type="button">Keep account</button>
+          <button className={styles.deleteConfirmBtn} disabled={deleteBusy} onClick={() => void deleteAccount()} type="button">
+            {deleteBusy ? "Deleting…" : "Delete permanently"}
+          </button>
+        </div>
+      </Dialog>
+    </>
   );
+
+  async function changePassword() {
+    if (pwBusy) return;
+    setPwBusy(true);
+    try {
+      const r = await api<{ message?: string }>("/api/v1/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({ current_password: currentPw, new_password: newPw }),
+      });
+      toast.success(r.message ?? "Password changed.");
+      setShowChange(false);
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't change the password.");
+    } finally {
+      setPwBusy(false);
+    }
+  }
+
+  async function deleteAccount() {
+    if (deleteBusy) return;
+    setDeleteBusy(true);
+    try {
+      await api("/api/v1/users/me", {
+        method: "DELETE",
+        body: JSON.stringify(deletePw ? { password: deletePw } : {}),
+      });
+      await logout();
+      router.replace("/?deleted=1");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't delete the account.");
+      setDeleteBusy(false);
+    }
+  }
 }

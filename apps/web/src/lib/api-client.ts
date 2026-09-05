@@ -48,7 +48,10 @@ export async function api<T = unknown>(
       ...init,
       credentials: "include",
       headers: {
-        ...(init.body ? { "Content-Type": "application/json" } : {}),
+        // FormData sets its own multipart boundary header — forcing JSON breaks it
+        ...(init.body && !(typeof FormData !== "undefined" && init.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...init.headers,
       },

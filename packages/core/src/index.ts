@@ -40,6 +40,24 @@ export const envSchema = z.object({
   // Bring-your-own OpenAI-compatible providers — JSON array, see customProviderSchema
   AI_CUSTOM_PROVIDERS: z.string().default("[]"),
 
+  // Embeddings (RAG) — provider-switchable; Gemini via the OpenAI-compat
+  // endpoint with dimensions=1536 pairs with the pgvector column. When no
+  // key is resolvable, ingestion indexes without vectors (BM25-only retrieval).
+  EMBEDDING_PROVIDER: z.enum(["openai", "gemini"]).default("gemini"),
+  EMBEDDING_API_KEY: z.string().default(""),
+  EMBEDDING_BASE_URL: z.string().default(""),
+
+  // Supabase Storage (durable raw-file storage for production ingestion)
+  SUPABASE_URL: z.string().default(""),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().default(""),
+
+  // College website sync (RAG v2) — default target for the admin sync button
+  COLLEGE_WEBSITE_URL: z.string().default(""),
+
+  // Direct Gemini key (optional — the AI_CUSTOM_PROVIDERS fallback covers
+  // the common setup; this lets ops set a dedicated embeddings key)
+  GEMINI_API_KEY: z.string().default(""),
+
   // Object storage
   S3_ENDPOINT: z.string().default(""),
   S3_BUCKET: z.string().default("upc-ai"),
@@ -115,6 +133,26 @@ export const customProviderSchema = z.object({
 export type CustomProviderConfig = z.infer<typeof customProviderSchema>;
 
 /**
+ * DB-stored provider spec (admin panel "Providers & Models" page). The API
+ * key is deliberately ABSENT — secrets live in env/secrets-manager only.
+ * `apiKeyEnv` names the env var to read the key from at call time, and
+ * `apiKeyName` is what the panel displays (masked status, never the value).
+ */
+export const managedProviderSchema = z.object({
+  name: z.string().min(1),
+  baseUrl: z.string().url(),
+  apiKeyEnv: z.string().min(1), // e.g. "GEMINI_API_KEY" — resolved at runtime
+  apiKeyName: z.string().min(1), // human label, e.g. "Gemini main key"
+  model: z.string().min(1),
+  tier: z.enum(MODEL_TIERS).default("standard"),
+  costPerMTokIn: z.coerce.number().min(0).default(0),
+  costPerMTokOut: z.coerce.number().min(0).default(0),
+  enabled: z.boolean().default(true),
+});
+
+export type ManagedProviderConfig = z.infer<typeof managedProviderSchema>;
+
+/**
  * Parse AI_CUSTOM_PROVIDERS (JSON array). Throws a readable error when the
  * whole value is malformed; individual invalid entries are skipped with a
  * warning so one bad entry can't take down chat.
@@ -173,6 +211,15 @@ export type OtpPurpose = (typeof OTP_PURPOSES)[number];
 
 export const OTP_TTL_SECONDS = 10 * 60; // 10 minutes
 export const OTP_MAX_ATTEMPTS = 5;
+
+/** Shared password policy (signup, reset, change). One place to tighten. */
+export const strongPasswordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain an uppercase letter")
+  .regex(/[a-z]/, "Must contain a lowercase letter")
+  .regex(/[0-9]/, "Must contain a digit")
+  .regex(/[^A-Za-z0-9]/, "Must contain a special character");
 
 export const MAX_LOGIN_ATTEMPTS = 5;
 export const LOGIN_LOCKOUT_SECONDS = 15 * 60;

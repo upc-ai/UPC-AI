@@ -10,7 +10,11 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "seed:admin": "tsx scripts/seed-admin.ts"
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "seed:categories": "tsx scripts/seed-categories.ts",
+    "promote": "tsx scripts/promote.ts",
+    "reset-password": "tsx scripts/reset-password.ts",
+    "eval:rag": "tsx scripts/eval-rag.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.5",
@@ -18,6 +22,7 @@
     "@ai-sdk/openai": "^1.0.5",
     "@upc/core": "workspace:*",
     "@upc/db": "workspace:*",
+    "@upc/ingest": "workspace:*",
     "@upc/ui": "workspace:*",
     "ai": "^4.0.9",
     "bcryptjs": "^2.4.3",
@@ -25,8 +30,11 @@
     "highlight.js": "^11.11.1",
     "ioredis": "^5.4.2",
     "jose": "^5.9.6",
+    "jszip": "^3.10.1",
     "katex": "^0.16.22",
+    "mammoth": "^1.8.0",
     "next": "^14.2.32",
+    "pdf-parse": "^1.1.1",
     "postgres": "^3.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -35,6 +43,7 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {

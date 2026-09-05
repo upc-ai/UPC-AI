@@ -1,29 +1,25 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { documents, auditLogs } from "@upc/db";
 import { ApiError } from "@upc/core";
 import { ok, fail } from "@/lib/api";
-import { requireAuth } from "@/lib/auth/guard";
+import { requireAuth, canReviewDocuments } from "@/lib/auth/guard";
 
 const actionSchema = z.object({
   action: z.enum(["approve", "reject", "publish"]),
   notes: z.string().max(2000).optional(),
 });
 
-function requireRole(roles: string[], needed: string[]) {
-  if (!roles.some((r) => needed.includes(r))) {
-    throw new ApiError("FORBIDDEN", "Insufficient permissions");
-  }
-}
-
 /** POST /v1/admin/documents/[id]/review — approve → publish (atomic active-version swap). */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const claims = await requireAuth(req);
     const body = actionSchema.parse(await req.json());
-    requireRole(claims.roles, ["approver", "knowledge_admin", "super_admin"]);
+    if (!canReviewDocuments(claims)) {
+      throw new ApiError("FORBIDDEN", "Insufficient permissions");
+    }
 
     const db = getDb();
     const [doc] = await db.select().from(documents).where(eq(documents.id, params.id)).limit(1);
@@ -63,13 +59,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 }
 
-/** GET /v1/admin/documents/[id]/review — pending review queue. */
+/** GET /v1/admin/documents/[id]/review — single document fetch (reviewers). */
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const claims = await requireAuth(req);
-    requireRole(claims.roles, ["approver", "knowledge_admin", "super_admin"]);
+    if (!canReviewDocuments(claims)) {
+      throw new ApiError("FORBIDDEN", "Insufficient permissions");
+    }
     const db = getDb();
-    void desc;
     const [doc] = await db.select().from(documents).where(eq(documents.id, params.id)).limit(1);
     if (!doc) throw new ApiError("RESOURCE_NOT_FOUND", "Document not found");
     return ok(doc);

@@ -1,0 +1,7 @@
+[
+  { "q": "What is the fee structure for BSc Computer Science?", "expect_title": "MATHEMATICS1" },
+  { "q": "Show me the first semester syllabus", "expect_title": "MATHEMATICS1" },
+  { "q": "hostel curfew time", "expect_title": "MATHEMATICS1" },
+  { "q": "admission last date", "expect_title": "MATHEMATICS1" },
+  { "q": "fees kitna hai", "expect_title": "MATHEMATICS1" }
+]

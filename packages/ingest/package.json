@@ -1,0 +1,34 @@
+{
+  "name": "@upc/ingest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./embed": "./src/embed.ts",
+    "./parse": "./src/parse.ts",
+    "./chunk": "./src/chunk.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@upc/core": "workspace:*",
+    "@upc/db": "workspace:*",
+    "drizzle-orm": "^0.36.4",
+    "postgres": "^3.4.5",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.8.0",
+    "jszip": "^3.10.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

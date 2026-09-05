@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { and, asc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
-import { chatSessions, messages, aiResponses, citations as citationsTable, userPreferences, chatAttachments } from "@upc/db";
+import { chatSessions, messages, aiResponses, citations as citationsTable, userPreferences, chatAttachments, retrievalLogs } from "@upc/db";
 import { ApiError, publicModelById, publicModelForTier, STUDY_MODES, LANGUAGES, type ResponseLength, type Difficulty, type LanguagePreference, type StudyMode } from "@upc/core";
 import { ok, fail } from "@/lib/api";
 import { requireAuth } from "@/lib/auth/guard";
@@ -11,6 +11,7 @@ import { detectIntent, tierFor } from "@/modules/orchestrator/intent";
 import { buildSystemPrompt, buildHistory } from "@/modules/orchestrator/prompts";
 import { retrieve } from "@/modules/retrieval/search";
 import { streamGenerate } from "@/modules/providers/gateway";
+import { getManagedConfig } from "@/modules/providers/managed-config";
 
 export const dynamic = "force-dynamic";
 /** 60s = Vercel Hobby plan ceiling (Pro allows up to 300 — raise there). */
@@ -146,9 +147,10 @@ function sse(event: string, data: unknown): string {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
-/** Daily anti-abuse quota: UPC-1 and UPC-1 Plus are capped at 20 messages per
- *  user per IST calendar day; UPC-1 Pro is unrestricted (user directive). */
-const DAILY_MESSAGE_LIMIT = 20;
+/** Daily anti-abuse quota: UPC-1 and UPC-1 Plus are capped per user per IST
+ *  calendar day; UPC-1 Pro is unrestricted (user directive). The limit is
+ *  admin-managed (Providers & Models page) with a hard-coded fallback. */
+const DAILY_MESSAGE_LIMIT_FALLBACK = 20;
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 
 function startOfIstDay(): Date {
@@ -236,6 +238,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // chats or messages must not hand quota back. Regenerate reuses an existing
     // user turn, so it doesn't consume quota.
     if (tier !== "frontier" && !body.regenerate) {
+      const { quota } = await getManagedConfig();
+      const DAILY_MESSAGE_LIMIT = quota.daily_message_limit || DAILY_MESSAGE_LIMIT_FALLBACK;
       const [used] = await db
         .select({ count: sql<number>`count(*)` })
         .from(messages)
@@ -345,18 +349,55 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         try {
           send("status", { status: "thinking", message: "Thinking…" });
 
-          // Retrieval for knowledge/mixed
-          let contextChunks: Awaited<ReturnType<typeof retrieve>> = [];
+          // Retrieval for knowledge/mixed (RAG v2: rewrite → hybrid → fusion,
+          // every attempt logged for the coverage-gap "unanswered questions" loop)
+          let contextChunks: Awaited<ReturnType<typeof retrieve>>["chunks"] = [];
           let noEvidence = false;
+          let retrievalLog: { query: string; rewritten: string | null; intent: string; topScore: number | null; chunks: number; refused: boolean; ms: number } | null = null;
           if (intentResult.intent === "knowledge" || intentResult.intent === "mixed") {
             send("status", { status: "searching", message: "Searching college documents…" });
+            const retrievalStart = Date.now();
             try {
-              contextChunks = await retrieve(body.content);
+              const r = await retrieve(body.content, undefined, { history: history.map((m) => ({ role: m.role, content: m.content })) });
+              contextChunks = r.chunks;
+              retrievalLog = {
+                query: body.content,
+                rewritten: r.effectiveQuery !== body.content ? r.effectiveQuery : null,
+                intent: intentResult.intent,
+                topScore: r.chunks[0]?.relevanceScore ?? null,
+                chunks: r.chunks.length,
+                refused: false,
+                ms: Date.now() - retrievalStart,
+              };
             } catch (err) {
               console.error("[retrieval] degraded:", err);
+              retrievalLog = {
+                query: body.content,
+                rewritten: null,
+                intent: intentResult.intent,
+                topScore: null,
+                chunks: 0,
+                refused: true,
+                ms: Date.now() - retrievalStart,
+              };
             }
             if (intentResult.intent === "knowledge" && contextChunks.length === 0) {
               noEvidence = true; // grounded refusal path (P7)
+              if (retrievalLog) retrievalLog.refused = true;
+            }
+            if (retrievalLog) {
+              db.insert(retrievalLogs)
+                .values({
+                  userId: claims.sub,
+                  query: retrievalLog.query,
+                  rewrittenQuery: retrievalLog.rewritten,
+                  intent: retrievalLog.intent,
+                  topScore: retrievalLog.topScore !== null ? String(retrievalLog.topScore) : null,
+                  chunkCount: retrievalLog.chunks,
+                  refused: retrievalLog.refused,
+                  latencyMs: retrievalLog.ms,
+                })
+                .catch(() => undefined); // telemetry must never kill the stream
             }
           }
 
@@ -488,6 +529,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
               document_id: c.documentId,
               document_title: c.documentTitle,
               page_number: c.pageNumber,
+              section: c.hierarchyPath, // "Doc > Section" path (RAG v2)
               snippet: c.content.slice(0, 220),
               relevance_score: Number(c.relevanceScore.toFixed(3)),
             }));

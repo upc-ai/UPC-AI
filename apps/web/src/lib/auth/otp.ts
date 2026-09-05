@@ -3,6 +3,7 @@ import { generateOtp, sha256 } from "./crypto";
 import { getDb } from "@/lib/db";
 import { otpRecords } from "@upc/db";
 import { and, desc, eq } from "drizzle-orm";
+import { sendMail, otpEmail } from "@/lib/mailer";
 
 export interface OtpSendResult {
   expiresInSeconds: number;
@@ -24,12 +25,15 @@ export async function issueOtp(email: string, purpose: OtpPurpose): Promise<OtpS
   });
 
   const env = getEnv();
-  if (env.MAIL_PROVIDER === "console") {
-    console.info(`[otp] ${purpose} code for ${email}: ${code} (valid 10 min)`);
-    return { expiresInSeconds: OTP_TTL_SECONDS, devCode: code };
+  if (env.MAIL_PROVIDER === "resend" && env.RESEND_API_KEY) {
+    // Real delivery — the code NEVER returns to the API caller in this mode.
+    await sendMail({ ...otpEmail(code, purpose), to: email });
+    return { expiresInSeconds: OTP_TTL_SECONDS };
   }
-  // TODO(v1.1): Resend adapter — the interface is ready.
-  return { expiresInSeconds: OTP_TTL_SECONDS };
+  // Dev convenience only (MAIL_PROVIDER=console): the code is logged server-side
+  // and pages may surface it locally. Never shown for password_reset.
+  console.info(`[otp] ${purpose} code for ${email}: ${code} (valid 10 min)`);
+  return { expiresInSeconds: OTP_TTL_SECONDS, devCode: purpose === "password_reset" ? undefined : code };
 }
 
 /** Verify an OTP: single-use, attempt-capped, expiring. */

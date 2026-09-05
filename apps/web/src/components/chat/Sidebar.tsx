@@ -315,6 +315,22 @@ export function Sidebar({
             <span>{user?.display_name ?? "Student"}</span>
           </span>
         )}
+        {(user?.user_type === "faculty" || user?.user_type === "admin") && (
+          <button
+            className={[styles.logoutBtn, pathname.startsWith("/admin") ? styles.historyItemActive : ""].join(" ")}
+            onClick={() => {
+              router.push("/admin");
+              onNavigate?.();
+            }}
+            aria-label="Admin panel"
+            title="Admin panel"
+          >
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+          </button>
+        )}
         <button
           className={[styles.logoutBtn, pathname === "/chat/settings" ? styles.historyItemActive : ""].join(" ")}
           onClick={() => {

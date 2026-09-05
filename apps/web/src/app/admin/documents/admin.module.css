@@ -1,0 +1,406 @@
+/* Knowledge base admin — warm-editorial cards on the product surface tokens */
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--space-md) var(--space-xxl);
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+.column {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-display-sm);
+  line-height: var(--lh-display-sm);
+  letter-spacing: var(--ls-display-sm);
+  font-weight: 500;
+  color: var(--app-ink);
+  margin: 0 0 var(--space-xs);
+}
+
+.subtitle {
+  font-size: 13.5px;
+  color: var(--app-muted);
+  margin: calc(-1 * var(--space-xs)) 0 var(--space-xs);
+}
+
+.card {
+  background: color-mix(in srgb, var(--app-card) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--app-ink) 4%, transparent);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card {
+    background: var(--app-card);
+  }
+}
+
+.cardTitle {
+  font-size: var(--text-caption-uppercase);
+  font-weight: 500;
+  letter-spacing: var(--ls-caption-uppercase);
+  text-transform: uppercase;
+  color: var(--app-muted);
+  margin: 0;
+}
+
+/* ── Upload form ─────────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.formRow {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.formRow > * {
+  flex: 1;
+}
+
+.input,
+.select,
+.textarea {
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  border-radius: var(--radius-sm);
+  color: var(--app-ink);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  padding: 8px 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.select {
+  cursor: pointer;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--app-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Staged file chip (Composer attachment pattern) */
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.fileList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.fileChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+  border: 1px solid var(--app-hairline);
+  font-size: 12.5px;
+  color: var(--app-body);
+  max-width: 100%;
+  min-width: 0;
+}
+
+.fileChipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileRemove {
+  background: none;
+  border: none;
+  color: var(--app-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: inline-flex;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.fileRemove:active {
+  color: var(--error);
+}
+
+.attachBtn {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--app-hairline);
+  border-radius: var(--radius-sm);
+  color: var(--app-body);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.attachBtn:active {
+  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.status {
+  font-size: 12px;
+  color: var(--app-muted-soft);
+}
+
+/* ── Documents table ────────────────────────────────────────────── */
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caption-uppercase);
+  color: var(--app-muted-soft);
+  font-weight: 500;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--app-hairline);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--app-ink) 5%, transparent);
+  color: var(--app-body);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.docTitle {
+  color: var(--app-ink);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 260px;
+}
+
+.docMeta {
+  font-size: 11.5px;
+  color: var(--app-muted-soft);
+  margin-top: 2px;
+}
+
+.statusChip {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* status colors */
+.statusUploaded {
+  background: color-mix(in srgb, var(--app-ink) 8%, transparent);
+  color: var(--app-muted);
+}
+.statusProcessing {
+  background: color-mix(in srgb, var(--warning, #b8860b) 14%, transparent);
+  color: var(--warning, #b8860b);
+}
+.statusIndexed {
+  background: color-mix(in srgb, var(--app-ink) 10%, transparent);
+  color: var(--app-ink);
+}
+.statusPublished {
+  background: color-mix(in srgb, var(--success, #1a7f37) 14%, transparent);
+  color: var(--success, #1a7f37);
+}
+.statusFailed {
+  background: color-mix(in srgb, var(--error, #c0392b) 12%, transparent);
+  color: var(--error, #c0392b);
+}
+.statusSuperseded {
+  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+  color: var(--app-muted-soft);
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.actBtn {
+  background: none;
+  border: 1px solid var(--app-hairline);
+  border-radius: var(--radius-sm);
+  color: var(--app-body);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.actBtn:active {
+  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+}
+
+.actBtnPrimary {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
+}
+
+.actBtnDanger {
+  color: var(--error);
+}
+
+.actBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.empty {
+  text-align: center;
+  color: var(--app-muted-soft);
+  font-size: 13px;
+  padding: var(--space-lg) 0;
+}
+
+.errorText {
+  font-size: 12px;
+  color: var(--error);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.loading {
+  text-align: center;
+  color: var(--app-muted-soft);
+  font-size: 13px;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--app-muted-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Website sync row */
+
+.syncRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.syncRow .input {
+  flex: 1;
+  min-width: 240px;
+}
+
+/* Paste-a-notice overlay */
+
+.noticeOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 14, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  z-index: 300;
+}
+
+.noticeCard {
+  background: var(--app-card);
+  border: 1px solid var(--app-hairline);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  width: min(520px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.noticeActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+  .formRow {
+    flex-direction: column;
+  }
+
+  .table th:nth-child(n + 4),
+  .table td:nth-child(n + 4) {
+    /* keep title, status, actions; collapse meta columns on phones */
+  }
+
+  .tableWrap {
+    /* allow horizontal scroll instead of squeezing */
+  }
+}

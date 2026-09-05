@@ -32,6 +32,9 @@ importers:
       '@upc/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@upc/ingest':
+        specifier: workspace:*
+        version: link:../../packages/ingest
       '@upc/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -53,12 +56,21 @@ importers:
       jose:
         specifier: ^5.9.6
         version: 5.10.0
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       katex:
         specifier: ^0.16.22
         version: 0.16.47
+      mammoth:
+        specifier: ^1.8.0
+        version: 1.12.1
       next:
         specifier: ^14.2.32
         version: 14.2.35(@babel/core@7.29.7)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      pdf-parse:
+        specifier: ^1.1.1
+        version: 1.1.4
       postgres:
         specifier: ^3.4.5
         version: 3.4.9
@@ -83,6 +95,9 @@ importers:
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0
+      xlsx:
+        specifier: ^0.18.5
+        version: 0.18.5
       zod:
         specifier: ^3.24.1
         version: 3.25.76
@@ -153,6 +168,9 @@ importers:
       '@upc/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@upc/ingest':
+        specifier: workspace:*
+        version: link:../../packages/ingest
       bullmq:
         specifier: ^5.34.0
         version: 5.81.3
@@ -225,6 +243,43 @@ importers:
       drizzle-kit:
         specifier: ^0.28.1
         version: 0.28.1
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)
+
+  packages/ingest:
+    dependencies:
+      '@upc/core':
+        specifier: workspace:*
+        version: link:../core
+      '@upc/db':
+        specifier: workspace:*
+        version: link:../db
+      drizzle-orm:
+        specifier: ^0.36.4
+        version: 0.36.4(@opentelemetry/api@1.9.0)(@types/react@18.3.31)(postgres@3.4.9)(react@18.3.1)
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
+      mammoth:
+        specifier: ^1.8.0
+        version: 1.12.1
+      pdf-parse:
+        specifier: ^1.1.1
+        version: 1.1.4
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
+      xlsx:
+        specifier: ^0.18.5
+        version: 0.18.5
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
@@ -1662,6 +1717,7 @@ packages:
   '@xmldom/xmldom@0.8.14':
     resolution: {integrity: sha512-T4EDRUBVZYRldYApjEJiU0e1stYWaRAX7CuSnKzrpwdZKo53zGV8/pqfzV6FfwNl9YThD2OumQYvqtvjvgG7aQ==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
