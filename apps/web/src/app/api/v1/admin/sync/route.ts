@@ -166,8 +166,8 @@ export async function POST(req: NextRequest) {
       actorId: claims.sub,
       action: "website_sync",
       resourceType: "setting",
-      resourceId: SYNC_SLUG,
-      changeSummary: `Synced ${startUrl}: ${created} new, ${changed} changed, ${unchanged} unchanged${failures.length ? `, ${failures.length} failed` : ""}`,
+      // resourceId is a UUID column — the string slug goes in the summary.
+      changeSummary: `Website sync (${SYNC_SLUG}) of ${startUrl}: ${created} new, ${changed} changed, ${unchanged} unchanged${failures.length ? `, ${failures.length} failed` : ""}`,
     });
 
     return ok({

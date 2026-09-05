@@ -101,8 +101,9 @@ export async function saveManagedProviders(
     actorId,
     action: "settings_update",
     resourceType: "setting",
-    resourceId: PROVIDERS_KEY,
-    changeSummary: `Providers & Models updated (${providers.length} provider${providers.length === 1 ? "" : "s"})`,
+    // resourceId is a UUID column — setting KEYS are strings, so they live in
+    // the summary only (passing the key here 500s with 22P02 invalid uuid).
+    changeSummary: `Providers & Models (${PROVIDERS_KEY}) updated — ${providers.length} provider${providers.length === 1 ? "" : "s"}`,
   });
 
   g.__managedConfigCache = undefined; // immediate effect
@@ -129,8 +130,8 @@ export async function saveDailyQuota(quota: DailyQuota, actorId: string): Promis
     actorId,
     action: "settings_update",
     resourceType: "setting",
-    resourceId: QUOTA_KEY,
-    changeSummary: `Daily message limit set to ${quota.daily_message_limit}`,
+    // resourceId is a UUID column — keep the string key in the summary only.
+    changeSummary: `Daily message limit (${QUOTA_KEY}) set to ${quota.daily_message_limit}`,
   });
 
   g.__managedConfigCache = undefined;
