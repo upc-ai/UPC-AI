@@ -12,7 +12,8 @@ import styles from "./admin.module.css";
 type DocStatus =
   | "uploaded" | "parsing" | "chunking" | "embedding" | "indexed"
   | "draft" | "published" | "superseded"
-  | "parse_failed" | "chunk_failed" | "embed_failed";
+  | "parse_failed" | "chunk_failed" | "embed_failed"
+  | "needs_ocr";
 
 interface AdminDoc {
   id: string;
@@ -54,7 +55,7 @@ const ACCEPTED_MIME = [
 const MAX_BYTES = 50 * 1024 * 1024;
 
 const PROCESSING: DocStatus[] = ["parsing", "chunking", "embedding"];
-const FAILED: DocStatus[] = ["parse_failed", "chunk_failed", "embed_failed"];
+const FAILED: DocStatus[] = ["parse_failed", "chunk_failed", "embed_failed", "needs_ocr"];
 
 function statusLabel(s: DocStatus, d?: AdminDoc): string {
   if (PROCESSING.includes(s)) {
@@ -71,6 +72,7 @@ function statusLabel(s: DocStatus, d?: AdminDoc): string {
     parse_failed: "Parse failed",
     chunk_failed: "Chunk failed",
     embed_failed: "Embed failed",
+    needs_ocr: "Needs OCR (scanned)",
   };
   return map[s] ?? s;
 }

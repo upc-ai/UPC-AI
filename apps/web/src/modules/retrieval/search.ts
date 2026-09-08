@@ -12,6 +12,9 @@ import { getDb } from "@/lib/db";
 import { getEnv } from "@upc/core";
 import { embedBatch, resolveEmbedConfig, type EmbedConfig } from "@upc/ingest";
 import { rewriteQuery } from "./rewrite";
+import { dedupeRanked } from "./dedupe";
+import { rerankChunks } from "./rerank";
+import { VISIBLE_DOC_FILTER } from "./visibility";
 
 export interface RetrievedChunk {
   chunkId: string;
@@ -22,13 +25,17 @@ export interface RetrievedChunk {
   pageNumber: number | null;
   relevanceScore: number;
   hierarchyPath: string | null;
+  metadata: Record<string, unknown> | null;
 }
 
 const VECTOR_CANDIDATES = 30;
 const BM25_CANDIDATES = 30;
+const RERANK_POOL = 12;
 export const TOP_K = 6;
-/** Fusion scores below this = no real evidence → refusal (P7). */
-export const EVIDENCE_THRESHOLD = 0.008;
+/** Fusion scores below this = no real evidence → refusal (P7).
+ *  0.016 = a chunk must surface in BOTH retrieval lists (or top of one +
+ *  support in the other) — single-list keyword noise stays under it. */
+export const EVIDENCE_THRESHOLD = 0.016;
 
 /** Query-side embedder: managed/env config + Gemini fallback from AI_CUSTOM_PROVIDERS. */
 async function queryEmbedConfig(): Promise<EmbedConfig | null> {
@@ -60,6 +67,8 @@ export interface RetrieveOptions {
   history?: { role: string; content: string }[];
   /** Skip the rewrite LLM call (eval runs, tests). */
   skipRewrite?: boolean;
+  /** Max chunks returned (eval requests deeper pools for Recall@10). Default TOP_K. */
+  limit?: number;
 }
 
 export interface RetrieveResult {
@@ -90,16 +99,13 @@ export async function retrieve(
   // ---- Stage 1a: vector search (cosine, pre-filtered) ----
   const vectorRows = queryEmbedding
     ? ((await db.execute(sql`
-        SELECT c.id, c.content, c.document_id, c.page_number, c.hierarchy_path,
+        SELECT c.id, c.content, c.document_id, c.page_number, c.hierarchy_path, c.metadata,
                d.title AS document_title, d.version AS document_version,
                1 - (e.embedding_vector <=> ${queryEmbedding}::vector) AS score
         FROM chunks c
         JOIN embeddings e ON e.chunk_id = c.id
         JOIN documents d ON d.id = c.document_id
-        WHERE c.status = 'active'
-          AND d.status = 'published'
-          AND d.is_active_version = true
-          AND (d.expiry_date IS NULL OR d.expiry_date > CURRENT_DATE)
+        WHERE ${VISIBLE_DOC_FILTER}
           ${filter?.departmentId ? sql`AND (d.department_id IS NULL OR d.department_id = ${filter.departmentId})` : sql``}
         ORDER BY e.embedding_vector <=> ${queryEmbedding}::vector
         LIMIT ${VECTOR_CANDIDATES}
@@ -108,15 +114,12 @@ export async function retrieve(
 
   // ---- Stage 1b: BM25 (tsvector) search ----
   const bm25Rows = ((await db.execute(sql`
-        SELECT c.id, c.content, c.document_id, c.page_number, c.hierarchy_path,
+        SELECT c.id, c.content, c.document_id, c.page_number, c.hierarchy_path, c.metadata,
                d.title AS document_title, d.version AS document_version,
                ts_rank(to_tsvector('simple', c.content), websearch_to_tsquery('simple', ${effectiveQuery})) AS score
         FROM chunks c
         JOIN documents d ON d.id = c.document_id
-        WHERE c.status = 'active'
-          AND d.status = 'published'
-          AND d.is_active_version = true
-          AND (d.expiry_date IS NULL OR d.expiry_date > CURRENT_DATE)
+        WHERE ${VISIBLE_DOC_FILTER}
           ${filter?.departmentId ? sql`AND (d.department_id IS NULL OR d.department_id = ${filter.departmentId})` : sql``}
           AND to_tsvector('simple', c.content) @@ websearch_to_tsquery('simple', ${effectiveQuery})
         ORDER BY score DESC
@@ -138,20 +141,42 @@ export async function retrieve(
   addRanking(vectorRows);
   addRanking(bm25Rows);
 
-  const ranked = [...fused.values()].sort((a, b) => b.score - a.score).slice(0, TOP_K);
+  const ranked = [...fused.values()].sort((a, b) => b.score - a.score);
 
-  const chunks = ranked
-    .filter((r) => r.score >= EVIDENCE_THRESHOLD)
-    .map((r) => ({
-      chunkId: r.row.id as string,
-      content: r.row.content as string,
-      documentId: r.row.document_id as string,
-      documentTitle: r.row.document_title as string,
-      documentVersion: (r.row.document_version as number) ?? 1,
-      pageNumber: (r.row.page_number as number | null) ?? null,
-      relevanceScore: Number(r.score),
-      hierarchyPath: (r.row.hierarchy_path as string | null) ?? null,
-    }));
+  // ---- Stage 3: near-duplicate suppression, then LLM rerank (both fail-open) ----
+  type FusedRow = Record<string, unknown> & { id: string; content: string };
+  const deduped = dedupeRanked(
+    ranked.map(
+      (r): FusedRow => ({ ...(r.row as Record<string, unknown>), id: r.row.id as string, content: r.row.content as string }),
+    ),
+  );
+  const shortlist = deduped.slice(0, RERANK_POOL);
+  const reranked = await rerankChunks(
+    effectiveQuery,
+    shortlist.map((r) => ({
+      ...r,
+      documentTitle: (r.document_title as string) ?? "",
+    })),
+  );
+
+  const chunks = reranked
+    .slice(0, opts.limit ?? TOP_K)
+    .map(toRetrievedChunk)
+    .filter((r) => r.relevanceScore >= EVIDENCE_THRESHOLD);
 
   return { chunks, effectiveQuery };
+}
+
+function toRetrievedChunk(row: Record<string, unknown>): RetrievedChunk {
+  return {
+    chunkId: row.id as string,
+    content: row.content as string,
+    documentId: row.document_id as string,
+    documentTitle: row.document_title as string,
+    documentVersion: (row.document_version as number) ?? 1,
+    pageNumber: (row.page_number as number | null) ?? null,
+    relevanceScore: Number(row.score),
+    hierarchyPath: (row.hierarchy_path as string | null) ?? null,
+    metadata: (row.metadata as Record<string, unknown> | null) ?? null,
+  };
 }

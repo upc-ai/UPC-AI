@@ -6,7 +6,7 @@ import { documents } from "@upc/db";
 import { ApiError, getEnv } from "@upc/core";
 import { ok, fail } from "@/lib/api";
 import { requireAuth, canManageDocuments } from "@/lib/auth/guard";
-import { runIngestion, recordIngestFailure, IngestError, type IngestEnv } from "@upc/ingest";
+import { runIngestion, recordIngestFailure, IngestError, NeedsOcrError, type IngestEnv } from "@upc/ingest";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -62,6 +62,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         embedded: result.embedded,
       });
     } catch (err) {
+      if (err instanceof NeedsOcrError) {
+        // Status already set to needs_ocr by the pipeline (markNeedsOcr) —
+        // surfaced as a normal result, not an error.
+        return ok({ document_id: body.document_id, status: "needs_ocr", error: err.message }, { status: 200 });
+      }
       if (err instanceof IngestError) {
         await recordIngestFailure(db, body.document_id, err.stage, err.message);
         return ok(

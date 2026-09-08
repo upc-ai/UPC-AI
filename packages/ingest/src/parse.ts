@@ -45,13 +45,75 @@ async function parsePdf(buffer: Buffer): Promise<ParsedDocument> {
   const result = await pdfParse(buffer);
   // pdf-parse gives total text; approximate page boundaries by form feeds if present
   const pageTexts = result.text.split("\f").filter((p) => p.trim().length > 0);
+  // Some PDFs hide NUL bytes in their text layer — Postgres rejects 0x00 outright
+  const text = structurePdfText(result.text.replace(/\f/g, "\n").replace(/\0/g, ""));
   return {
-    text: result.text.replace(/\f/g, "\n"),
+    text,
     pages: pageTexts.length || null,
     pageTexts,
     tables: [],
     ocrApplied: false,
+    ...(isScannedPdf(text, pageTexts.length) ? { needsOcr: true, error: SCANNED_PDF_ERROR } : {}),
   };
+}
+
+export const SCANNED_PDF_ERROR = "Scanned PDF — no usable text layer; needs OCR";
+/** Below this average extraction yield (chars per page) a PDF is treated as scanned. */
+export const SCANNED_MIN_CHARS_PER_PAGE = 120;
+
+/** Scanned/image-only detection: no text at all, or a suspiciously thin text
+ *  layer relative to page count (watermarked covers, OCR leftovers). */
+export function isScannedPdf(text: string, pages: number): boolean {
+  const len = text.trim().length;
+  if (len === 0) return true;
+  if (pages > 0 && len / pages < SCANNED_MIN_CHARS_PER_PAGE) return true;
+  return false;
+}
+
+/**
+ * Recover structure that pdf-parse flattens: heading-looking lines become `## `
+ * (the chunker splits on them and builds hierarchy paths), bullet glyphs become
+ * `- ` list markers, blank lines (paragraph breaks) are preserved. Conservative
+ * by design — anything ambiguous passes through untouched.
+ */
+export function structurePdfText(raw: string): string {
+  const out: string[] = [];
+  for (const lineRaw of raw.split("\n")) {
+    const t = lineRaw.trim();
+    if (!t) {
+      out.push("");
+      continue;
+    }
+    if (/^#{1,3}\s+/.test(t)) {
+      out.push(t); // already structured
+      continue;
+    }
+    // Bullet glyphs → list marker
+    if (/^[•●▪◦○‣·]\s*/.test(t)) {
+      out.push("- " + t.replace(/^[•●▪◦○‣·]\s*/, ""));
+      continue;
+    }
+    // ALL-CAPS Latin heading ("COURSE OBJECTIVES") — not Devanagari (no case there)
+    if (
+      t.length <= 80 &&
+      !/[\u0900-\u097F]/.test(t) &&
+      /[A-Z]{2,}/.test(t) &&
+      !/[a-z]/.test(t) &&
+      /\p{L}/u.test(t)
+    ) {
+      out.push("## " + t);
+      continue;
+    }
+    // Numbered heading ("1. Introduction", "2.1 Course Objectives") — short,
+    // no sentence-final period, at least a few letters in the remainder.
+    const numbered = t.match(/^(\d+(?:\.\d+)*[.)]?)\s+(\S.*)$/);
+    if (numbered && t.length <= 70 && !/[.]$/.test(t) && (numbered[2]!.match(/\p{L}/gu)?.length ?? 0) >= 3) {
+      out.push("## " + t);
+      continue;
+    }
+    out.push(t);
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 async function parseDocx(buffer: Buffer): Promise<ParsedDocument> {

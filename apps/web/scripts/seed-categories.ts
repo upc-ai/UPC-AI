@@ -18,6 +18,12 @@ const DEFAULT_CATEGORIES: { slug: string; name: string; icon: string }[] = [
   { slug: "scholarships", name: "Scholarships", icon: "🎓" },
   { slug: "library", name: "Library", icon: "📖" },
   { slug: "faculty-info", name: "Faculty Info", icon: "👥" },
+  // RAG organization (harvest curation, 2026-09-05)
+  { slug: "about-college", name: "About the College", icon: "🏛️" },
+  { slug: "courses", name: "Courses & Programs", icon: "🎓" },
+  { slug: "facilities", name: "Facilities", icon: "🏏" },
+  { slug: "study-material", name: "Old Papers & E-Content", icon: "🗂️" },
+  { slug: "forms", name: "Forms & Certificates", icon: "🧾" },
 ];
 
 async function main() {

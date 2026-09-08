@@ -14,7 +14,14 @@
     "seed:categories": "tsx scripts/seed-categories.ts",
     "promote": "tsx scripts/promote.ts",
     "reset-password": "tsx scripts/reset-password.ts",
-    "eval:rag": "tsx scripts/eval-rag.ts"
+    "eval:rag": "tsx scripts/eval-rag.ts",
+    "crawl:site": "tsx scripts/crawl-site.ts",
+    "harvest:site": "tsx scripts/harvest-site.ts",
+    "curate:harvest": "tsx scripts/curate-harvest.ts",
+    "import:curated": "tsx scripts/import-curated.ts",
+    "kb:audit": "tsx scripts/kb-audit.ts",
+    "ocr:scanned": "node scripts/ocr-scanned.mjs",
+    "backfill:vectors": "tsx scripts/backfill-vectors.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.5",

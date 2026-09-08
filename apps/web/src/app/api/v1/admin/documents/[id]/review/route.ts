@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { documents, auditLogs } from "@upc/db";
 import { ApiError } from "@upc/core";
+import { canPublish } from "@upc/ingest";
 import { ok, fail } from "@/lib/api";
 import { requireAuth, canReviewDocuments } from "@/lib/auth/guard";
 
@@ -34,6 +35,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       if (doc.status !== "indexed") {
         throw new ApiError("VALIDATION_ERROR", `Document must be indexed before approval (current: ${doc.status})`);
       }
+      // Safety invariant: failed/unfinished ingestion and missing embeddings
+      // can never be published (pure logic in @upc/ingest, unit-tested).
+      const [counts] = (await db.execute(sql`
+        select
+          (select count(*)::int from chunks c where c.document_id = ${doc.id}) as chunk_count,
+          (select count(*)::int from embeddings e join chunks c on c.id = e.chunk_id where c.document_id = ${doc.id}) as embedding_count
+      `)) as unknown as { chunk_count: number; embedding_count: number }[];
+      const verdict = canPublish(
+        { status: doc.status, processingError: doc.processingError },
+        { chunkCount: counts?.chunk_count ?? 0, embeddingCount: counts?.embedding_count ?? 0 },
+      );
+      if (!verdict.ok) throw new ApiError("VALIDATION_ERROR", `Cannot publish: ${verdict.reason}`);
       // Supersede previous active version of this canonical doc, then publish.
       await db
         .update(documents)

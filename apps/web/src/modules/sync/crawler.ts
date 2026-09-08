@@ -14,6 +14,17 @@ const MAX_DEPTH = 3;
 const POLITENESS_MS = 300;
 const UA = "UPCAI-KnowledgeSync/1.0 (+https://upcai.app; college knowledge base sync)";
 
+/** Budget overrides — the server sync route keeps the defaults (Vercel 60s cap);
+ *  the local harvest script passes a bigger budget and streams results to disk. */
+export interface CrawlBudget {
+  maxPages?: number;
+  maxPdfs?: number;
+  maxDepth?: number;
+  /** Stream each result as it is fetched instead of accumulating in memory.
+   *  When set, crawlCollegeSite returns [] — the callback owns the result. */
+  onPage?: (page: CrawledPage) => void | Promise<void>;
+}
+
 export interface CrawledPage {
   url: string;
   title: string;
@@ -22,6 +33,8 @@ export interface CrawledPage {
   kind: "html" | "pdf";
   /** Raw bytes for PDFs (fed to the ingest pipeline). */
   bytes?: Buffer;
+  /** Raw HTML for html pages (harvest re-extraction; unused by the sync route). */
+  html?: string;
 }
 
 /** Extract same-domain links from raw HTML. */
@@ -102,26 +115,41 @@ async function fetchWithTimeout(url: string, ms: number): Promise<Response | nul
  * Crawl the college website. Breadth-first, same-domain, budgeted. Returns
  * readable text pages first, then up to MAX_PDFS linked PDF binaries.
  */
-export async function crawlCollegeSite(startUrl: string): Promise<CrawledPage[]> {
+export async function crawlCollegeSite(startUrl: string, budget?: CrawlBudget): Promise<CrawledPage[]> {
+  const maxPages = budget?.maxPages ?? MAX_PAGES;
+  const maxPdfs = budget?.maxPdfs ?? MAX_PDFS;
+  const maxDepth = budget?.maxDepth ?? MAX_DEPTH;
+  const onPage = budget?.onPage;
   const start = new URL(startUrl);
   const seen = new Set<string>([startUrl]);
   const pages: CrawledPage[] = [];
   const pdfs: CrawledPage[] = [];
+  // Counts every emitted page — the loop budget works in streaming mode too
+  // (pages[] stays empty there, so pages.length alone would never throttle).
+  let fetched = 0;
   const queue: { url: string; depth: number }[] = [{ url: startUrl, depth: 0 }];
 
-  while (queue.length > 0 && pages.length < MAX_PAGES) {
+  while (queue.length > 0 && fetched < maxPages) {
     const { url, depth } = queue.shift()!;
     const res = await fetchWithTimeout(url, 15_000);
     if (!res) continue;
     const ctype = res.headers.get("content-type") ?? "";
     if (ctype.includes("text/html") || ctype.includes("xhtml")) {
-      const html = await res.text();
+      let html: string;
+      try {
+        html = await res.text();
+      } catch {
+        continue; // body read aborted mid-stream (signal timeout) — skip page
+      }
       const text = htmlToText(html);
       if (text.length >= 150) {
         // skip nav-shell pages with no real content
-        pages.push({ url, title: extractTitle(html, url), text, kind: "html" });
+        const page: CrawledPage = { url, title: extractTitle(html, url), text, kind: "html", html };
+        fetched++;
+        if (onPage) await onPage(page);
+        else pages.push(page);
       }
-      if (depth < MAX_DEPTH) {
+      if (depth < maxDepth) {
         for (const link of extractLinks(html, url)) {
           if (!seen.has(link)) {
             seen.add(link);
@@ -137,7 +165,7 @@ export async function crawlCollegeSite(startUrl: string): Promise<CrawledPage[]>
           if (u.hostname !== start.hostname) continue;
           const key = u.toString();
           if (pdfs.some((p) => p.url === key)) continue;
-          if (pdfs.length >= MAX_PDFS) break;
+          if (pdfs.length >= maxPdfs) break;
           pdfs.push({ url: key, title: "", text: "", kind: "pdf" });
         } catch {
           /* skip */
@@ -149,13 +177,19 @@ export async function crawlCollegeSite(startUrl: string): Promise<CrawledPage[]>
 
   // Fetch the collected PDFs (they flow through the full parse pipeline)
   for (const p of pdfs) {
-    if (pages.length + pdfs.filter((x) => x.bytes).length >= MAX_PAGES + MAX_PDFS) break;
+    if (pages.length + pdfs.filter((x) => x.bytes).length >= maxPages + maxPdfs) break;
     const res = await fetchWithTimeout(p.url, 30_000);
     if (!res) continue;
-    const bytes = Buffer.from(await res.arrayBuffer());
+    let bytes: Buffer;
+    try {
+      bytes = Buffer.from(await res.arrayBuffer());
+    } catch {
+      continue; // large/slow download aborted — skip, don't kill the harvest
+    }
     if (bytes.length < 1000) continue; // 404 HTML bodies etc.
     p.bytes = bytes;
     p.title = decodeURIComponent(new URL(p.url).pathname.split("/").pop() ?? "document.pdf");
+    if (onPage) await onPage(p);
     await sleep(POLITENESS_MS);
   }
 

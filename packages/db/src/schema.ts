@@ -55,6 +55,7 @@ export const intentEnum = pgEnum("intent", ["academic", "knowledge", "mixed", "c
 export const docStatusEnum = pgEnum("doc_status", [
   "uploaded", "scanning", "scan_failed", "parsing", "parse_failed",
   "chunking", "chunk_failed", "embedding", "embed_failed",
+  "needs_ocr",
   "indexed", "draft", "in_review", "approved", "published", "superseded", "archived",
 ]);
 export const accessLevelEnum = pgEnum("access_level", ["public", "internal", "restricted"]);
@@ -569,6 +570,11 @@ export const embeddings = pgTable(
     dimensions: integer("dimensions").notNull().default(1536),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
+  (t) => [
+    // Approximate nearest-neighbor for retrieval's cosine (<=>) search —
+    // without it the vector stage sequential-scans every embedding row.
+    index("embeddings_vector_hnsw").using("hnsw", t.embeddingVector.op("vector_cosine_ops")),
+  ],
 );
 
 export const ingestionJobs = pgTable(
