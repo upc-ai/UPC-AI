@@ -78,7 +78,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           { status: 200 },
         );
       }
-      throw err;
+      // Storage/DB/unknown failures (e.g. "Supabase download failed") — record
+      // them on the document so the panel shows the REAL reason, and return a
+      // graceful error instead of an unhandled 500.
+      const message = err instanceof Error ? err.message : String(err);
+      await recordIngestFailure(db, body.document_id, "parsing", message).catch(() => undefined);
+      return ok({ document_id: body.document_id, status: "parse_failed", error: message }, { status: 200 });
     }
   } catch (err) {
     return fail(err);

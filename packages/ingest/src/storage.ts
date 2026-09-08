@@ -96,7 +96,12 @@ export async function readRawFile(storagePath: string, config: StorageConfig | n
     const res = await fetch(`${config.supabaseUrl}/storage/v1/object/authenticated/${config.bucket}/${objectPath}`, {
       headers: { Authorization: `Bearer ${config.serviceKey}` },
     });
-    if (!res.ok) throw new Error(`Supabase download failed: ${res.status}`);
+    if (!res.ok) {
+      // Supabase puts the real reason in the body (e.g. "The related resource
+      // does not exist" = bucket/object missing) — surface it.
+      const body = await res.text().catch(() => "");
+      throw new Error(`Supabase download failed: ${res.status} ${body.slice(0, 300)}`);
+    }
     return Buffer.from(await res.arrayBuffer());
   }
   const { readFile } = await import("node:fs/promises");

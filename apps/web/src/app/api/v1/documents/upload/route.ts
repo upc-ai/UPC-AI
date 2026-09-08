@@ -109,6 +109,10 @@ export async function POST(req: NextRequest) {
     const objectPath = objectPathFor(documentId, extension);
     const storagePath = `${STORAGE_BUCKET}/${objectPath}`;
 
+    // Sign FIRST — if storage is misconfigured (bucket missing, key wrong), we
+    // fail cleanly here WITHOUT leaving an orphan document row behind.
+    const { url, token } = await createSignedUploadUrl(storage, objectPath);
+
     const [doc] = await db
       .insert(documents)
       .values({
@@ -131,8 +135,6 @@ export async function POST(req: NextRequest) {
         version,
       })
       .returning({ id: documents.id });
-
-    const { url, token } = await createSignedUploadUrl(storage, objectPath);
 
     const [job] = await db
       .insert(ingestionJobs)
