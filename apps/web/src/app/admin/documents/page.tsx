@@ -182,9 +182,9 @@ export default function AdminDocumentsPage() {
     try {
       let documentId: string;
 
-      if (storageMode === "supabase") {
-        // Supabase mode — JSON metadata, then bytes go browser → signed URL
-        // (bypasses the Vercel ~4.5MB body cap; token is in the URL)
+      if (storageMode === "supabase" && file.size > 4 * 1024 * 1024) {
+        // Oversized file — two-phase signed-URL flow (browser PUTs directly to
+        // Supabase, bypassing the Vercel ~4.5MB server body cap)
         const r = await api<{ document_id: string; upload_url?: string }>(
           "/api/v1/documents/upload",
           {
@@ -204,8 +204,9 @@ export default function AdminDocumentsPage() {
         );
 
         if (r.upload_url) {
+          // Supabase signed-upload URLs respond to PUT (token is in the query string)
           const put = await fetch(r.upload_url, {
-            method: "POST",
+            method: "PUT",
             headers: { "Content-Type": file.type },
             body: file,
           });
@@ -218,7 +219,8 @@ export default function AdminDocumentsPage() {
           body: JSON.stringify({ document_id: r.document_id }),
         });
       } else {
-        // Local mode — single multipart request with the file inline
+        // ≤4MB (or local mode) — single multipart request through our own
+        // server: no browser→Supabase CORS, hash recorded server-side.
         const form = new FormData();
         form.append("file", file);
         form.append(

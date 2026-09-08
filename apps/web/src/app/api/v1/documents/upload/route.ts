@@ -10,7 +10,7 @@ import { requireAuth, canManageDocuments } from "@/lib/auth/guard";
 import {
   resolveStorageConfig,
   createSignedUploadUrl,
-  writeRawLocal,
+  uploadRaw,
   sha256Hex,
   objectPathFor,
   STORAGE_BUCKET,
@@ -51,12 +51,14 @@ const metadataSchema = z.object({
 });
 
 /**
- * POST /v1/documents/upload — step 1 of the two-phase flow.
- * Supabase mode: creates the document row and returns a signed upload URL;
- * the browser PUTs the raw bytes straight to Supabase Storage (bypasses the
- * Vercel ~4.5MB body cap), then calls /documents/upload-complete.
- * Local mode (dev, no SUPABASE_*): accepts multipart file+metadata and
- * writes to disk — the single-request legacy path.
+ * POST /v1/documents/upload — two storage modes:
+ * • Multipart (file inline): works in BOTH modes — Supabase mode uploads
+ *   server→Supabase via uploadRaw (no browser CORS involvement) and records
+ *   the sha256 (verifiable upload); local mode writes to disk. The client
+ *   uses this for everything ≤ ~4MB (Vercel body cap).
+ * • JSON metadata (Supabase mode only): two-phase flow for oversized files —
+ *   creates the row and returns a signed upload URL for a browser-direct PUT
+ *   (bypasses the body cap), then /documents/upload-complete verifies.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -71,12 +73,16 @@ export async function POST(req: NextRequest) {
     const env = getEnv();
     const storage = resolveStorageConfig({ SUPABASE_URL: env.SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY });
 
-    // ── Local mode: multipart (legacy single-request path) ─────────────
-    if (!storage) {
-      return localMultipartUpload(req, claims.sub, db);
+    // ── Multipart: file inline (preferred for anything under the body cap) ──
+    const contentType = req.headers.get("content-type") ?? "";
+    if (contentType.includes("multipart/form-data")) {
+      return multipartUpload(req, claims.sub, db, storage);
     }
 
-    // ── Supabase mode: JSON metadata only, file goes browser → Supabase ─
+    // ── JSON: two-phase signed-URL flow (Supabase mode only, oversized files) ──
+    if (!storage) {
+      throw new ApiError("VALIDATION_ERROR", "JSON upload requires Supabase storage to be configured — send multipart/form-data instead.");
+    }
     const body = metadataSchema.parse(await req.json());
     const mime = body.mime_type ?? "";
     if (!ALLOWED_MIME[mime]) {
@@ -165,8 +171,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/** Local-disk upload (dev): file bytes arrive in the same request. */
-async function localMultipartUpload(req: NextRequest, userId: string, db: ReturnType<typeof getDb>) {
+/** Multipart upload (file inline) — Supabase mode uploads server→Supabase, local mode to disk. */
+async function multipartUpload(
+  req: NextRequest,
+  userId: string,
+  db: ReturnType<typeof getDb>,
+  storage: ReturnType<typeof resolveStorageConfig>,
+) {
   const { mkdir, writeFile } = await import("node:fs/promises");
   const path = await import("node:path");
   const form = await req.formData();
@@ -188,7 +199,7 @@ async function localMultipartUpload(req: NextRequest, userId: string, db: Return
     .limit(1);
   if (!category) throw new ApiError("VALIDATION_ERROR", `Unknown category: ${metadata.category_slug}`);
 
-  // Version lineage when superseding (string-typed: see the Supabase branch above)
+  // Version lineage when superseding
   let canonicalId: string = randomUUID();
   let version = 1;
   if (metadata.supersedes_document_id) {
@@ -202,11 +213,22 @@ async function localMultipartUpload(req: NextRequest, userId: string, db: Return
     }
   }
 
-  const fileName = `${randomUUID()}.${ALLOWED_MIME[mime]}`;
-  const storagePath = `storage/raw/${fileName}`;
   const bytes = Buffer.from(await file.arrayBuffer());
-  await writeRawLocal(storagePath, bytes);
   const contentHash = sha256Hex(bytes);
+
+  // Upload bytes FIRST (server→Supabase or server→disk) — the document row is
+  // only created once the file is durably stored. No phantoms possible.
+  let storagePath: string;
+  if (storage) {
+    const objectPath = objectPathFor(randomUUID(), ALLOWED_MIME[mime]!);
+    await uploadRaw(storage, objectPath, bytes, mime);
+    storagePath = `${STORAGE_BUCKET}/${objectPath}`;
+  } else {
+    const fileName = `${randomUUID()}.${ALLOWED_MIME[mime]}`;
+    storagePath = `storage/raw/${fileName}`;
+    await mkdir(path.dirname(path.join(process.cwd(), storagePath)), { recursive: true });
+    await writeFile(path.join(process.cwd(), storagePath), bytes);
+  }
 
   const [doc] = await db
     .insert(documents)
@@ -233,7 +255,7 @@ async function localMultipartUpload(req: NextRequest, userId: string, db: Return
 
   const [job] = await db
     .insert(ingestionJobs)
-      .values({ documentId: doc!.id, jobType: "ingest_document", status: "queued" })
+    .values({ documentId: doc!.id, jobType: "ingest_document", status: "queued" })
     .returning({ id: ingestionJobs.id });
 
   await db.insert(auditLogs).values({
@@ -248,10 +270,10 @@ async function localMultipartUpload(req: NextRequest, userId: string, db: Return
     {
       document_id: doc!.id,
       job_id: job!.id,
-      storage_mode: "local",
+      storage_mode: storage ? "supabase" : "local",
       content_hash: contentHash,
-      status: "processing",
-      estimated_processing_time_seconds: 61,
+      status: "uploaded",
+      estimated_processing_time_seconds: 60,
     },
     { status: 202 },
   );
