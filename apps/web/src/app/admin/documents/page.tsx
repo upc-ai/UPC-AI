@@ -260,6 +260,28 @@ export default function AdminDocumentsPage() {
     }
   };
 
+  /** Hard-delete a document (and every version sharing its canonicalId):
+   *  chunks, vectors and the storage file are removed — cannot be undone. */
+  const deleteDoc = async (d: AdminDoc) => {
+    if (
+      !window.confirm(
+        `Delete "${d.title}" permanently?${d.version > 1 ? " All versions of this document go too." : ""} Chunks, vectors and the stored file are removed. This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setActionBusy(d.id);
+    try {
+      const r = await api<{ deleted?: number; storage_errors?: string[] }>(`/api/v1/admin/documents/${d.id}`, { method: "DELETE" });
+      toast.success(`"${d.title}" deleted${r.deleted && r.deleted > 1 ? ` (${r.deleted} rows)` : ""}.`);
+      await loadDocs();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed.");
+    } finally {
+      setActionBusy(null);
+    }
+  };
+
   const submit = async () => {
     if (files.length === 0 || uploading) return;
     if (!title.trim() || !categorySlug) {
@@ -695,6 +717,15 @@ export default function AdminDocumentsPage() {
                               New version
                             </button>
                           )}
+                          <button
+                            className={[styles.actBtn, styles.actBtnDanger].join(" ")}
+                            onClick={() => void deleteDoc(d)}
+                            disabled={actionBusy === d.id || uploading}
+                            type="button"
+                            title="Delete permanently — removes all versions, chunks, vectors and the stored file"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>

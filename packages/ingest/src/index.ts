@@ -13,6 +13,7 @@ export {
   createSignedUploadUrl,
   uploadRaw,
   objectExists,
+  deleteObject,
   readRawFile,
   writeRawLocal,
   objectPathFor,

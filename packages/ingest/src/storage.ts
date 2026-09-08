@@ -89,6 +89,18 @@ export async function objectExists(config: StorageConfig, objectPath: string): P
   return res.ok;
 }
 
+/** Permanently remove an object (document deletion). 404 counts as success. */
+export async function deleteObject(config: StorageConfig, objectPath: string): Promise<void> {
+  const res = await fetch(`${config.supabaseUrl}/storage/v1/object/${config.bucket}/${objectPath}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${config.serviceKey}` },
+  });
+  if (!res.ok && res.status !== 404) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Supabase delete failed: ${res.status} ${body.slice(0, 300)}`);
+  }
+}
+
 /** Read the raw file for ingestion — Supabase object or local disk. */
 export async function readRawFile(storagePath: string, config: StorageConfig | null): Promise<Buffer> {
   if (config && storagePath.startsWith(`${config.bucket}/`)) {
