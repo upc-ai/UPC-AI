@@ -3,7 +3,7 @@ import { and, asc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { chatSessions, messages, aiResponses, citations as citationsTable, userPreferences, chatAttachments, retrievalLogs } from "@upc/db";
-import { ApiError, publicModelById, publicModelForTier, STUDY_MODES, LANGUAGES, type ResponseLength, type Difficulty, type LanguagePreference, type StudyMode } from "@upc/core";
+import { ApiError, getEnv, publicModelById, publicModelForTier, STUDY_MODES, LANGUAGES, type ResponseLength, type Difficulty, type LanguagePreference, type StudyMode } from "@upc/core";
 import { ok, fail } from "@/lib/api";
 import { requireAuth } from "@/lib/auth/guard";
 import { rateLimit } from "@/lib/redis";
@@ -70,18 +70,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             pageNumber: citationsTable.pageNumber,
             snippet: citationsTable.snippet,
             relevanceScore: citationsTable.relevanceScore,
-            sourceUrl: sql<string | null>`(select c.metadata->>'source_url' from chunks c where c.id = ${citationsTable.chunkId})`,
           })
           .from(citationsTable)
           .where(eq(citationsTable.messageId, m.id))
           .orderBy(asc(citationsTable.citationOrder));
-        // Dedupe: one chip per unique source page (first citation wins)
-        const seenDocs = new Set<string>();
-        const dedupedCites = cites.filter((c) => {
-          if (seenDocs.has(c.documentId)) return false;
-          seenDocs.add(c.documentId);
-          return true;
-        });
         const attachments = attachmentRows
           .filter((a) => a.messageId === m.id)
           .map((a) => ({
@@ -91,21 +83,26 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
             size_bytes: a.sizeBytes,
             ...(a.mimeType.startsWith("image/") ? { data: a.data } : {}),
           }));
+        const env = getEnv();
+        const officialUrl = env.COLLEGE_WEBSITE_URL?.trim() || "https://www.upcollege.ac.in/";
         return {
           id: m.id,
           role: m.role,
           content: m.content,
           created_at: m.createdAt,
           ...(attachments.length ? { attachments } : {}),
-          citations: dedupedCites.map((c) => ({
-            order: c.citationOrder,
-            document_id: c.documentId,
-            document_title: c.documentTitle,
-            source_url: c.sourceUrl,
-            page_number: c.pageNumber,
-            snippet: c.snippet ?? "",
-            relevance_score: Number(c.relevanceScore ?? 0),
-          })),
+          // One official-link chip whenever the answer used college knowledge
+          citations: cites.length
+            ? [{
+                order: 1,
+                document_id: cites[0]!.documentId,
+                document_title: "Udai Pratap College — Official Website",
+                source_url: officialUrl,
+                page_number: null,
+                snippet: cites[0]!.snippet ?? "",
+                relevance_score: Number(cites[0]!.relevanceScore ?? 0),
+              }]
+            : [],
         };
       }),
     );
@@ -539,47 +536,25 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
               console.error("[chat-stream] metrics persist failed:", err);
             }
 
-            // Citations — dedupe by source URL: students see the college page
-            // each answer came from (like web-search AIs), not one chip per
-            // chunk. `order` keeps the chunk's context number so the model's
-            // in-text [n] markers match the chips. Docs without a URL (direct
-            // uploads) keep per-chunk chips opening the sources panel.
-            const seenSources = new Map<string, number>();
-            const citationPayload: {
-              order: number;
-              document_id: string;
-              document_title: string;
-              source_url: string | null;
-              page_number: number | null;
-              section: string | null;
-              snippet: string;
-              relevance_score: number;
-            }[] = [];
-            contextChunks.slice(0, 6).forEach((c, i) => {
-              const meta = (c.metadata ?? {}) as Record<string, unknown>;
-              const sourceUrl = typeof meta.source_url === "string" && meta.source_url.startsWith("http") ? meta.source_url : null;
-              const key = sourceUrl ?? `doc:${c.documentId}`;
-              let order = seenSources.get(key);
-              if (order === undefined) {
-                order = i + 1;
-                seenSources.set(key, order);
-                citationPayload.push({
-                  order,
-                  document_id: c.documentId,
-                  document_title: c.documentTitle,
-                  source_url: sourceUrl,
-                  page_number: c.pageNumber,
-                  section: c.hierarchyPath,
-                  snippet: c.content.slice(0, 220),
-                  relevance_score: Number(c.relevanceScore.toFixed(3)),
-                });
-              }
-            });
+            // Citations — ONE chip: the college's official website. Students see
+            // a clean official link (no deep-page redirects), only when the
+            // answer was grounded in college knowledge. Per-chunk rows stay in
+            // the DB as retrieval telemetry.
+            const officialUrl = getEnv().COLLEGE_WEBSITE_URL?.trim() || "https://www.upcollege.ac.in/";
+            const citationPayload = contextChunks.length
+              ? [{
+                  order: 1,
+                  document_id: contextChunks[0]!.documentId,
+                  document_title: "Udai Pratap College — Official Website",
+                  source_url: officialUrl,
+                  page_number: null,
+                  section: null,
+                  snippet: contextChunks[0]!.content.slice(0, 220),
+                  relevance_score: Number(contextChunks[0]!.relevanceScore.toFixed(3)),
+                }]
+              : [];
             for (let i = 0; i < Math.min(contextChunks.length, 6); i++) {
               const c = contextChunks[i]!;
-              const meta = (c.metadata ?? {}) as Record<string, unknown>;
-              const sourceUrl = typeof meta.source_url === "string" && meta.source_url.startsWith("http") ? meta.source_url : null;
-              const key = sourceUrl ?? `doc:${c.documentId}`;
               try {
                 await db.insert(citationsTable).values({
                   messageId: aiMsg!.id,
@@ -590,7 +565,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                   pageNumber: c.pageNumber,
                   snippet: c.content.slice(0, 220),
                   relevanceScore: String(c.relevanceScore.toFixed(2)),
-                  citationOrder: seenSources.get(key) ?? i + 1,
+                  citationOrder: 1,
                 });
               } catch (err) {
                 console.error("[chat-stream] citation persist failed:", err);
