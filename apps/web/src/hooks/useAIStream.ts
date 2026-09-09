@@ -14,6 +14,8 @@ export interface Citation {
   order: number;
   document_id: string;
   document_title: string;
+  /** College-website page this answer came from (synced docs) — null for direct uploads. */
+  source_url: string | null;
   page_number: number | null;
   snippet: string;
   relevance_score: number;

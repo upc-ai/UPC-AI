@@ -63,10 +63,25 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const withCitations = await Promise.all(
       rows.map(async (m) => {
         const cites = await db
-          .select()
+          .select({
+            citationOrder: citationsTable.citationOrder,
+            documentId: citationsTable.documentId,
+            documentTitle: citationsTable.documentTitle,
+            pageNumber: citationsTable.pageNumber,
+            snippet: citationsTable.snippet,
+            relevanceScore: citationsTable.relevanceScore,
+            sourceUrl: sql<string | null>`(select c.metadata->>'source_url' from chunks c where c.id = ${citationsTable.chunkId})`,
+          })
           .from(citationsTable)
           .where(eq(citationsTable.messageId, m.id))
           .orderBy(asc(citationsTable.citationOrder));
+        // Dedupe: one chip per unique source page (first citation wins)
+        const seenDocs = new Set<string>();
+        const dedupedCites = cites.filter((c) => {
+          if (seenDocs.has(c.documentId)) return false;
+          seenDocs.add(c.documentId);
+          return true;
+        });
         const attachments = attachmentRows
           .filter((a) => a.messageId === m.id)
           .map((a) => ({
@@ -82,10 +97,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           content: m.content,
           created_at: m.createdAt,
           ...(attachments.length ? { attachments } : {}),
-          citations: cites.map((c) => ({
+          citations: dedupedCites.map((c) => ({
             order: c.citationOrder,
             document_id: c.documentId,
             document_title: c.documentTitle,
+            source_url: c.sourceUrl,
             page_number: c.pageNumber,
             snippet: c.snippet ?? "",
             relevance_score: Number(c.relevanceScore ?? 0),
@@ -523,17 +539,47 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
               console.error("[chat-stream] metrics persist failed:", err);
             }
 
-            // Citations
-            const citationPayload = contextChunks.slice(0, 6).map((c, i) => ({
-              order: i + 1,
-              document_id: c.documentId,
-              document_title: c.documentTitle,
-              page_number: c.pageNumber,
-              section: c.hierarchyPath, // "Doc > Section" path (RAG v2)
-              snippet: c.content.slice(0, 220),
-              relevance_score: Number(c.relevanceScore.toFixed(3)),
-            }));
-            for (const c of contextChunks.slice(0, 6)) {
+            // Citations — dedupe by source URL: students see the college page
+            // each answer came from (like web-search AIs), not one chip per
+            // chunk. `order` keeps the chunk's context number so the model's
+            // in-text [n] markers match the chips. Docs without a URL (direct
+            // uploads) keep per-chunk chips opening the sources panel.
+            const seenSources = new Map<string, number>();
+            const citationPayload: {
+              order: number;
+              document_id: string;
+              document_title: string;
+              source_url: string | null;
+              page_number: number | null;
+              section: string | null;
+              snippet: string;
+              relevance_score: number;
+            }[] = [];
+            contextChunks.slice(0, 6).forEach((c, i) => {
+              const meta = (c.metadata ?? {}) as Record<string, unknown>;
+              const sourceUrl = typeof meta.source_url === "string" && meta.source_url.startsWith("http") ? meta.source_url : null;
+              const key = sourceUrl ?? `doc:${c.documentId}`;
+              let order = seenSources.get(key);
+              if (order === undefined) {
+                order = i + 1;
+                seenSources.set(key, order);
+                citationPayload.push({
+                  order,
+                  document_id: c.documentId,
+                  document_title: c.documentTitle,
+                  source_url: sourceUrl,
+                  page_number: c.pageNumber,
+                  section: c.hierarchyPath,
+                  snippet: c.content.slice(0, 220),
+                  relevance_score: Number(c.relevanceScore.toFixed(3)),
+                });
+              }
+            });
+            for (let i = 0; i < Math.min(contextChunks.length, 6); i++) {
+              const c = contextChunks[i]!;
+              const meta = (c.metadata ?? {}) as Record<string, unknown>;
+              const sourceUrl = typeof meta.source_url === "string" && meta.source_url.startsWith("http") ? meta.source_url : null;
+              const key = sourceUrl ?? `doc:${c.documentId}`;
               try {
                 await db.insert(citationsTable).values({
                   messageId: aiMsg!.id,
@@ -544,7 +590,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
                   pageNumber: c.pageNumber,
                   snippet: c.content.slice(0, 220),
                   relevanceScore: String(c.relevanceScore.toFixed(2)),
-                  citationOrder: citationPayload.findIndex((p) => p.document_id === c.documentId && p.page_number === c.pageNumber) + 1,
+                  citationOrder: seenSources.get(key) ?? i + 1,
                 });
               } catch (err) {
                 console.error("[chat-stream] citation persist failed:", err);

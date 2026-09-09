@@ -303,20 +303,38 @@ function CitationChips({
 }) {
   return (
     <div className={styles.citationChips}>
-      {citations.map((c) => (
-        <button
-          key={`${c.document_id}-${c.order}`}
-          className={styles.citationChip}
-          onClick={() => onCitationClick(citations, c.order)}
-          aria-label={`Source ${c.order}: ${c.document_title}`}
-        >
-          <strong>[{c.order}]</strong>
-          <span>
-            {c.document_title}
-            {c.page_number ? ` · p.${c.page_number}` : ""}
-          </span>
-        </button>
-      ))}
+      {citations.map((c) =>
+        c.source_url ? (
+          // Synced from the college website — the chip IS the link students expect
+          <a
+            key={`${c.document_id}-${c.order}`}
+            className={styles.citationChip}
+            href={c.source_url}
+            target="_blank"
+            rel="noreferrer"
+            title={`Source: ${c.document_title}${c.page_number ? ` · p.${c.page_number}` : ""}`}
+          >
+            <strong>[{c.order}]</strong>
+            <span>
+              {c.document_title}
+              {c.page_number ? ` · p.${c.page_number}` : ""}
+            </span>
+          </a>
+        ) : (
+          <button
+            key={`${c.document_id}-${c.order}`}
+            className={styles.citationChip}
+            onClick={() => onCitationClick(citations, c.order)}
+            aria-label={`Source ${c.order}: ${c.document_title}`}
+          >
+            <strong>[{c.order}]</strong>
+            <span>
+              {c.document_title}
+              {c.page_number ? ` · p.${c.page_number}` : ""}
+            </span>
+          </button>
+        ),
+      )}
     </div>
   );
 }
