@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
+import { Button, useToast } from "@upc/ui";
 import styles from "../admin-panel.module.css";
 
 interface AnalyticsData {
@@ -28,6 +29,13 @@ interface UnansweredData {
   refused_count: number;
   total_count: number;
   window_days: number;
+  trend?: {
+    refused_this_week: number;
+    total_this_week: number;
+    refused_last_week: number;
+    total_last_week: number;
+  };
+  top_questions?: { question: string; times_asked: number; last_asked: string; best_score: number | null }[];
 }
 
 function UsageChart({ data }: { data: { day: string; messages: number; active_users: number }[] }) {
@@ -67,6 +75,7 @@ function UsageChart({ data }: { data: { day: string; messages: number; active_us
 }
 
 export default function AdminAnalyticsPage() {
+  const toast = useToast();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [unanswered, setUnanswered] = useState<UnansweredData | null>(null);
@@ -184,11 +193,40 @@ export default function AdminAnalyticsPage() {
       </section>
 
       <section className={styles.card} aria-label="Unanswered questions">
-        <h2 className={styles.cardTitle}>Questions the AI couldn&apos;t answer</h2>
+        <div className={styles.cardHeaderRow}>
+          <h2 className={styles.cardTitle}>Questions the AI couldn&apos;t answer</h2>
+          {unanswered && unanswered.questions.length > 0 && (
+            <Button
+              onClick={() => {
+                const text = [
+                  `Questions UPC AI couldn't answer (last ${unanswered.window_days} days):`,
+                  ...unanswered.questions.map((q) => `- ${q.question} (asked ${q.times_asked}×, ${q.fully_refused ? "no answer" : "weak match"})`),
+                ].join("\n");
+                void navigator.clipboard.writeText(text).then(
+                  () => toast.success("Question list copied — paste it in the chat to tune the knowledge base."),
+                  () => toast.error("Copy failed — select the table manually."),
+                );
+              }}
+            >
+              Copy list
+            </Button>
+          )}
+        </div>
         <p className={styles.note}>
           What students asked that the knowledge base couldn&apos;t cover — your to-do list for the next sync or upload.
           {unanswered ? ` (${unanswered.refused_count} refusals out of ${unanswered.total_count} knowledge queries in ${unanswered.window_days} days)` : ""}
         </p>
+        {unanswered?.trend && (
+          <p className={styles.note}>
+            This week: {unanswered.trend.refused_this_week} unanswered of {unanswered.trend.total_this_week} queries ·
+            last week: {unanswered.trend.refused_last_week} of {unanswered.trend.total_last_week}
+            {unanswered.trend.total_this_week > 0
+              ? unanswered.trend.refused_this_week <= unanswered.trend.refused_last_week
+                ? " — coverage is holding or improving."
+                : " — coverage slipping, add documents for the topics below."
+              : ""}
+          </p>
+        )}
         {!unanswered ? (
           <div className={styles.loading}>Loading…</div>
         ) : unanswered.questions.length === 0 ? (
@@ -220,6 +258,35 @@ export default function AdminAnalyticsPage() {
           </div>
         )}
       </section>
+
+      {unanswered && unanswered.top_questions && unanswered.top_questions.length > 0 && (
+        <section className={styles.card} aria-label="Top questions">
+          <h2 className={styles.cardTitle}>What students are asking</h2>
+          <p className={styles.note}>Most frequent knowledge queries — the demand signal for what matters most.</p>
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Asked</th>
+                  <th>Last asked</th>
+                  <th>Best match</th>
+                </tr>
+              </thead>
+              <tbody>
+                {unanswered.top_questions.map((q) => (
+                  <tr key={q.question}>
+                    <td>{q.question}</td>
+                    <td>{q.times_asked}×</td>
+                    <td className={styles.muted}>{new Date(q.last_asked).toLocaleDateString()}</td>
+                    <td>{q.best_score != null ? q.best_score.toFixed(2) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
