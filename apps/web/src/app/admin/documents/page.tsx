@@ -282,6 +282,30 @@ export default function AdminDocumentsPage() {
     }
   };
 
+  /** Publish every "Ready to publish" document that passes the server-side
+   *  guard (fully indexed + fully embedded). Documents that fail are skipped
+   *  and reported — nothing unsafe ever goes live. */
+  const publishAll = async () => {
+    const ready = docs.filter((d) => d.status === "indexed").length;
+    if (!window.confirm(`Publish all ${ready} ready documents?\n\nOnly documents that pass quality checks (fully indexed, every chunk embedded) go live. Others are skipped and listed for you.`)) {
+      return;
+    }
+    setActionBusy("bulk");
+    try {
+      const r = await api<{ published: number; skipped_count: number; skipped?: { title: string; reason: string }[] }>(
+        "/api/v1/admin/documents/bulk-publish",
+        { method: "POST" },
+      );
+      toast.success(`Published ${r.published} documents${r.skipped_count ? ` — ${r.skipped_count} skipped (see console)` : ""}.`);
+      if (r.skipped?.length) console.warn("[bulk-publish] skipped:", r.skipped);
+      await loadDocs();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Bulk publish failed.");
+    } finally {
+      setActionBusy(null);
+    }
+  };
+
   const submit = async () => {
     if (files.length === 0 || uploading) return;
     if (!title.trim() || !categorySlug) {
@@ -633,7 +657,17 @@ export default function AdminDocumentsPage() {
         </section>
 
         <section className={styles.card} aria-label="Documents">
-          <h2 className={styles.cardTitle}>Documents</h2>
+          <div className={styles.cardHeader}>
+            <h2 className={styles.cardTitle}>Documents</h2>
+            {docs.filter((d) => d.status === "indexed").length > 0 && (
+              <Button
+                disabled={uploading || actionBusy !== null}
+                onClick={() => void publishAll()}
+              >
+                Publish all ready ({docs.filter((d) => d.status === "indexed").length})
+              </Button>
+            )}
+          </div>
           {!docsLoaded ? (
             <div className={styles.loading}>Loading documents…</div>
           ) : docs.length === 0 ? (
