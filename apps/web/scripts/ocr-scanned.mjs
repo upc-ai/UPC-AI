@@ -37,21 +37,27 @@ function csvEscape(v) {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-function geminiKey() {
-  // Prefer keys with fresh vision quota: BACKUP2 → BACKUP → GEMINI_API_KEY → chat key.
+// All candidate keys, freshest-first — transcribePdf rotates on 429 mid-run
+// (a key's daily vision cap may be spent while another's is still fresh).
+function geminiKeys() {
+  const keys = [];
   for (const k of [process.env.GEMINI_API_KEY_BACKUP2, process.env.GEMINI_API_KEY_BACKUP, process.env.GEMINI_API_KEY]) {
-    if (k?.trim()) return { key: k.trim(), baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-3.5-flash" };
+    if (k?.trim()) keys.push({ key: k.trim(), baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-3.5-flash" });
   }
-  const customs = JSON.parse(process.env.AI_CUSTOM_PROVIDERS ?? "[]");
-  const p = customs.find((x) => /generativelanguage/.test(x.baseUrl));
-  if (!p) throw new Error("no Gemini provider in AI_CUSTOM_PROVIDERS");
-  return { key: p.apiKey, baseUrl: p.baseUrl.replace(/\/$/, ""), model: "gemini-3.5-flash" };
+  if (!keys.length) {
+    const customs = JSON.parse(process.env.AI_CUSTOM_PROVIDERS ?? "[]");
+    const p = customs.find((x) => /generativelanguage/.test(x.baseUrl));
+    if (!p) throw new Error("no Gemini provider in AI_CUSTOM_PROVIDERS");
+    keys.push({ key: p.apiKey, baseUrl: p.baseUrl.replace(/\/$/, ""), model: "gemini-3.5-flash" });
+  }
+  return keys;
 }
 
-async function transcribePdf(cfg, bytes) {
+/** Transcribe one PDF, rotating keys on 429; waits out 5xx overload windows. */
+async function transcribePdf(keyList, bytes) {
   const dataUrl = `data:application/pdf;base64,${bytes.toString("base64")}`;
-  const body = {
-    model: cfg.model,
+  const buildBody = (model) => ({
+    model,
     messages: [
       {
         role: "user",
@@ -67,20 +73,23 @@ async function transcribePdf(cfg, bytes) {
     ],
     temperature: 0,
     max_tokens: 8000,
-  };
-  for (let attempt = 0; attempt <= 3; attempt++) {
+  });
+
+  const maxAttempts = keyList.length * 3; // several rotations' worth of patience
+  for (let attempt = 0; attempt <= maxAttempts; attempt++) {
+    const cfg = keyList[attempt % keyList.length];
     try {
       const res = await fetch(`${cfg.baseUrl}/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.key}` },
-        body: JSON.stringify(body),
+        body: JSON.stringify(buildBody(cfg.model)),
         signal: AbortSignal.timeout(180_000),
       });
       if (!res.ok) {
         const detail = await res.text().catch(() => "");
         if (res.status === 429 || res.status >= 500) {
-          console.log(`  [retry ${attempt + 1}] ${res.status} — backing off`);
-          await sleep(15_000 * 2 ** attempt);
+          console.log(`  [retry ${attempt + 1}] ${res.status} on key …${cfg.key.slice(-8)} — backing off`);
+          await sleep(15_000 * 2 ** (attempt % 4));
           continue;
         }
         return { error: `HTTP ${res.status}: ${detail.slice(0, 200)}` };
@@ -90,9 +99,9 @@ async function transcribePdf(cfg, bytes) {
       if (!text.trim() || text.trim().length < 100) return { error: "transcription too short" };
       return { md: text.replace(/^```markdown\s*/i, "").replace(/```\s*$/, "").trim() };
     } catch (err) {
-      if (attempt < 3) {
+      if (attempt < maxAttempts) {
         console.log(`  [retry ${attempt + 1}] ${err instanceof Error ? err.message : err}`);
-        await sleep(15_000 * 2 ** attempt);
+        await sleep(15_000 * 2 ** (attempt % 4));
         continue;
       }
       return { error: err instanceof Error ? err.message : String(err) };
@@ -103,13 +112,13 @@ async function transcribePdf(cfg, bytes) {
 
 async function main() {
   mkdirSync(OCR_DIR, { recursive: true });
-  const cfg = geminiKey();
+  const keyList = geminiKeys();
   const rows = csvParse(readFileSync(CSV_PATH, "utf8").replace(/^\uFEFF/, ""));
   const header = rows[0];
   const data = rows.slice(1).filter((r) => r.length >= 8);
 
   const scanned = data.filter((r) => r[2] === "pdf" && r[7] === "scanned");
-  console.log(`[ocr] ${scanned.length} scanned PDFs queued; model ${cfg.model}; output ${OCR_DIR}`);
+  console.log(`[ocr] ${scanned.length} scanned PDFs queued; ${keyList.length} keys in rotation; output ${OCR_DIR}`);
 
   let ok = 0;
   const failed = [];
@@ -132,7 +141,7 @@ async function main() {
       continue;
     }
     process.stdout.write(`[ocr ${i + 1}/${scanned.length}] ${mdName} …\n`);
-    const result = await transcribePdf(cfg, bytes);
+    const result = await transcribePdf(keyList, bytes);
     if (result.error) {
       failed.push({ file: mdName, reason: result.error });
       console.log(`  [failed] ${result.error}`);
