@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogoMark } from "@upc/ui";
 import { api, ApiError } from "@/lib/api-client";
 import { PasswordField } from "@/components/auth/PasswordField";
+import { PasswordChecklist } from "@/components/auth/PasswordChecklist";
 import styles from "../auth.module.css";
 
 /**
@@ -114,7 +115,7 @@ export default function ForgotPasswordPage() {
                 autoComplete="new-password"
                 inputClassName={styles.input}
               />
-              <span className={styles.hint}>8+ characters with an uppercase letter, a lowercase letter, a digit, and a special character.</span>
+              <PasswordChecklist password={newPassword} />
               <label className={styles.label} htmlFor="confirm">Confirm new password</label>
               <PasswordField
                 id="confirm"

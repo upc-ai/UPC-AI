@@ -29,7 +29,7 @@ export const envSchema = z.object({
   // Mail (OTP delivery) — dev mode logs codes instead of sending
   MAIL_PROVIDER: z.enum(["console", "resend"]).default("console"),
   RESEND_API_KEY: z.string().default(""),
-  MAIL_FROM: z.string().default("UPC AI <no-reply@upcai.in>"),
+  MAIL_FROM: z.string().default("UPC AI <no-reply@upcai.app>"),
 
   // AI providers (optional at boot; gateway degrades gracefully)
   GROQ_API_KEY: z.string().default(""),
@@ -212,14 +212,25 @@ export type OtpPurpose = (typeof OTP_PURPOSES)[number];
 export const OTP_TTL_SECONDS = 10 * 60; // 10 minutes
 export const OTP_MAX_ATTEMPTS = 5;
 
-/** Shared password policy (signup, reset, change). One place to tighten. */
+/** Shared password policy (signup, reset, change). One place to tighten.
+ *  Letters (upper+lower) and a digit are mandatory; a special character is
+ *  RECOMMENDED but not required (user decision 2026-09-10 — students must not
+ *  be blocked at signup for missing a symbol). */
 export const strongPasswordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .regex(/[A-Z]/, "Must contain an uppercase letter")
   .regex(/[a-z]/, "Must contain a lowercase letter")
-  .regex(/[0-9]/, "Must contain a digit")
-  .regex(/[^A-Za-z0-9]/, "Must contain a special character");
+  .regex(/[0-9]/, "Must contain a digit");
+
+/** Client-side rule list for the signup/reset live checklists. */
+export const PASSWORD_RULES = [
+  { id: "length", label: "At least 8 characters", test: (pw: string) => pw.length >= 8, optional: false },
+  { id: "upper", label: "An uppercase letter (A–Z)", test: (pw: string) => /[A-Z]/.test(pw), optional: false },
+  { id: "lower", label: "A lowercase letter (a–z)", test: (pw: string) => /[a-z]/.test(pw), optional: false },
+  { id: "digit", label: "A number (0–9)", test: (pw: string) => /[0-9]/.test(pw), optional: false },
+  { id: "symbol", label: "A special character (!@#$…) — recommended", test: (pw: string) => /[^A-Za-z0-9]/.test(pw), optional: true },
+] as const;
 
 export const MAX_LOGIN_ATTEMPTS = 5;
 export const LOGIN_LOCKOUT_SECONDS = 15 * 60;
