@@ -26,7 +26,9 @@ const bodySchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for") ?? "local";
-    const rl = await rateLimit(`register:${ip}`, 5, 60);
+    // Campus-NAT: one public IP for the whole university — this limit must
+    // absorb onboarding-day spikes (per-IP flood defense only).
+    const rl = await rateLimit(`register:${ip}`, 30, 60);
     if (!rl.allowed) throw new ApiError("RATE_LIMIT_EXCEEDED", "Too many attempts. Please wait.");
 
     const body = bodySchema.parse(await req.json());

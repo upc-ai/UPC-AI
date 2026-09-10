@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
 
     const [perEmail, perIp] = await Promise.all([
       rateLimit(`forgot:${body.email}`, 3, 3600),
-      rateLimit(`forgotip:${ip}`, 10, 3600),
+      // Campus-NAT: one public IP for the whole university (per-email cap
+      // above still prevents reset-bombing any single inbox).
+      rateLimit(`forgotip:${ip}`, 30, 3600),
     ]);
     if (!perEmail.allowed || !perIp.allowed) {
       throw new ApiError("RATE_LIMIT_EXCEEDED", "Too many reset requests. Please wait an hour.");

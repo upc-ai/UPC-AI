@@ -19,7 +19,10 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for") ?? "local";
     const body = bodySchema.parse(await req.json());
 
-    const rl = await rateLimit(`login:${ip}`, 10, 60);
+    // Campus-NAT calibrated: the whole university shares one public IP, so this
+    // per-IP limit is flood defense only — the per-account lockout (below) is
+    // the real brute-force protection and is unaffected by this number.
+    const rl = await rateLimit(`login:${ip}`, 100, 60);
     if (!rl.allowed) throw new ApiError("RATE_LIMIT_EXCEEDED", "Too many attempts. Please wait a minute.");
 
     const db = getDb();

@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
 
     const [perEmail, perIp] = await Promise.all([
       rateLimit(`otp:${body.email}`, 3, 60),
-      rateLimit(`otpip:${ip}`, 5, 3600),
+      // Campus-NAT: the whole university shares one public IP — the per-IP cap
+      // must absorb rollout-day verification spikes (per-email cap above still
+      // prevents OTP-bombing any single inbox).
+      rateLimit(`otpip:${ip}`, 30, 60),
     ]);
     if (!perEmail.allowed || !perIp.allowed) {
       throw new ApiError("RATE_LIMIT_EXCEEDED", "Too many OTP requests. Please wait.");
