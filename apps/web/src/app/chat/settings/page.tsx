@@ -308,7 +308,9 @@ export default function SettingsPage() {
             disabled={pwBusy || !currentPw || !newPw || newPw !== confirmPw}
             onClick={() => void changePassword()}
             type="button"
+            aria-busy={pwBusy}
           >
+            {pwBusy && <span className={styles.btnSpinner} aria-hidden="true" />}
             {pwBusy ? "Saving…" : "Save new password"}
           </button>
         </div>
@@ -325,7 +327,8 @@ export default function SettingsPage() {
         </div>
         <div className={styles.dialogActions}>
           <button className={styles.changeBtn} onClick={() => setShowDelete(false)} type="button">Keep account</button>
-          <button className={styles.deleteConfirmBtn} disabled={deleteBusy} onClick={() => void deleteAccount()} type="button">
+          <button className={styles.deleteConfirmBtn} disabled={deleteBusy} onClick={() => void deleteAccount()} type="button" aria-busy={deleteBusy}>
+            {deleteBusy && <span className={styles.btnSpinner} aria-hidden="true" />}
             {deleteBusy ? "Deleting…" : "Delete permanently"}
           </button>
         </div>

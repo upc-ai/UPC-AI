@@ -21,7 +21,7 @@ export interface Citation {
   relevance_score: number;
 }
 
-export type StreamStatus = "idle" | "thinking" | "searching" | "streaming" | "done" | "error";
+export type StreamStatus = "idle" | "thinking" | "searching" | "reading" | "streaming" | "done" | "error";
 
 /** A file the student attached to the message (base64, no data: prefix). */
 export interface SendAttachment {
@@ -51,6 +51,7 @@ export function useAIStream(sessionId: string | null) {
   const [completedAt, setCompletedAt] = useState(0); // bump → parent invalidates queries
   const [activeModel, setActiveModel] = useState<string | null>(null); // branded label from server
   const [doneMessageId, setDoneMessageId] = useState<string | null>(null); // id from the done event
+  const [retrievalCount, setRetrievalCount] = useState<number | null>(null); // chunks found — powers "Reading N sections…"
 
   const bufferRef = useRef("");
   const rafRef = useRef<number | null>(null);
@@ -97,6 +98,7 @@ export function useAIStream(sessionId: string | null) {
       setError(null);
       setActiveModel(null);
       setDoneMessageId(null);
+      setRetrievalCount(null);
       setStatus("thinking");
 
       try {
@@ -187,6 +189,15 @@ export function useAIStream(sessionId: string | null) {
               if (typeof data.model === "string") setActiveModel(data.model);
               break;
             }
+            case "retrieval": {
+              // Evidence landed — the model is now reading the retrieved chunks
+              const found = typeof data.chunks_found === "number" ? data.chunks_found : 0;
+              if (found > 0) {
+                setRetrievalCount(found);
+                setStatus((s) => (s === "streaming" ? s : "reading"));
+              }
+              break;
+            }
             case "token": {
               setStatus("streaming");
               bufferRef.current += data.text as string;
@@ -232,7 +243,7 @@ export function useAIStream(sessionId: string | null) {
     [sessionId, scheduleFlush, flush],
   );
 
-  const isStreaming = status === "thinking" || status === "searching" || status === "streaming";
+  const isStreaming = status === "thinking" || status === "searching" || status === "reading" || status === "streaming";
 
-  return { send, cancel, streamingContent, streamingCitations, status, isStreaming, error, completedAt, activeModel, doneMessageId };
+  return { send, cancel, streamingContent, streamingCitations, status, isStreaming, error, completedAt, activeModel, doneMessageId, retrievalCount };
 }

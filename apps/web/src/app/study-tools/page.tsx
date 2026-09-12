@@ -62,7 +62,7 @@ export default function StudyToolsPage() {
           <Reveal>
             <div className={styles.ctaBand}>
               <h2>Make revision automatic.</h2>
-              <p>Free for every UPC student. Sign up with your college email.</p>
+              <p>Free for every UPC student. Sign up in seconds.</p>
               <Link href="/signup" className={styles.ctaBtn}>
                 Get Started Free
               </Link>

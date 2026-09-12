@@ -381,12 +381,13 @@
 .mockupStatus {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 15px;
+  gap: var(--space-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
   color: var(--on-dark-soft);
   margin-bottom: var(--space-sm);
+  min-height: 20px;
 }
 
 .mockupStatus svg,
@@ -840,6 +841,69 @@
   color: var(--body);
 }
 
+/* Heritage band — keynote numerals over hairline grid */
+
+.heritageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--hairline);
+  border-left: 1px solid var(--hairline);
+}
+
+.stat {
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: clamp(24px, 3.5vw, 40px) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statSub {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted-soft);
+}
+
+@media (max-width: 900px) {
+  .heritageGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .heritageGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .stat {
+    padding: var(--space-md);
+  }
+  .statValue {
+    font-size: clamp(36px, 10vw, 48px);
+  }
+}
+
 /* FAQ */
 
 .faqList {
@@ -850,6 +914,31 @@
 
 .faqItem {
   border-bottom: 1px solid var(--hairline);
+  /* Let `block-size: auto` interpolate where supported (progressive enhancement
+     — unsupported browsers keep the instant toggle). */
+  interpolate-size: allow-keywords;
+}
+
+/* Smooth accordion open/close where ::details-content is supported */
+.faqItem::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow-y: clip;
+  transition:
+    block-size 260ms var(--ease-out-strong),
+    opacity 220ms var(--ease-out-strong),
+    content-visibility 260ms allow-discrete;
+}
+
+.faqItem[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqItem::details-content {
+    transition: none;
+  }
 }
 
 .faqQ {
@@ -1184,7 +1273,9 @@
 .compareCard p,
 .faqQ,
 .faqA,
-.strip {
+.strip,
+.statValue,
+.statLabel {
   overflow-wrap: break-word;
 }
 
@@ -1195,7 +1286,8 @@
 .compareGrid > *,
 .featureGrid > *,
 .tileGrid > *,
-.faqList > * {
+.faqList > *,
+.heritageGrid > * {
   min-width: 0;
 }
 
@@ -1256,15 +1348,15 @@
 }
 
 :global([data-theme="dark"]) .nav {
-  background: rgba(23, 23, 23, 0.72);
+  background: rgba(10, 10, 10, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 :global([data-theme="dark"]) .mobileMenu {
-  background: rgba(23, 23, 23, 0.92);
+  background: rgba(8, 8, 8, 0.94);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 :global([data-theme="dark"]) .heroBadge {
@@ -1290,9 +1382,9 @@
 }
 
 /* Slightly lighter panel + brighter edge so the dark mockup still reads
-   as a floating object over the dark canvas */
+   as a floating object over the true-black canvas */
 :global([data-theme="dark"]) .mockup {
-  background: rgba(38, 38, 38, 0.9);
+  background: rgba(24, 24, 24, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
@@ -1318,7 +1410,7 @@
   :global([data-theme="dark"]) .featureCard,
   :global([data-theme="dark"]) .compareCard,
   :global([data-theme="dark"]) .tile {
-    background: #212121;
+    background: #0f0f0f;
   }
 }
 
@@ -1329,6 +1421,6 @@
   :global([data-theme="dark"]) .featureCard,
   :global([data-theme="dark"]) .compareCard,
   :global([data-theme="dark"]) .tile {
-    background: #212121;
+    background: #0f0f0f;
   }
 }

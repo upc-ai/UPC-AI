@@ -65,6 +65,12 @@
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 500;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.navItem:hover {
+  color: var(--app-ink);
+  background: color-mix(in srgb, var(--app-ink) 5%, transparent);
 }
 
 .navItemActive,
@@ -105,7 +111,7 @@
 }
 
 .logout:active {
-  background: var(--error-bg, rgba(192, 57, 43, 0.08));
+  background: color-mix(in srgb, var(--error) 10%, var(--app-card));
 }
 
 .main {
@@ -148,10 +154,10 @@
 
 .card {
   background: color-mix(in srgb, var(--app-card) 72%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -162,6 +168,14 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .card {
     background: var(--app-card);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .card {
+    background: var(--app-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
@@ -193,11 +207,19 @@
 .stat {
   background: color-mix(in srgb, var(--app-card) 72%, transparent);
   border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: transform 160ms var(--ease-out), border-color 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stat:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--app-ink) 14%, transparent);
+  }
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -215,9 +237,11 @@
 }
 
 .statValue {
-  font-size: 26px;
-  font-weight: 650;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 500;
   letter-spacing: -0.02em;
+  line-height: 1.1;
   color: var(--app-ink);
   font-variant-numeric: tabular-nums;
 }
@@ -337,10 +361,42 @@
   font-weight: 500;
   padding: 7px 12px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: color 150ms ease, background 150ms ease, transform 140ms var(--ease-out);
 }
 
-.btn:active {
-  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+.btn:hover:not(:disabled) {
+  color: var(--app-ink);
+  background: color-mix(in srgb, var(--app-ink) 5%, transparent);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  background: color-mix(in srgb, var(--app-ink) 8%, transparent);
+}
+
+/* Busy spinner inside buttons (Process/Retry/Publish rows, syncs) */
+.btnSpinner {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: btnSpin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnSpinner {
+    animation-duration: 1.2s;
+  }
 }
 
 .btnPrimary {
@@ -369,13 +425,13 @@
 }
 
 .chipGood {
-  background: color-mix(in srgb, var(--success, #1a7f37) 14%, transparent);
-  color: var(--success, #1a7f37);
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  color: var(--success);
 }
 
 .chipBad {
-  background: color-mix(in srgb, var(--error, #c0392b) 12%, transparent);
-  color: var(--error, #c0392b);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  color: var(--error);
 }
 
 .chipSource {
@@ -467,5 +523,14 @@
 
   .main {
     padding: var(--space-md) var(--space-sm) var(--space-xxl);
+  }
+}
+
+@media (max-width: 640px) {
+  .statGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .statValue {
+    font-size: 28px;
   }
 }

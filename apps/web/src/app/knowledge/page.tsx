@@ -70,8 +70,8 @@ export default function KnowledgePage() {
                 <div className={styles.aboutRow}>
                   <span className={styles.aboutLabel}>Cited</span>
                   <p className={styles.aboutText}>
-                    Every claim in the answer carries a citation — the document name and the exact
-                    page it came from. Tap it to see the source.
+                    When an answer is grounded in college knowledge, it carries one official
+                    source — the college&apos;s own website — so you can verify it yourself.
                   </p>
                 </div>
               </Reveal>
@@ -101,7 +101,7 @@ export default function KnowledgePage() {
           <Reveal>
             <div className={styles.ctaBand}>
               <h2>Ask it anything about campus.</h2>
-              <p>Free for every UPC student. Sign up with your college email.</p>
+              <p>Free for every UPC student. Sign up in seconds.</p>
               <Link href="/signup" className={styles.ctaBtn}>
                 Get Started Free
               </Link>

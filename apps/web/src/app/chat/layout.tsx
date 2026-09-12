@@ -45,6 +45,17 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     }
   }, [status, splashDone]);
 
+  // Escape closes the mobile drawer (keyboard users shouldn't need to aim
+  // at the scrim with a finger-sized target)
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
+
   // Apply the user's saved theme (settings page persists it; light is the default)
   useEffect(() => {
     try {
@@ -81,7 +92,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         />
         {drawerOpen && (
           <div
-            style={{ position: "fixed", inset: 0, background: "rgba(20,20,19,0.5)", zIndex: 199 }}
+            style={{ position: "fixed", inset: 0, background: "var(--scrim)", zIndex: 199 }}
             onClick={() => setDrawerOpen(false)}
             aria-hidden="true"
           />

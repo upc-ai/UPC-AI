@@ -1,18 +1,21 @@
 /**
- * UPC AI Design Tokens — warm-editorial system (Design System v2.0, §10).
- * Cream canvas, serif display, coral CTAs, dark navy product surfaces.
- * This file is the single token source; components reference vars, never hex.
+ * UPC AI Design Tokens — monochrome system v3 (Apple-grade, true black/white).
+ * Cormorant display + Inter body; glass surfaces; black-on-light /
+ * white-on-black accent. Light is the default; [data-theme="dark"] flips
+ * the whole system to OLED true black (#000 canvas, layered near-black
+ * surfaces — never grey). This file is the single token source; components
+ * reference vars, never hex.
  */
 
 /* ------------------------------------------------------------------ */
 /* Brand & semantic (theme-independent)                                */
 /* ------------------------------------------------------------------ */
 :root {
-  /* Brand */
+  /* Brand — coral retired (kept for compat); monochrome accent is the brand */
   --primary: #cc785c;
   --primary-active: #a9583e;
   --primary-disabled: #e6dfd8;
-  /* Accent: monochrome like the logo — black on light surfaces, cream on dark (see dark override). */
+  /* Accent: monochrome like the logo — black on light surfaces, white on dark (see dark override). */
   --accent: #000000;
   --accent-teal: #5db8a6;
   --accent-amber: #e8a55a;
@@ -33,6 +36,8 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px; /* the composer's signature radius */
   --radius-pill: 9999px;
 
   /* Spacing (4px base) */
@@ -82,20 +87,20 @@
   --text-code: 14px;
   --lh-code: 1.6;
 
-  /* Motion */
+  /* Motion — custom curves only; never ease-in for UI */
   --duration-fast: 100ms;
   --duration-normal: 150ms;
   --duration-moderate: 200ms;
   --duration-slow: 300ms;
   --ease-default: ease;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* strong ease-out for entrances */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* iOS drawer */
 }
 
 /* ------------------------------------------------------------------ */
-/* Marketing surfaces — neutral monochrome (ChatGPT-style)             */
-/* Light is the :root default; [data-theme="dark"] flips the whole     */
-/* marketing system (landing + auth) to the product's #171717-family   */
-/* dark so the user's theme choice applies everywhere.                 */
+/* Marketing surfaces — monochrome, white light / true-black dark       */
 /* ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
@@ -103,55 +108,85 @@
   --surface-soft: #f7f7f7;
   --surface-card: #f5f5f5;
   --surface-cream-strong: #ebebeb;
-  --surface-dark: #212121;
-  --surface-dark-elevated: #303030;
-  --surface-dark-soft: #262626;
-  --hairline: #ececec;
-  --hairline-soft: #f2f2f2;
-  --ink: #0d0d0d;
-  --body-strong: #282828;
-  --body: #4d4d4d;
-  --muted: #6e6e6e;
-  --muted-soft: #999999;
+  /* Always-dark bands (hero mockup, CTA) — sit dark on white in light mode */
+  --surface-dark: #161616;
+  --surface-dark-elevated: #262626;
+  --surface-dark-soft: #1d1d1d;
+  --hairline: #e6e6e6;
+  --hairline-soft: #f0f0f0;
+  --ink: #1d1d1f;
+  --body-strong: #2e2e30;
+  --body: #4d4d4f;
+  --muted: #6e6e73;
+  --muted-soft: #98989d;
   --on-primary: #ffffff;
-  --link: #0d0d0d;
-  --on-dark: #ececec;
-  --on-dark-soft: #b4b4b4;
+  --link: #1d1d1f;
+  --on-dark: #f5f5f7;
+  --on-dark-soft: #b8b8bd;
   --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
   /* Elevation shadows — per-theme so light stays airy, dark stays deep */
   --shadow-composer:
     0 1px 2px rgba(0, 0, 0, 0.04),
     0 12px 40px rgba(0, 0, 0, 0.08);
   --shadow-menu: 0 16px 48px rgba(0, 0, 0, 0.12);
+
+  /* Glass — the ONE recipe (blur+saturate, per-theme tint) */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.86);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur-strong: blur(24px) saturate(160%);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-edge: rgba(255, 255, 255, 0.9);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 12px 32px rgba(0, 0, 0, 0.1);
+
+  /* Modal scrim */
+  --scrim: rgba(0, 0, 0, 0.55);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --canvas: #171717;
-  --surface-soft: #1f1f1f;
-  --surface-card: #212121;
-  --surface-cream-strong: #262626;
-  /* --surface-dark family unchanged: dark bands keep #212121 in both themes */
-  --hairline: #2e2e2e;
-  --hairline-soft: #262626;
-  --ink: #ececec;
-  --body-strong: #d4d4d4;
+  --canvas: #000000;
+  --surface-soft: #0a0a0a;
+  --surface-card: #101010;
+  --surface-cream-strong: #161616;
+  /* dark bands become a lifted layer on true black */
+  --surface-dark: #0d0d0d;
+  --surface-dark-elevated: #171717;
+  --surface-dark-soft: #111111;
+  --hairline: #1f1f1f;
+  --hairline-soft: #171717;
+  --ink: #ededed;
+  --body-strong: #d6d6d6;
   --body: #b4b4b4;
   --muted: #8f8f8f;
-  --muted-soft: #6e6e6e;
-  --on-primary: #0d0d0d;
+  --muted-soft: #6a6a6a;
+  --on-primary: #0a0a0a;
   --link: #e8e8e8;
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.6);
   --shadow-composer:
-    0 1px 2px rgba(0, 0, 0, 0.12),
-    0 12px 40px rgba(0, 0, 0, 0.22);
-  --shadow-menu: 0 16px 48px rgba(0, 0, 0, 0.35);
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-menu:
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+
+  --glass-bg: rgba(18, 18, 18, 0.72);
+  --glass-bg-strong: rgba(22, 22, 22, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-edge: rgba(255, 255, 255, 0.14);
+  --glass-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 12px 32px rgba(0, 0, 0, 0.55);
+
+  --scrim: rgba(0, 0, 0, 0.72);
 }
 
 /* ------------------------------------------------------------------ */
-/* Product surfaces — neutral monochrome, dark default                 */
-/* (ChatGPT-style darks: #212121 canvas, #171717 chrome, #323232       */
-/* user bubbles; light: white canvas, #ececec bubbles)                 */
+/* Product surfaces — monochrome, white light / true-black dark         */
+/* (chat workspace, settings, admin: #000 canvas, layered               */
+/* near-black surfaces — never grey)                                   */
 /* ------------------------------------------------------------------ */
 :root,
 [data-theme="light"] {
@@ -164,32 +199,32 @@
   --composer-bg: #ffffff;
   --composer-border: #e5e5e5;
   --code-block: #1a1a1a;
-  --app-ink: #0d0d0d;
-  --app-body: #4d4d4d;
-  --app-muted: #6e6e6e;
-  --app-muted-soft: #a6a6a6;
-  --app-link: #0d0d0d;
-  --app-on-dark: #ececec;
+  --app-ink: #1d1d1f;
+  --app-body: #4d4d4f;
+  --app-muted: #6e6e73;
+  --app-muted-soft: #a6a6ab;
+  --app-link: #1d1d1f;
+  --app-on-dark: #f5f5f7;
   --app-hairline: #e5e5e5;
 }
 
 [data-theme="dark"] {
-  --app-canvas: #212121;
-  --app-sidebar: #171717;
-  --app-card: #2f2f2f;
-  --app-card-soft: #2a2a2a;
-  --bubble-user: #323232;
-  --bubble-user-hover: #3a3a3a;
-  --composer-bg: #2f2f2f;
-  --composer-border: #3d3d3d;
-  --code-block: #1a1a1a;
-  --app-ink: #ececec;
+  --app-canvas: #000000;
+  --app-sidebar: #0a0a0a;
+  --app-card: #141414;
+  --app-card-soft: #1c1c1c;
+  --bubble-user: #1f1f1f;
+  --bubble-user-hover: #262626;
+  --composer-bg: #111111;
+  --composer-border: #262626;
+  --code-block: #0d0d0d;
+  --app-ink: #ededed;
   --app-body: #d4d4d4;
   --app-muted: #a6a6a6;
   --app-muted-soft: #8f8f8f;
   --app-link: #e8e8e8;
-  --app-on-dark: #ececec;
-  --app-hairline: #3d3d3d;
+  --app-on-dark: #f5f5f7;
+  --app-hairline: #242424;
   /* Accent inverts on dark surfaces (black would be invisible) — the logo's white-on-black colorway. */
   --accent: #ffffff;
 }
@@ -198,10 +233,10 @@
 /* High contrast overrides                                              */
 /* ------------------------------------------------------------------ */
 [data-contrast="high"] {
-  --hairline: #6c6a64;
-  --app-hairline: #5b5950;
-  --muted-soft: #6c6a64;
-  --app-muted-soft: #5b5950;
+  --hairline: #6a6a6a;
+  --app-hairline: #5f5f5f;
+  --muted-soft: #6a6a6a;
+  --app-muted-soft: #5f5f5f;
   --shadow-soft: none;
 }
 [data-contrast="high"] *:focus-visible {
@@ -210,18 +245,18 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Syntax highlighting (code blocks, warm dark in both themes)          */
+/* Syntax highlighting (code blocks — content, keeps restrained hues)   */
 /* ------------------------------------------------------------------ */
 :root {
   --code-bg: var(--code-block);
-  --code-text: #e8e6df;
+  --code-text: #e8e8e8;
   --code-keyword: #c65f4a;
   --code-string: #7d9a6c;
   --code-number: #d4a017;
-  --code-comment: #8f8c84;
+  --code-comment: #8a8a8a;
   --code-function: #e0a188;
   --code-type: #e8a55a;
-  --code-lineno: #6c6a64;
+  --code-lineno: #6a6a6a;
 }
 
 /* ------------------------------------------------------------------ */

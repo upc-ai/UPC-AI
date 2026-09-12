@@ -264,20 +264,20 @@
   color: var(--app-muted);
 }
 .statusProcessing {
-  background: color-mix(in srgb, var(--warning, #b8860b) 14%, transparent);
-  color: var(--warning, #b8860b);
+  background: color-mix(in srgb, var(--warning) 14%, transparent);
+  color: var(--warning);
 }
 .statusIndexed {
   background: color-mix(in srgb, var(--app-ink) 10%, transparent);
   color: var(--app-ink);
 }
 .statusPublished {
-  background: color-mix(in srgb, var(--success, #1a7f37) 14%, transparent);
-  color: var(--success, #1a7f37);
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  color: var(--success);
 }
 .statusFailed {
-  background: color-mix(in srgb, var(--error, #c0392b) 12%, transparent);
-  color: var(--error, #c0392b);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  color: var(--error);
 }
 .statusSuperseded {
   background: color-mix(in srgb, var(--app-ink) 6%, transparent);
@@ -301,14 +301,44 @@
   font-weight: 500;
   padding: 5px 10px;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   text-decoration: none;
   line-height: 1.4;
   box-sizing: border-box;
+  transition: color 150ms ease, background 150ms ease, transform 140ms var(--ease-out);
 }
 
-.actBtn:active {
-  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+.actBtn:hover:not(:disabled) {
+  color: var(--app-ink);
+  background: color-mix(in srgb, var(--app-ink) 5%, transparent);
+}
+
+.actBtn:active:not(:disabled) {
+  transform: scale(0.97);
+  background: color-mix(in srgb, var(--app-ink) 8%, transparent);
+}
+
+.actSpinner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: actSpin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes actSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actSpinner {
+    animation-duration: 1.2s;
+  }
 }
 
 .actBtnPrimary {
@@ -366,49 +396,67 @@
   min-width: 240px;
 }
 
-/* Paste-a-notice overlay */
+/* Bulk-publish skip list — surfaced in-page, not buried in the console */
 
-.noticeOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 15, 14, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-md);
-  z-index: 300;
-}
-
-.noticeCard {
-  background: var(--app-card);
-  border: 1px solid var(--app-hairline);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-  width: min(520px, 100%);
+.skipNotice {
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+  background: color-mix(in srgb, var(--warning) 8%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  gap: var(--space-xs);
 }
+
+.skipHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  color: var(--app-ink);
+  font-size: 13px;
+}
+
+.skipList {
+  margin: 0;
+  padding: 0 0 0 2px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skipList li {
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Paste-a-notice dialog actions (content sits inside @upc/ui Dialog) */
 
 .noticeActions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
 @media (max-width: 900px) {
   .formRow {
     flex-direction: column;
   }
+}
 
-  .table th:nth-child(n + 4),
-  .table td:nth-child(n + 4) {
-    /* keep title, status, actions; collapse meta columns on phones */
+@media (max-width: 640px) {
+  /* The table scrolls horizontally in its own wrap — tighten cells so the
+     title + actions stay usable on phones without dense pinching. */
+  .table th,
+  .table td {
+    padding-left: 8px;
+    padding-right: 8px;
   }
-
-  .tableWrap {
-    /* allow horizontal scroll instead of squeezing */
+  .rowActions {
+    flex-wrap: wrap;
+    white-space: normal;
   }
 }

@@ -1,4 +1,4 @@
-/* Settings — warm-editorial cards on the product surface tokens */
+/* Settings — glass cards on the product surface tokens */
 
 .page {
   flex: 1;
@@ -31,10 +31,10 @@
 
 .card {
   background: color-mix(in srgb, var(--app-card) 72%, transparent);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid color-mix(in srgb, var(--app-ink) 8%, transparent);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -45,6 +45,14 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .card {
     background: var(--app-card);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .card {
+    background: var(--app-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 
@@ -120,6 +128,18 @@
   padding: 8px 10px;
   cursor: pointer;
   min-width: 150px;
+  max-width: 100%;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.select:hover {
+  border-color: color-mix(in srgb, var(--app-ink) 18%, transparent);
+}
+
+.select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .note {
@@ -155,10 +175,17 @@
   padding: 8px 16px;
   cursor: pointer;
   margin-top: var(--space-xs);
+  transition: background 150ms ease, border-color 150ms ease, transform 140ms var(--ease-out);
+}
+
+.logout:hover {
+  border-color: color-mix(in srgb, var(--error) 35%, transparent);
+  background: color-mix(in srgb, var(--error) 6%, transparent);
 }
 
 .logout:active {
-  background: var(--error-bg);
+  transform: scale(0.97);
+  background: color-mix(in srgb, var(--error) 10%, transparent);
 }
 
 .loading {
@@ -180,32 +207,45 @@
   padding: 8px 14px;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 150ms ease, color 150ms ease, transform 140ms var(--ease-out);
+}
+
+.changeBtn:hover {
+  color: var(--app-ink);
+  background: color-mix(in srgb, var(--app-ink) 5%, transparent);
 }
 
 .changeBtn:active {
-  background: color-mix(in srgb, var(--app-ink) 6%, transparent);
+  transform: scale(0.97);
+  background: color-mix(in srgb, var(--app-ink) 8%, transparent);
 }
 
 .deleteBtn {
   background: none;
-  border: 1px solid color-mix(in srgb, var(--error, #c0392b) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
   border-radius: var(--radius-sm);
-  color: var(--error, #c0392b);
+  color: var(--error);
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 500;
   padding: 8px 14px;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 150ms ease, transform 140ms var(--ease-out);
+}
+
+.deleteBtn:hover {
+  background: color-mix(in srgb, var(--error) 7%, transparent);
 }
 
 .deleteBtn:active {
-  background: color-mix(in srgb, var(--error, #c0392b) 10%, transparent);
+  transform: scale(0.97);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
 }
 
 .deleteConfirmBtn {
-  background: var(--error, #c0392b);
-  color: #fff;
+  background: var(--error);
+  color: #ffffff;
   border: none;
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
@@ -213,11 +253,41 @@
   font-weight: 550;
   padding: 8px 14px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 140ms var(--ease-out), opacity 150ms ease;
+}
+
+.deleteConfirmBtn:active {
+  transform: scale(0.97);
 }
 
 .deleteConfirmBtn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/* Shared busy spinner inside destructive/primary buttons */
+.btnSpinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: spin 700ms linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnSpinner {
+    animation-duration: 1.2s;
+  }
 }
 
 .pwSubmit {
@@ -230,6 +300,15 @@
   font-weight: 550;
   padding: 8px 14px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 140ms var(--ease-out), opacity 150ms ease;
+}
+
+.pwSubmit:active {
+  transform: scale(0.97);
 }
 
 .pwSubmit:disabled {
@@ -284,5 +363,9 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-xs);
+  }
+  .select {
+    min-width: 0;
+    width: 100%;
   }
 }

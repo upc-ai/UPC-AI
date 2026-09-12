@@ -4,7 +4,7 @@ import styles from "../landing.module.css";
 export const FAQS = [
   {
     q: "Is UPC AI free for students?",
-    a: "Yes. UPC AI is free for every student and faculty member of Udai Pratap College with a college email address.",
+    a: "Yes. UPC AI is free for every student and faculty member of Udai Pratap College — sign up with your Gmail address in seconds.",
   },
   {
     q: "How accurate are the answers?",

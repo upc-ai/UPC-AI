@@ -108,7 +108,7 @@ export function SessionChat({ sessionId }: { sessionId: string }) {
     }
   };
 
-  const { send, cancel, streamingContent, streamingCitations, status, isStreaming, error, completedAt, doneMessageId } = useAIStream(sessionId);
+  const { send, cancel, streamingContent, streamingCitations, status, isStreaming, error, completedAt, doneMessageId, retrievalCount } = useAIStream(sessionId);
 
   // Load history, then auto-send any pending first question (from the welcome screen)
   const pendingSent = useRef(false);
@@ -288,6 +288,7 @@ export function SessionChat({ sessionId }: { sessionId: string }) {
         streamingContent={streamingContent}
         streamStatus={status}
         streamingCitations={streamingCitations}
+        retrievalCount={retrievalCount}
         onCitationClick={openSources}
         onRegenerate={handleRegenerate}
         onEdit={handleEdit}

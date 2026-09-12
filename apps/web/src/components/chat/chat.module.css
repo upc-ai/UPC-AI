@@ -13,7 +13,6 @@
   --glass-border: color-mix(in srgb, var(--app-ink) 10%, transparent);
   --glass-highlight: color-mix(in srgb, var(--app-ink) 4%, transparent);
   --glass-menu: color-mix(in srgb, var(--app-card) 88%, transparent);
-  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* Invisible scrollbars across the whole chat workspace — scrolling stays
@@ -71,8 +70,8 @@
   justify-content: center;
   gap: var(--space-xs);
   background: var(--glass-surface);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   color: var(--app-ink);
   border: 1px solid var(--glass-border);
@@ -83,7 +82,7 @@
   font-weight: 500;
   cursor: pointer;
   min-height: 40px;
-  transition: transform 140ms var(--ease-out-strong);
+  transition: transform 140ms var(--ease-out);
 }
 
 .newChatBtn:active {
@@ -243,6 +242,14 @@
   text-transform: capitalize;
 }
 
+.messagesWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .messages {
   flex: 1;
   overflow-y: auto;
@@ -255,6 +262,67 @@
 
 .messages::-webkit-scrollbar {
   display: none; /* Chrome/Edge/Safari — scroll still works, bar hidden */
+}
+
+/* Jump-to-latest — appears only when the user scrolled away during a turn */
+.jumpLatest {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--glass-menu);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-menu);
+  color: var(--app-ink);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 13px;
+  cursor: pointer;
+  z-index: 40;
+  animation: jumpIn 160ms var(--ease-out);
+  transition: transform 140ms var(--ease-out);
+}
+
+.jumpLatest:hover {
+  transform: translateX(-50%) scale(1.04);
+}
+
+.jumpLatest:active {
+  transform: translateX(-50%) scale(0.96);
+}
+
+@keyframes jumpIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* Fresh messages slide in softly (local ids only = just-sent/just-committed) */
+.msgEnter {
+  animation: msgIn 240ms var(--ease-out);
+}
+
+@keyframes msgIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .column {
@@ -436,7 +504,7 @@
   max-width: 80%;
   background: var(--bubble-user);
   color: var(--app-ink);
-  border-radius: 20px;
+  border-radius: var(--radius-2xl);
   border-bottom-right-radius: 6px;
   padding: 10px 14px;
   font-size: var(--text-body-md);
@@ -549,39 +617,74 @@
   from { opacity: 0; }
 }
 
-/* Thinking shimmer */
+/* Thinking — the thought-orb avatar + status label.
+   The orb animates through stream phases (working → searching → solving);
+   while streaming, the whole block dissolves via .orbExit (blur+fade). */
 
 .thinking {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 16px;
+  gap: var(--space-md);
+  min-height: 64px;
   color: var(--app-muted);
 }
 
-.thinking svg {
+.thinkingAvatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thinkingLogo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent);
-  animation: pulseMark 1.8s ease-in-out infinite;
+  animation: orbLogoBreathe 2.6s ease-in-out infinite;
+}
+
+/* The orb canvas renders its own dots; keep the mark readable above them */
+.thinkingLogo svg {
+  filter: drop-shadow(0 0 6px var(--app-canvas)) drop-shadow(0 0 2px var(--app-canvas));
+}
+
+@keyframes orbLogoBreathe {
+  0%, 100% { opacity: 0.75; transform: scale(0.97); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+.orbExit {
+  animation: orbOut 200ms var(--ease-out) forwards;
+  pointer-events: none;
+}
+
+@keyframes orbOut {
+  from { opacity: 1; filter: blur(0); transform: scale(1); }
+  to { opacity: 0; filter: blur(4px); transform: scale(1.05); }
 }
 
 .thinkingText {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--app-muted);
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
 @keyframes shimmer {
-  0%, 100% { opacity: 0.5; }
+  0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
 }
 
-@keyframes pulseMark {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .thinkingText, .thinking svg, .caret { animation: none; }
+  .thinkingText, .thinkingLogo, .caret, .msgEnter, .jumpLatest, .orbExit { animation: none; }
 }
 
 /* Citations + sources */
@@ -598,8 +701,8 @@
   align-items: center;
   gap: 6px;
   background: var(--glass-surface);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   box-shadow: inset 0 1px 0 var(--glass-highlight);
   border-radius: var(--radius-sm);
@@ -609,7 +712,7 @@
   cursor: pointer;
   font-family: var(--font-body);
   max-width: 280px;
-  transition: transform 140ms var(--ease-out-strong);
+  transition: transform 140ms var(--ease-out);
 }
 
 .citationChip:active {
@@ -708,13 +811,13 @@
   max-width: 680px;
   margin: 0 auto;
   background: var(--glass-surface);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  backdrop-filter: var(--glass-blur-strong);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-composer), inset 0 1px 0 var(--glass-highlight);
-  border-radius: 24px;
+  border-radius: var(--radius-3xl);
   padding: 12px 14px 10px;
-  transition: border-color 150ms ease, box-shadow 200ms var(--ease-out-strong);
+  transition: border-color 150ms ease, box-shadow 200ms var(--ease-out);
 }
 
 .composerFocused {
@@ -789,14 +892,14 @@
   min-width: 175px;
   z-index: 50;
   background: var(--glass-menu);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 5px;
   box-shadow: var(--shadow-menu), inset 0 1px 0 var(--glass-highlight);
   transform-origin: bottom left;
-  animation: menuIn 180ms var(--ease-out-strong);
+  animation: menuIn 180ms var(--ease-out);
 }
 
 .composerMenuWide {
@@ -871,11 +974,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 140ms var(--ease-out-strong), opacity 150ms ease;
+  transition: transform 140ms var(--ease-out), opacity 150ms ease;
 }
 
 .sendBtn:active {
   transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sendBtn:hover:not(:disabled) {
+    transform: scale(1.06);
+  }
 }
 
 .sendBtn:disabled {
@@ -896,7 +1005,8 @@
 .errorBanner {
   max-width: 680px;
   margin: 0 auto var(--space-sm);
-  background: var(--error-bg);
+  /* mix into a surface rather than a fixed light bg — stays legible on true black */
+  background: color-mix(in srgb, var(--error) 12%, var(--app-card));
   color: var(--error);
   border-radius: var(--radius-md);
   padding: 10px 14px;
@@ -1104,7 +1214,7 @@
   z-index: 60;
   box-shadow: var(--shadow-menu);
   transform-origin: top right;
-  animation: menuIn 180ms var(--ease-out-strong);
+  animation: menuIn 180ms var(--ease-out);
 }
 
 .menuItem {
@@ -1244,10 +1354,33 @@
   pointer-events: none;
 }
 
+/* Logo nested inside the breathing orb — one calm, alive opening moment */
 .splashMark {
-  color: var(--accent);
+  position: relative;
+  width: 64px;
+  height: 64px;
   display: flex;
-  animation: splashPulse 1.6s ease-in-out infinite;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.splashLogo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: splashBreathe 2.6s ease-in-out infinite;
+}
+
+.splashLogo svg {
+  filter: drop-shadow(0 0 6px var(--app-canvas)) drop-shadow(0 0 2px var(--app-canvas));
+}
+
+@keyframes splashBreathe {
+  0%, 100% { opacity: 0.7; transform: scale(0.97); }
+  50% { opacity: 1; transform: scale(1.03); }
 }
 
 .splashWord {
@@ -1256,17 +1389,10 @@
   letter-spacing: -0.02em;
   font-size: 15px;
   color: var(--app-muted);
-  animation: splashPulse 1.6s ease-in-out infinite;
-}
-
-@keyframes splashPulse {
-  0%, 100% { opacity: 0.45; transform: scale(0.98); }
-  50% { opacity: 1; transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .splashMark,
-  .splashWord {
+  .splashLogo {
     animation: none;
     opacity: 0.85;
     transform: none;
@@ -1315,12 +1441,12 @@
     inset: 0 auto 0 0;
     z-index: 200;
     transform: translateX(-100%);
-    transition: transform var(--duration-moderate) var(--ease-default);
+    transition: transform 280ms var(--ease-drawer);
     box-shadow: none;
   }
   .sidebarOpen {
     transform: none;
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--shadow-menu);
   }
   .sourcesPanel {
     position: fixed;

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
-import { useToast, Button } from "@upc/ui";
+import { useToast, Button, Dialog } from "@upc/ui";
 import styles from "./admin.module.css";
 
 /* ------------------------------------------------------------------ */
@@ -120,6 +120,8 @@ export default function AdminDocumentsPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [actionBusy, setActionBusy] = useState<string | null>(null);
+  /** Documents the last bulk-publish skipped (guard failures) — shown in-page. */
+  const [skippedList, setSkippedList] = useState<{ title: string; reason: string }[] | null>(null);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -284,7 +286,7 @@ export default function AdminDocumentsPage() {
 
   /** Publish every "Ready to publish" document that passes the server-side
    *  guard (fully indexed + fully embedded). Documents that fail are skipped
-   *  and reported — nothing unsafe ever goes live. */
+   *  and listed in the page — nothing unsafe ever goes live. */
   const publishAll = async () => {
     const ready = docs.filter((d) => d.status === "indexed").length;
     if (!window.confirm(`Publish all ${ready} ready documents?\n\nOnly documents that pass quality checks (fully indexed, every chunk embedded) go live. Others are skipped and listed for you.`)) {
@@ -296,8 +298,8 @@ export default function AdminDocumentsPage() {
         "/api/v1/admin/documents/bulk-publish",
         { method: "POST" },
       );
-      toast.success(`Published ${r.published} documents${r.skipped_count ? ` — ${r.skipped_count} skipped (see console)` : ""}.`);
-      if (r.skipped?.length) console.warn("[bulk-publish] skipped:", r.skipped);
+      toast.success(`Published ${r.published} documents${r.skipped_count ? ` — ${r.skipped_count} skipped (listed below)` : ""}.`);
+      setSkippedList(r.skipped_count > 0 ? (r.skipped ?? []) : null);
       await loadDocs();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Bulk publish failed.");
@@ -663,11 +665,31 @@ export default function AdminDocumentsPage() {
               <Button
                 disabled={uploading || actionBusy !== null}
                 onClick={() => void publishAll()}
+                loading={actionBusy === "bulk"}
               >
                 Publish all ready ({docs.filter((d) => d.status === "indexed").length})
               </Button>
             )}
           </div>
+          {skippedList && skippedList.length > 0 && (
+            <div className={styles.skipNotice} role="status">
+              <div className={styles.skipHead}>
+                <strong>{skippedList.length} document{skippedList.length === 1 ? "" : "s"} skipped</strong>
+                <button className={styles.actBtn} onClick={() => setSkippedList(null)} type="button" aria-label="Dismiss skipped list">
+                  Dismiss
+                </button>
+              </div>
+              <ul className={styles.skipList}>
+                {skippedList.map((s) => (
+                  <li key={s.title}>
+                    <span className={styles.docTitle}>{s.title}</span>
+                    <span className={styles.errorText}> — {s.reason}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className={styles.note}>Fix the issue (usually re-process), then publish individually.</p>
+            </div>
+          )}
           {!docsLoaded ? (
             <div className={styles.loading}>Loading documents…</div>
           ) : docs.length === 0 ? (
@@ -722,30 +744,34 @@ export default function AdminDocumentsPage() {
                             onClick={() => void process(d.id)}
                             disabled={actionBusy === d.id || uploading}
                             type="button"
+                            aria-busy={actionBusy === d.id}
                           >
+                            {actionBusy === d.id && <span className={styles.actSpinner} aria-hidden="true" />}
                             {FAILED.includes(d.status) ? "Retry" : "Process"}
                           </button>
                         )}
-                          {d.status === "indexed" && (
-                            <button
-                              className={[styles.actBtn, styles.actBtnPrimary].join(" ")}
-                              onClick={() => void publish(d.id)}
-                              disabled={actionBusy === d.id}
-                              type="button"
-                            >
-                              Publish
-                            </button>
-                          )}
-                          {d.status === "indexed" && (
-                            <button
-                              className={[styles.actBtn, styles.actBtnDanger].join(" ")}
-                              onClick={() => void reject(d.id)}
-                              disabled={actionBusy === d.id}
-                              type="button"
-                            >
-                              Reject
-                            </button>
-                          )}
+                        {d.status === "indexed" && (
+                          <button
+                            className={[styles.actBtn, styles.actBtnPrimary].join(" ")}
+                            onClick={() => void publish(d.id)}
+                            disabled={actionBusy === d.id}
+                            type="button"
+                            aria-busy={actionBusy === d.id}
+                          >
+                            {actionBusy === d.id && <span className={styles.actSpinner} aria-hidden="true" />}
+                            Publish
+                          </button>
+                        )}
+                        {d.status === "indexed" && (
+                          <button
+                            className={[styles.actBtn, styles.actBtnDanger].join(" ")}
+                            onClick={() => void reject(d.id)}
+                            disabled={actionBusy === d.id}
+                            type="button"
+                          >
+                            Reject
+                          </button>
+                        )}
                           {d.status === "published" && (
                             <button className={styles.actBtn} onClick={() => newVersion(d)} type="button">
                               New version
@@ -771,43 +797,40 @@ export default function AdminDocumentsPage() {
         </section>
       </div>
 
-      {noticeOpen && (
-        <div className={styles.noticeOverlay} role="dialog" aria-modal="true" aria-label="Paste a notice">
-          <div className={styles.noticeCard}>
-            <h2 className={styles.cardTitle}>Paste a notice</h2>
-            <p className={styles.note}>Quick circulars and announcements — no file needed. It enters the same review queue.</p>
-            <label className={styles.label} htmlFor="notice-title">Title</label>
-            <input
-              id="notice-title"
-              className={styles.input}
-              value={noticeTitle}
-              onChange={(e) => setNoticeTitle(e.target.value)}
-              placeholder="e.g. Exam form deadline extended"
-              maxLength={500}
-            />
-            <label className={styles.label} htmlFor="notice-text">Notice text</label>
-            <textarea
-              id="notice-text"
-              className={styles.textarea}
-              value={noticeText}
-              onChange={(e) => setNoticeText(e.target.value)}
-              placeholder="Paste the full notice text here…"
-              rows={6}
-            />
-            <div className={styles.noticeActions}>
-              <button className={styles.actBtn} onClick={() => setNoticeOpen(false)} type="button">Cancel</button>
-              <button
-                className={[styles.actBtn, styles.actBtnPrimary].join(" ")}
-                onClick={() => void submitNotice()}
-                disabled={noticeBusy || !noticeTitle.trim() || !noticeText.trim()}
-                type="button"
-              >
-                {noticeBusy ? "Adding…" : "Add to queue"}
-              </button>
-            </div>
-          </div>
+      <Dialog open={noticeOpen} onClose={() => setNoticeOpen(false)} title="Paste a notice">
+        <p className={styles.note}>Quick circulars and announcements — no file needed. It enters the same review queue.</p>
+        <label className={styles.label} htmlFor="notice-title">Title</label>
+        <input
+          id="notice-title"
+          className={styles.input}
+          value={noticeTitle}
+          onChange={(e) => setNoticeTitle(e.target.value)}
+          placeholder="e.g. Exam form deadline extended"
+          maxLength={500}
+        />
+        <label className={styles.label} htmlFor="notice-text">Notice text</label>
+        <textarea
+          id="notice-text"
+          className={styles.textarea}
+          value={noticeText}
+          onChange={(e) => setNoticeText(e.target.value)}
+          placeholder="Paste the full notice text here…"
+          rows={6}
+        />
+        <div className={styles.noticeActions}>
+          <button className={styles.actBtn} onClick={() => setNoticeOpen(false)} type="button">Cancel</button>
+          <button
+            className={[styles.actBtn, styles.actBtnPrimary].join(" ")}
+            onClick={() => void submitNotice()}
+            disabled={noticeBusy || !noticeTitle.trim() || !noticeText.trim()}
+            type="button"
+            aria-busy={noticeBusy}
+          >
+            {noticeBusy && <span className={styles.actSpinner} aria-hidden="true" />}
+            {noticeBusy ? "Adding…" : "Add to queue"}
+          </button>
         </div>
-      )}
+      </Dialog>
     </div>
   );
 }

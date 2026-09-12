@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LogoMark } from "@upc/ui";
+import { ThinkingOrb, type OrbState } from "thinking-orbs";
 import { Markdown } from "./Markdown";
 import type { Citation, StreamStatus } from "@/hooks/useAIStream";
 import styles from "@/components/chat/chat.module.css";
@@ -26,6 +27,14 @@ export type FeedbackType = "thumbs_up" | "thumbs_down";
 const STATUS_LABEL: Record<string, string> = {
   thinking: "Thinking…",
   searching: "Searching college documents…",
+  reading: "Reading the documents…",
+};
+
+/** Thinking-orb state per stream phase — the animation tells the story. */
+const STATUS_ORB: Record<string, OrbState> = {
+  thinking: "working",
+  searching: "searching",
+  reading: "solving",
 };
 
 /* ---------------- Icons (stroke style matches the existing set) ---------------- */
@@ -83,6 +92,7 @@ export function MessageList({
   streamingContent,
   streamStatus,
   streamingCitations,
+  retrievalCount,
   onCitationClick,
   onRegenerate,
   onEdit,
@@ -93,6 +103,8 @@ export function MessageList({
   streamingContent: string;
   streamStatus: StreamStatus;
   streamingCitations: Citation[];
+  /** Chunks the server retrieved — labels the reading phase. */
+  retrievalCount: number | null;
   onCitationClick: (citations: Citation[], order: number) => void;
   onRegenerate?: () => void;
   onEdit?: (messageId: string, content: string) => void;
@@ -101,6 +113,7 @@ export function MessageList({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const atBottomRef = useRef(true);
+  const [showJump, setShowJump] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
@@ -110,7 +123,9 @@ export function MessageList({
     const el = containerRef.current;
     if (!el) return;
     const onScroll = () => {
-      atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      atBottomRef.current = atBottom;
+      setShowJump((prev) => (prev === !atBottom ? prev : !atBottom));
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
@@ -124,7 +139,30 @@ export function MessageList({
     }
   }, [messages.length, streamingContent, streamStatus]);
 
-  const showThinking = streamStatus === "thinking" || streamStatus === "searching";
+  const showThinking = streamStatus === "thinking" || streamStatus === "searching" || streamStatus === "reading";
+
+  // Thinking avatar exit: keep the orb mounted ~160ms into streaming so it
+  // dissolves (blur+fade) instead of blinking out when the first token lands.
+  const prevThinking = useRef(false);
+  const [orbExiting, setOrbExiting] = useState(false);
+  useEffect(() => {
+    if (showThinking) {
+      prevThinking.current = true;
+      return;
+    }
+    if (prevThinking.current) {
+      prevThinking.current = false;
+      setOrbExiting(true);
+      const t = setTimeout(() => setOrbExiting(false), 200);
+      return () => clearTimeout(t);
+    }
+  }, [showThinking]);
+
+  const label =
+    streamStatus === "reading" && retrievalCount
+      ? `Reading ${retrievalCount} document section${retrievalCount === 1 ? "" : "s"}…`
+      : (STATUS_LABEL[streamStatus] ?? "Thinking…");
+
   const busy = showThinking || streamStatus === "streaming";
   const lastId = messages.length > 0 ? messages[messages.length - 1]!.id : null;
 
@@ -151,11 +189,12 @@ export function MessageList({
   };
 
   return (
-    <div className={styles.messages} ref={containerRef} role="log" aria-live="polite">
-      <div className={styles.column}>
+    <div className={styles.messagesWrap}>
+      <div className={styles.messages} ref={containerRef} role="log" aria-live="polite">
+        <div className={styles.column}>
         {messages.map((m) =>
           m.role === "user" ? (
-            <div key={m.id} className={styles.messageGroupUser}>
+            <div key={m.id} className={[styles.messageGroupUser, m.id.startsWith("local-") ? styles.msgEnter : ""].join(" ").trim()}>
               {editingId === m.id ? (
                 <div className={styles.editBox}>
                   <textarea
@@ -267,13 +306,20 @@ export function MessageList({
           ),
         )}
 
-        {/* Streaming AI message */}
-        {(showThinking || streamStatus === "streaming") && (
+        {/* Streaming AI message. During the 200ms .orbExiting window the orb
+            dissolves (blur+fade) before the first tokens mount — the blur
+            bridges the swap instead of showing two overlapping states. */}
+        {(showThinking || orbExiting || streamStatus === "streaming") && (
           <div className={styles.aiMessage}>
-            {showThinking ? (
-              <div className={styles.thinking} role="status">
-                <LogoMark size={16} />
-                <span className={styles.thinkingText}>{STATUS_LABEL[streamStatus] ?? "Thinking…"}</span>
+            {showThinking || orbExiting ? (
+              <div className={[styles.thinking, orbExiting ? styles.orbExit : ""].join(" ").trim()} role="status" aria-label={label}>
+                <span className={styles.thinkingAvatar}>
+                  <span className={styles.thinkingLogo} aria-hidden="true">
+                    <LogoMark size={22} />
+                  </span>
+                  <ThinkingOrb state={STATUS_ORB[streamStatus] ?? "working"} size={64} aria-hidden="true" />
+                </span>
+                <span className={styles.thinkingText}>{label}</span>
               </div>
             ) : (
               <>
@@ -289,7 +335,26 @@ export function MessageList({
           </div>
         )}
 
+        </div>
       </div>
+      {showJump && (
+        <button
+          className={styles.jumpLatest}
+          onClick={() => {
+            if (containerRef.current) {
+              atBottomRef.current = true;
+              setShowJump(false);
+              containerRef.current.scrollTop = containerRef.current.scrollHeight;
+            }
+          }}
+          aria-label="Jump to latest message"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+          </svg>
+          Latest
+        </button>
+      )}
     </div>
   );
 }

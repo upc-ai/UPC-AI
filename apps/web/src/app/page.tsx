@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
+import { HeritageStats } from "./_components/HeritageStats";
 import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
 import { FAQS, FaqItem } from "./_components/FAQ";
@@ -33,12 +34,12 @@ const ABOUT = [
 ];
 
 const KNOWLEDGE_TILES = [
-  { name: "Notices", count: "250+ documents", mono: "N" },
+  { name: "Notices", count: "260+ documents", mono: "N" },
   { name: "Fee Structure", count: "All courses", mono: "₹" },
   { name: "Timetables", count: "Every section", mono: "T" },
   { name: "Syllabus", count: "All subjects", mono: "S" },
   { name: "Scholarships", count: "Latest schemes", mono: "Sch" },
-  { name: "Previous Papers", count: "5 years", mono: "P" },
+  { name: "Previous Papers", count: "Past papers", mono: "P" },
   { name: "Hostel", count: "Rules & fees", mono: "H" },
   { name: "Library", count: "Catalogue", mono: "L" },
 ];
@@ -72,10 +73,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ---------------- Trust strip ---------------- */}
+        {/* ---------------- Trust strip (real college facts) ---------------- */}
         <Reveal>
           <div className={styles.strip}>
-            Used by 5,000+ students across 12 departments at Udai Pratap College, Varanasi
+            Established 1909 · First autonomous college in Uttar Pradesh · NAAC &apos;A&apos;
+            Accredited · 30 departments, 5 faculties
           </div>
         </Reveal>
 
@@ -166,16 +168,31 @@ export default function LandingPage() {
           </Reveal>
         </section>
 
-        {/* ---------------- Testimonial ---------------- */}
+        {/* ---------------- Heritage — real milestones (replaces the old placeholder testimonial) ---------------- */}
+        <section id="heritage" className={`${styles.container} ${styles.section}`}>
+          <Reveal>
+            <p className={styles.sectionKicker}>A century of learning</p>
+            <h2 className={styles.sectionTitle}>The college behind the AI.</h2>
+            <p className={styles.sectionSub}>
+              Udai Pratap College has stood in Varanasi since 1909 — the knowledge base behind
+              every answer is its own.
+            </p>
+          </Reveal>
+          <HeritageStats />
+        </section>
+
+        {/* ---------------- Founder quote (real words, from the college archives) ---------------- */}
         <section className={`${styles.container} ${styles.section}`} style={{ paddingTop: 0 }}>
           <Reveal>
             <blockquote className={styles.quote}>
-              “I found the exact revised fee structure in seconds — with the official document
-              attached. No WhatsApp groups, no rumours.”
+              “Knowledge was given to man to bless and not to harass mankind — to lift the
+              fallen, to wipe away tears.”
             </blockquote>
             <div className={styles.quoteBy}>
-              <span className={styles.quoteAvatar}>RS</span>
-              <span className={styles.quoteName}>Rahul Sharma · BSc CS, 2nd Year</span>
+              <span className={styles.quoteAvatar}>RU</span>
+              <span className={styles.quoteName}>
+                Rajarshi Udai Pratap Singh Ju Deo · Founder, 1909
+              </span>
             </div>
           </Reveal>
         </section>
@@ -199,7 +216,7 @@ export default function LandingPage() {
           <Reveal>
             <div className={styles.ctaBand}>
               <h2>Ready to study smarter?</h2>
-              <p>Free for every UPC student. Sign up with your college email.</p>
+              <p>Free for every UPC student. Sign up in seconds.</p>
               <Link href="/signup" className={styles.ctaBtn}>
                 Get Started Free
               </Link>
