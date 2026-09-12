@@ -91,7 +91,6 @@ export function WelcomeChat({ onSessionCreated }: { onSessionCreated: (sessionId
 export function SessionChat({ sessionId }: { sessionId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [title, setTitle] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(false);
   const [sources, setSources] = useState<{ open: boolean; list: Citation[]; activeOrder: number | null }>({ open: false, list: [], activeOrder: null });
   const [studyMode, setStudyMode] = useState<StudyMode>("learn");
   const [language, setLanguage] = useState<"en" | "hi" | "auto">("en");
@@ -157,8 +156,6 @@ export function SessionChat({ sessionId }: { sessionId: string }) {
         }
       } catch {
         /* session may be empty */
-      } finally {
-        setLoaded(true);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -266,13 +263,9 @@ export function SessionChat({ sessionId }: { sessionId: string }) {
 
   const openSources = (list: Citation[], order: number) => setSources({ open: true, list, activeOrder: order });
 
-  if (!loaded) {
-    return (
-      <div className={styles.main}>
-        <div className={styles.loadingShell}>Loading conversation…</div>
-      </div>
-    );
-  }
+  // No loading gate: history is fast, and a "Loading conversation…" flash on
+  // every open reads as lag. The workspace (header + composer) renders
+  // immediately and the messages simply appear when the fetch resolves.
 
   return (
     <div className={styles.main}>

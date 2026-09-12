@@ -80,14 +80,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         jetbrains.variable,
         notoDevanagari.variable,
       ].join(" ")}
-      data-theme="light"
+      data-theme="dark"
       suppressHydrationWarning
     >
       <body>
         {/* Pre-paint theme: apply the user's saved choice (settings page,
             localStorage "upcai:theme") before first paint on EVERY page —
             landing and auth included. First-in-body inline script runs
-            before anything renders (next-themes pattern). Default = light. */}
+            before anything renders (next-themes pattern). Default = dark;
+            users can switch to light (or System) in Settings. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("upcai:theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}else if(t==="system"){document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}catch(e){}})();`,

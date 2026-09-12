@@ -12,14 +12,13 @@ const COLUMNS: {
       { label: "Features", href: "/#about" },
       { label: "Knowledge", href: "/knowledge" },
       { label: "Study Tools", href: "/study-tools" },
-      { label: "Quiz", href: "/study-tools" },
     ],
   },
   {
     h: "College",
     links: [
       { label: "For Faculty", href: "/for-faculty" },
-      { label: "Admin Portal", href: "/for-faculty" },
+      { label: "Our Heritage", href: "/#heritage" },
       { label: "Partnership", href: "mailto:hello@helloupcai.app", external: true },
     ],
   },
@@ -41,8 +40,10 @@ const COLUMNS: {
   },
 ];
 
-/** Marketing footer — shared by every page via MarketingPage. Internal links
-    are next/link routes; mailtos stay plain anchors. */
+/** Marketing footer — shared by every page via MarketingPage. Two-sided:
+ *  brand + socials on the left, link columns in a 2×2 on the right, bottom
+ *  bar spanning both. Internal links are next/link routes; mailtos stay
+ *  plain anchors. */
 export function LandingFooter() {
   return (
     <footer className={styles.footer}>
@@ -74,25 +75,28 @@ export function LandingFooter() {
               </a>
             </div>
           </div>
-          {COLUMNS.map((col) => (
-            <div key={col.h} className={styles.footerCol}>
-              <h4>{col.h}</h4>
-              <ul>
-                {col.links.map((l) => (
-                  <li key={l.label}>
-                    {l.external ? (
-                      <a href={l.href}>{l.label}</a>
-                    ) : (
-                      <Link href={l.href}>{l.label}</Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className={styles.footerLinks}>
+            {COLUMNS.map((col) => (
+              <div key={col.h} className={styles.footerCol}>
+                <h4>{col.h}</h4>
+                <ul>
+                  {col.links.map((l) => (
+                    <li key={l.label}>
+                      {l.external ? (
+                        <a href={l.href}>{l.label}</a>
+                      ) : (
+                        <Link href={l.href}>{l.label}</Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
         <div className={styles.footerBottom}>
-          © {new Date().getFullYear()} UPC AI · upcai.app · Udai Pratap College, Varanasi · Made with care for students
+          <span>© {new Date().getFullYear()} UPC AI · Udai Pratap College, Varanasi</span>
+          <span>upcai.app · Made with care for students</span>
         </div>
       </div>
     </footer>

@@ -15,17 +15,34 @@ export function getAccessToken() {
   return accessToken;
 }
 
-export async function refreshAccessToken(): Promise<string | null> {
-  try {
-    const res = await fetch("/api/v1/auth/refresh", { method: "POST", credentials: "include" });
-    if (!res.ok) return null;
-    const json = (await res.json()) as { data?: { access_token?: string } };
-    const token = json.data?.access_token ?? null;
-    accessToken = token;
-    return token;
-  } catch {
-    return null;
+/**
+ * Single-flight refresh: when several parallel requests 401 at once (app boot
+ * fires many), they must share ONE refresh call. The refresh endpoint ROTATES
+ * the cookie on every success — a second concurrent refresh presents the
+ * just-superseded token, the server reads "token reuse" and REVOKES the whole
+ * session. That race was logging users out for good (dead session server-side,
+ * refresh fails on next boot). Never call the refresh endpoint outside this.
+ */
+let refreshInFlight: Promise<string | null> | null = null;
+
+export function refreshAccessToken(): Promise<string | null> {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch("/api/v1/auth/refresh", { method: "POST", credentials: "include" });
+        if (!res.ok) return null;
+        const json = (await res.json()) as { data?: { access_token?: string } };
+        const token = json.data?.access_token ?? null;
+        accessToken = token;
+        return token;
+      } catch {
+        return null;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
   }
+  return refreshInFlight;
 }
 
 export class ApiError extends Error {

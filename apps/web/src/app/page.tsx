@@ -6,31 +6,53 @@ import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
 import { FAQS, FaqItem } from "./_components/FAQ";
 
-const ABOUT = [
+const FEATURES = [
   {
-    label: "Academic help",
-    text: "Step-by-step solutions, derivations and code help for any subject — with Explain Simply and Challenge Me study modes.",
+    icon: "✦",
+    title: "Ask anything, get the steps",
+    text: "Doubts, derivations, code, exam prep — UPC AI works through the problem with you, shows the reasoning, and adapts from Explain Simply to Challenge Me as you grow.",
   },
   {
-    label: "Official answers",
-    text: "Fees, exams, notices, timetables and rules are answered from approved college documents, with the exact source cited. If the evidence isn't there, UPC AI says so instead of guessing.",
+    icon: "◈",
+    title: "Answers from official documents",
+    text: "Fees, exam dates, hostel rules, scholarships — answered only from college-approved documents, with the official source attached. No rumours, no guessing.",
   },
   {
-    label: "Images & PDFs",
-    text: "Send a photo of a problem or a PDF — UPC AI reads it and works with it directly in the chat.",
+    icon: "⚡",
+    title: "Instant, any hour",
+    text: "No waiting for office hours or scrolling WhatsApp groups. The answer to most college questions arrives in seconds — at 2 AM during exam week too.",
   },
   {
-    label: "English & Hindi",
-    text: "Ask in either language, or mix both — answers follow the language you use.",
+    icon: "⌘",
+    title: "Reads photos & PDFs",
+    text: "Snap a photo of a problem or upload the syllabus PDF — UPC AI reads it and works with it directly in the chat.",
   },
   {
-    label: "Study tools",
-    text: "Quizzes generated from your syllabus and flashcards that schedule themselves with spaced repetition.",
+    icon: "अ",
+    title: "English & Hindi",
+    text: "Ask in either language, or mix both — the answer follows the language you think in, Devanagari included.",
   },
   {
-    label: "Free & private",
-    text: "Free for the UPC community. Sign up in seconds — conversations stay private and are never shared.",
+    icon: "◎",
+    title: "Free for the UPC family",
+    text: "Every student and professor of Udai Pratap College gets it free. Sign up in seconds with your Gmail address.",
   },
+];
+
+const FOR_STUDENTS = [
+  "Instant, cited answers to college questions — fees, forms, deadlines, rules",
+  "Step-by-step academic help that shows its work, not just the final answer",
+  "Explain Simply when you're starting out; Challenge Me when you're ready",
+  "Revision from your own syllabus — quizzes and flashcards that adapt to you",
+  "Ask in Hindi or English — the language you're comfortable in",
+];
+
+const FOR_FACULTY = [
+  "One official source of truth — stop re-answering the same fee and exam questions",
+  "Upload a circular once; the AI answers from the latest version, with the source",
+  "Your syllabus and past papers become searchable knowledge in seconds",
+  "Notices reach students as answers — not as buried PDF links",
+  "See what students are actually asking (anonymised) and fix the gaps",
 ];
 
 const KNOWLEDGE_TILES = [
@@ -81,22 +103,24 @@ export default function LandingPage() {
           </div>
         </Reveal>
 
-        {/* ---------------- About UPC AI (glass cards over ambient) ---------------- */}
+        {/* ---------------- What is UPC AI (feature cards over ambient) ---------------- */}
         <section id="about" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
           <Reveal>
-            <p className={styles.sectionKicker}>About UPC AI</p>
-            <h2 className={styles.sectionTitle}>One assistant for the whole campus.</h2>
+            <p className={styles.sectionKicker}>What is UPC AI</p>
+            <h2 className={styles.sectionTitle}>AI for your studies — built on your college.</h2>
             <p className={styles.sectionSub}>
-              The official AI assistant of Udai Pratap College — built for students and faculty,
-              grounded in the college&apos;s own documents, and free for the UPC community.
+              UPC AI is an AI assistant made for Udai Pratap College. It explains any subject
+              step by step, and when a question touches the college — fees, exams, hostel,
+              scholarships — it answers only from official documents, with the source attached.
             </p>
           </Reveal>
-          <div className={styles.aboutList}>
-            {ABOUT.map((row) => (
-              <Reveal key={row.label}>
-                <div className={styles.aboutRow}>
-                  <span className={styles.aboutLabel}>{row.label}</span>
-                  <p className={styles.aboutText}>{row.text}</p>
+          <div className={styles.featureGrid}>
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delay={(i % 3) * 60}>
+                <div className={styles.featureCard}>
+                  <span className={styles.featureIcon} aria-hidden="true">{f.icon}</span>
+                  <h3 className={styles.featureTitle}>{f.title}</h3>
+                  <p className={styles.featureText}>{f.text}</p>
                 </div>
               </Reveal>
             ))}
@@ -153,6 +177,42 @@ export default function LandingPage() {
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ---------------- For the whole campus ---------------- */}
+        <section id="campus" className={`${styles.container} ${styles.section}`}>
+          <Reveal>
+            <p className={styles.sectionKicker}>Made for the whole campus</p>
+            <h2 className={styles.sectionTitle}>Why students and professors use it daily.</h2>
+            <p className={styles.sectionSub}>
+              One assistant, two superpowers — study help that explains, and official information
+              that&apos;s actually findable.
+            </p>
+          </Reveal>
+          <div className={styles.compareGrid}>
+            <Reveal>
+              <div className={styles.compareCard}>
+                <h3>For students</h3>
+                <p>Less hunting, more understanding.</p>
+                <ul>
+                  {FOR_STUDENTS.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+            <Reveal delay={90}>
+              <div className={styles.compareCard}>
+                <h3>For professors</h3>
+                <p>Your knowledge, amplified.</p>
+                <ul>
+                  {FOR_FACULTY.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
           </div>
         </section>
 
