@@ -382,9 +382,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
+  /* Claude-style italic serif thinking label (restored per user) */
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
   color: var(--on-dark-soft);
   margin-bottom: var(--space-sm);
   min-height: 20px;

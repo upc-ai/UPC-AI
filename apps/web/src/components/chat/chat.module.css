@@ -670,10 +670,12 @@
 }
 
 .thinkingText {
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  /* The Claude-style signature: italic serif "thinking…" — user restored it
+     (plain sans read as generic; the cursive label is the brand voice) */
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  letter-spacing: 0.01em;
   color: var(--app-muted);
   animation: shimmer 1.8s ease-in-out infinite;
 }
