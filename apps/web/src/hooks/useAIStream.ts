@@ -134,6 +134,12 @@ export function useAIStream(sessionId: string | null) {
         }
 
         if (!res.ok || !res.body) {
+          if (res.status === 413) {
+            // The base64 attachments pushed the request body past the platform
+            // cap — nothing reached the AI. (Images are downscaled client-side
+            // now; this is the honest fallback if something still slips through.)
+            throw new Error("That attachment is too large to send. Try a smaller or clearer photo, or a shorter PDF.");
+          }
           let message = "Couldn't reach UPC AI";
           try {
             const body = (await res.json()) as { error?: { message?: string } };

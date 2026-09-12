@@ -69,6 +69,37 @@ function readFile(file: File): Promise<string> {
   });
 }
 
+/** Phone photos are 2–8 MB — past the ~4.5 MB serverless body limit once
+    base64 inflates them 4/3 (the request 413s before the AI ever sees it),
+    and vision models don't need the extra pixels. Downscale to ≤1600px JPEG
+    before staging. GIFs keep their animation (never re-encoded); anything
+    that fails to compress falls back to the original file. */
+const COMPRESS_OVER_BYTES = 500 * 1024;
+const COMPRESS_MAX_SIDE = 1600;
+
+async function compressImage(file: File): Promise<File> {
+  if (file.type === "image/gif" || file.size <= COMPRESS_OVER_BYTES) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, COMPRESS_MAX_SIDE / Math.max(bmp.width, bmp.height));
+    const w = Math.max(1, Math.round(bmp.width * scale));
+    const h = Math.max(1, Math.round(bmp.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bmp, 0, 0, w, h);
+    bmp.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    if (!blob || blob.size >= file.size) return file;
+    const name = `${file.name.replace(/\.[^.]+$/, "")}.jpg`;
+    return new File([blob], name, { type: "image/jpeg", lastModified: Date.now() });
+  } catch {
+    return file;
+  }
+}
+
 export function Composer({
   onSend,
   onCancel,
@@ -146,6 +177,11 @@ export function Composer({
         toast.error(`"${f.name}" is over 13 MB — compress it or split it first.`);
         continue;
       }
+      // PDFs can't be downscaled client-side — a large one base64-inflates
+      // past the platform body cap and would 413 on the live site.
+      if (f.type === "application/pdf" && f.size > 3.5 * 1024 * 1024) {
+        toast.error(`"${f.name}" is a large PDF — it may fail to send. If it does, split or scan the pages as photos.`);
+      }
       accepted.push(f);
     }
     if (accepted.length === 0) return;
@@ -164,13 +200,14 @@ export function Composer({
     const read: PendingAttachment[] = [];
     for (const f of staged) {
       try {
-        const data = await readFile(f);
+        const processed = f.type.startsWith("image/") ? await compressImage(f) : f;
+        const data = await readFile(processed);
         read.push({
           id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-          name: f.name,
-          mime_type: f.type,
+          name: processed.name,
+          mime_type: processed.type,
           data,
-          size: f.size,
+          size: processed.size,
         });
       } catch {
         toast.error(`Couldn't read "${f.name}".`);
