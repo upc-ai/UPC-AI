@@ -63,7 +63,7 @@ export default function PrivacyPage() {
               <h3>Contact</h3>
               <p>
                 Questions about privacy? Email{" "}
-                <a href="mailto:hello@helloupcai.app">hello@helloupcai.app</a>.
+                <a href="mailto:hello@upcai.app">hello@upcai.app</a>.
               </p>
             </div>
           </Reveal>

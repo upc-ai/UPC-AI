@@ -62,8 +62,8 @@ export default function ForFacultyPage() {
               <h2>Bring your department online.</h2>
               <p>
                 Want your documents in UPC AI? Write to us at{" "}
-                <a href="mailto:hello@helloupcai.app" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
-                  hello@helloupcai.app
+                <a href="mailto:hello@upcai.app" style={{ borderBottom: "1px solid rgba(255,255,255,0.3)" }}>
+                  hello@upcai.app
                 </a>
               </p>
               <Link href="/signup" className={styles.ctaBtn}>

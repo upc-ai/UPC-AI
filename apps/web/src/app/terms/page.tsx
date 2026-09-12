@@ -64,7 +64,7 @@ export default function TermsPage() {
               <p>
                 These terms may be updated as the service grows. Continued use after an update
                 means you accept the revised terms. Questions? Email{" "}
-                <a href="mailto:hello@helloupcai.app">hello@helloupcai.app</a>.
+                <a href="mailto:hello@upcai.app">hello@upcai.app</a>.
               </p>
             </div>
           </Reveal>

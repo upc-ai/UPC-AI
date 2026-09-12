@@ -497,6 +497,32 @@
   border-bottom: 1px solid var(--hairline-soft);
 }
 
+/* Editorial prose — how top AI companies write their landing sections:
+   a big readable measure, no boxes, one leading paragraph. */
+
+.proseSection {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.proseSection p {
+  font-size: clamp(16px, 1.9vw, 19px);
+  line-height: 1.7;
+  color: var(--body);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.proseLead {
+  font-size: clamp(19px, 2.4vw, 23px) !important;
+  line-height: 1.55 !important;
+  color: var(--ink) !important;
+  font-weight: 450;
+  letter-spacing: -0.005em;
+}
+
 .featureGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -706,6 +732,11 @@
   font-weight: 550;
   letter-spacing: 0.01em;
   color: var(--ink);
+}
+
+.aboutText strong {
+  color: var(--ink);
+  font-weight: 550;
 }
 
 .aboutText {

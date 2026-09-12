@@ -45,7 +45,7 @@ export default function AccessibilityPage() {
 
               <h3>Report an issue</h3>
               <p>
-                Email <a href="mailto:hello@helloupcai.app">hello@helloupcai.app</a> with what
+                Email <a href="mailto:hello@upcai.app">hello@upcai.app</a> with what
                 you were trying to do and what got in the way. Every accessibility report is
                 treated as a bug, not a suggestion.
               </p>

@@ -19,7 +19,7 @@ const COLUMNS: {
     links: [
       { label: "For Faculty", href: "/for-faculty" },
       { label: "Our Heritage", href: "/#heritage" },
-      { label: "Partnership", href: "mailto:hello@helloupcai.app", external: true },
+      { label: "Partnership", href: "mailto:hello@upcai.app", external: true },
     ],
   },
   {
@@ -27,7 +27,7 @@ const COLUMNS: {
     links: [
       { label: "Help Center", href: "/faq" },
       { label: "About", href: "/about" },
-      { label: "Contact", href: "mailto:hello@helloupcai.app", external: true },
+      { label: "Contact", href: "mailto:hello@upcai.app", external: true },
     ],
   },
   {
@@ -67,11 +67,11 @@ export function LandingFooter() {
                 </svg>
                 @upc_ai
               </a>
-              <a href="mailto:hello@helloupcai.app" aria-label="Email UPC AI" title="hello@helloupcai.app">
+              <a href="mailto:hello@upcai.app" aria-label="Email UPC AI" title="hello@upcai.app">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3.5 6.5 8.5 6 8.5-6" />
                 </svg>
-                hello@helloupcai.app
+                hello@upcai.app
               </a>
             </div>
           </div>

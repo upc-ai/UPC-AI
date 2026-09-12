@@ -6,54 +6,17 @@ import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
 import { FAQS, FaqItem } from "./_components/FAQ";
 
-const FEATURES = [
-  {
-    icon: "✦",
-    title: "Ask anything, get the steps",
-    text: "Doubts, derivations, code, exam prep — UPC AI works through the problem with you, shows the reasoning, and adapts from Explain Simply to Challenge Me as you grow.",
-  },
-  {
-    icon: "◈",
-    title: "Answers from official documents",
-    text: "Fees, exam dates, hostel rules, scholarships — answered only from college-approved documents, with the official source attached. No rumours, no guessing.",
-  },
-  {
-    icon: "⚡",
-    title: "Instant, any hour",
-    text: "No waiting for office hours or scrolling WhatsApp groups. The answer to most college questions arrives in seconds — at 2 AM during exam week too.",
-  },
-  {
-    icon: "⌘",
-    title: "Reads photos & PDFs",
-    text: "Snap a photo of a problem or upload the syllabus PDF — UPC AI reads it and works with it directly in the chat.",
-  },
-  {
-    icon: "अ",
-    title: "English & Hindi",
-    text: "Ask in either language, or mix both — the answer follows the language you think in, Devanagari included.",
-  },
-  {
-    icon: "◎",
-    title: "Free for the UPC family",
-    text: "Every student and professor of Udai Pratap College gets it free. Sign up in seconds with your Gmail address.",
-  },
-];
+const FOR_STUDENTS = {
+  label: "For students",
+  lead: "Less hunting, more understanding.",
+  text: "The revised fee figure in seconds, with the official document it came from. A derivation worked through line by line, not just the final answer. Revision built from your own syllabus. Answers in Hindi or English, at 2 AM if that's when you study — free, for your whole degree.",
+};
 
-const FOR_STUDENTS = [
-  "Instant, cited answers to college questions — fees, forms, deadlines, rules",
-  "Step-by-step academic help that shows its work, not just the final answer",
-  "Explain Simply when you're starting out; Challenge Me when you're ready",
-  "Revision from your own syllabus — quizzes and flashcards that adapt to you",
-  "Ask in Hindi or English — the language you're comfortable in",
-];
-
-const FOR_FACULTY = [
-  "One official source of truth — stop re-answering the same fee and exam questions",
-  "Upload a circular once; the AI answers from the latest version, with the source",
-  "Your syllabus and past papers become searchable knowledge in seconds",
-  "Notices reach students as answers — not as buried PDF links",
-  "See what students are actually asking (anonymised) and fix the gaps",
-];
+const FOR_FACULTY = {
+  label: "For professors",
+  lead: "Your knowledge, amplified.",
+  text: "One assistant answers the same fifty routine questions so you don't have to. Upload a circular once — every student who asks gets the official version, source attached. Your notes and past papers become searchable knowledge. And an anonymised list of what students ask most shows you exactly where the confusion is.",
+};
 
 const KNOWLEDGE_TILES = [
   { name: "Notices", count: "260+ documents", mono: "N" },
@@ -103,27 +66,43 @@ export default function LandingPage() {
           </div>
         </Reveal>
 
-        {/* ---------------- What is UPC AI (feature cards over ambient) ---------------- */}
+        {/* ---------------- What is UPC AI (editorial prose, no card grid) ---------------- */}
         <section id="about" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
           <Reveal>
             <p className={styles.sectionKicker}>What is UPC AI</p>
-            <h2 className={styles.sectionTitle}>AI for your studies — built on your college.</h2>
-            <p className={styles.sectionSub}>
-              UPC AI is an AI assistant made for Udai Pratap College. It explains any subject
-              step by step, and when a question touches the college — fees, exams, hostel,
-              scholarships — it answers only from official documents, with the source attached.
-            </p>
+            <h2 className={styles.sectionTitle}>AI for your studies —<br />built on your college.</h2>
           </Reveal>
-          <div className={styles.featureGrid}>
-            {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 3) * 60}>
-                <div className={styles.featureCard}>
-                  <span className={styles.featureIcon} aria-hidden="true">{f.icon}</span>
-                  <h3 className={styles.featureTitle}>{f.title}</h3>
-                  <p className={styles.featureText}>{f.text}</p>
-                </div>
-              </Reveal>
-            ))}
+          <div className={styles.proseSection}>
+            <Reveal>
+              <p className={styles.proseLead}>
+                UPC AI is an AI assistant made for Udai Pratap College. It works like the AI
+                tools you already know — ask anything, in plain English or Hindi, and it thinks,
+                searches and answers in seconds. What makes it different is what it knows:
+                your college, its documents, your syllabus.
+              </p>
+            </Reveal>
+            <Reveal delay={70}>
+              <p>
+                Studying with it is simple. Stuck on a derivation at midnight? It works through
+                the steps with you and shows its reasoning. Starting from zero, ask it to explain
+                simply; ready to be pushed, switch to Challenge Me. Photograph a problem or
+                upload a PDF and it reads them directly in the chat.
+              </p>
+            </Reveal>
+            <Reveal delay={140}>
+              <p>
+                When a question touches the college — fees, exams, hostels, scholarships — it
+                answers only from official, approved documents and attaches the source. If the
+                evidence isn&apos;t there, it says so instead of guessing. No rumours, no
+                out-of-date PDFs, no waiting for office hours.
+              </p>
+            </Reveal>
+            <Reveal delay={210}>
+              <p>
+                It is free for every student and professor of the college, private by design,
+                and made for how UPC actually studies — including Hindi.
+              </p>
+            </Reveal>
           </div>
         </section>
 
@@ -180,37 +159,27 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ---------------- For the whole campus ---------------- */}
+        {/* ---------------- For the whole campus (editorial rows) ---------------- */}
         <section id="campus" className={`${styles.container} ${styles.section}`}>
           <Reveal>
             <p className={styles.sectionKicker}>Made for the whole campus</p>
             <h2 className={styles.sectionTitle}>Why students and professors use it daily.</h2>
-            <p className={styles.sectionSub}>
-              One assistant, two superpowers — study help that explains, and official information
-              that&apos;s actually findable.
-            </p>
           </Reveal>
-          <div className={styles.compareGrid}>
+          <div className={styles.aboutList}>
             <Reveal>
-              <div className={styles.compareCard}>
-                <h3>For students</h3>
-                <p>Less hunting, more understanding.</p>
-                <ul>
-                  {FOR_STUDENTS.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
+              <div className={styles.aboutRow}>
+                <span className={styles.aboutLabel}>{FOR_STUDENTS.label}</span>
+                <p className={styles.aboutText}>
+                  <strong>{FOR_STUDENTS.lead}</strong> {FOR_STUDENTS.text}
+                </p>
               </div>
             </Reveal>
-            <Reveal delay={90}>
-              <div className={styles.compareCard}>
-                <h3>For professors</h3>
-                <p>Your knowledge, amplified.</p>
-                <ul>
-                  {FOR_FACULTY.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
+            <Reveal delay={70}>
+              <div className={styles.aboutRow}>
+                <span className={styles.aboutLabel}>{FOR_FACULTY.label}</span>
+                <p className={styles.aboutText}>
+                  <strong>{FOR_FACULTY.lead}</strong> {FOR_FACULTY.text}
+                </p>
               </div>
             </Reveal>
           </div>

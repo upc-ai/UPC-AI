@@ -34,7 +34,7 @@ export default function FaqPage() {
           <Reveal>
             <p className={styles.prose} style={{ marginTop: "var(--space-xl)" }}>
               Still stuck? Write to us at{" "}
-              <a href="mailto:hello@helloupcai.app">hello@helloupcai.app</a> — we reply to every
+              <a href="mailto:hello@upcai.app">hello@upcai.app</a> — we reply to every
               message.
             </p>
           </Reveal>
