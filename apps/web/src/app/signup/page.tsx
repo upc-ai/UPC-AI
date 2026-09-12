@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogoMark } from "@upc/ui";
-import { registerAccount, loginWithGoogle } from "@/lib/auth-store";
+import { bootstrapAuth, registerAccount, loginWithGoogle, useAuth } from "@/lib/auth-store";
 import { ApiError } from "@/lib/api-client";
 import { GoogleButton, GOOGLE_CLIENT_ID } from "@/components/auth/GoogleButton";
 import { PasswordField } from "@/components/auth/PasswordField";
 import { PasswordChecklist } from "@/components/auth/PasswordChecklist";
 import styles from "../auth.module.css";
+
+bootstrapAuth();
 
 function passwordStrength(pw: string): { score: 0 | 1 | 2 | 3 | 4; label: string; color: string } {
   let score = 0;
@@ -23,6 +25,7 @@ function passwordStrength(pw: string): { score: 0 | 1 | 2 | 3 | 4; label: string
 
 export default function SignupPage() {
   const router = useRouter();
+  const { status } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,6 +35,12 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const strength = useMemo(() => passwordStrength(password), [password]);
+
+  // Already signed in? Skip the form — same validated client-side redirect
+  // the login page uses (never middleware: a dead cookie must not loop here).
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/chat");
+  }, [status, router]);
 
   const googleSignup = async (idToken: string) => {
     setError(null);
@@ -46,8 +55,11 @@ export default function SignupPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password !== "" && strength.score < 4) {
-      setError("Password needs 8+ characters with an uppercase letter, a lowercase letter, a digit AND a special character (e.g. Test@12345).");
+    // Locked policy: letter+number mandatory, symbol RECOMMENDED but must NOT
+    // block (score 3 = 8+ chars, upper+lower, digit). The checklist shows the
+    // symbol rule as "(optional)".
+    if (password !== "" && strength.score < 3) {
+      setError("Password needs 8+ characters with an uppercase letter, a lowercase letter and a digit. A symbol is recommended but optional.");
       return;
     }
     setLoading(true);
