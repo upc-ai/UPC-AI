@@ -15,7 +15,7 @@ import { getManagedConfig } from "@/modules/providers/managed-config";
 
 export const dynamic = "force-dynamic";
 /** 60s = Vercel Hobby plan ceiling (Pro allows up to 300 — raise there). */
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /** GET /v1/chat/sessions/{id}/messages — paginated history with citations + attachments. */
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -512,6 +512,22 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
               } else if (event.type === "error") {
                 send("error", { code: event.code, message: event.message, retrying: event.retrying });
               }
+            }
+
+            // Empty generation (zero tokens — e.g. a safety filter on an image):
+            // never send a bare done. Stream the same friendly fallback the
+            // grounded-refusal path uses so the student sees WHAT happened.
+            if (!full.trim()) {
+              const fallback =
+                language === "hi"
+                  ? "UPC AI उस उत्तर को पूरा नहीं कर सका। कृपया दोबारा कोशिश करें — यदि यह बार-बार विफल हो, तो फ़ोटो दोबारा भेजें।"
+                  : "UPC AI couldn't generate an answer for that. Please try again — if it keeps failing, re-send the image.";
+              let seqF = 0;
+              for (const token of fallback.match(/.{1,20}/g) ?? []) {
+                seqF++;
+                send("token", { text: token, sequence: seqF });
+              }
+              full = fallback;
             }
 
             // Persist final content (metrics/citations are telemetry — a failure

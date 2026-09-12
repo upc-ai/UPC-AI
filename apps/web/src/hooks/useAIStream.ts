@@ -233,6 +233,14 @@ export function useAIStream(sessionId: string | null) {
         // Stream ended: final flush
         flush();
         if (mountedRef.current && !controller.signal.aborted) {
+          if (!doneReceived) {
+            // The connection closed WITHOUT the done event — the serverless
+            // function was killed or the network dropped mid-generation.
+            // Never present that as success: show the retry banner instead.
+            setStatus("error");
+            setError("UPC AI couldn't finish that answer. Please try again.");
+            return;
+          }
           setStatus((s) => (s === "error" ? s : "done"));
           setCompletedAt(Date.now());
         }
