@@ -15,6 +15,11 @@ import styles from "../landing.module.css";
  */
 export function HeroChatDemo() {
   const [step, setStep] = useState(0);
+  // BorderBeam injects its CSS as a <style> tag that React's server renderer
+  // double-escapes → hydration mismatch in dev. Render it client-side only;
+  // the glass mockup stands alone for that first frame.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const timers = [
@@ -28,51 +33,57 @@ export function HeroChatDemo() {
     return () => timers.forEach(clearTimeout);
   }, [step === 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <div style={{ position: "relative" }}>
-      <BorderBeam size="line" colorVariant="mono">
-        <div className={styles.mockup} data-testid="hero-mockup">
-          <div className={styles.mockupBar}>
-            <span className={styles.mockupDot} />
-            <span className={styles.mockupDot} />
-            <span className={styles.mockupDot} />
-            <span className={styles.mockupTitle}>upcai.app</span>
-          </div>
+  const mockupCard = (
+    <div className={styles.mockup} data-testid="hero-mockup">
+      <div className={styles.mockupBar}>
+        <span className={styles.mockupDot} />
+        <span className={styles.mockupDot} />
+        <span className={styles.mockupDot} />
+        <span className={styles.mockupTitle}>upcai.app</span>
+      </div>
 
-          {step >= 1 && (
-            <div className={styles.mockupUser}>
-              What is the BSc CS fee structure for 2nd year?
-            </div>
-          )}
+      {step >= 1 && (
+        <div className={styles.mockupUser}>
+          What is the BSc CS fee structure for 2nd year?
+        </div>
+      )}
 
-          {step === 2 && (
-            <div className={styles.mockupStatus} role="img" aria-label="UPC AI is thinking">
-              <ThinkingOrb state="working" size={20} theme="dark" aria-hidden="true" />
-              <span className={styles.shimmer}>Thinking…</span>
-            </div>
-          )}
+      {step === 2 && (
+        <div className={styles.mockupStatus} role="img" aria-label="UPC AI is thinking">
+          <ThinkingOrb state="working" size={20} theme="dark" aria-hidden="true" />
+          <span className={styles.shimmer}>Thinking…</span>
+        </div>
+      )}
 
-          {step >= 3 && (
-            <div className={styles.mockupAnswer}>
-              <span className={styles.line}>
-                Tuition: <strong>₹15,000</strong> per semester <em>[1]</em>
-              </span>
-              {step >= 4 && (
-                <span className={styles.line}>
-                  Library: ₹2,000 · Lab: ₹3,000 <em>[2]</em>
-                </span>
-              )}
-            </div>
-          )}
-
-          {step >= 5 && (
-            <div className={styles.mockupSources}>
-              <LogoMark size={13} />
-              Udai Pratap College — Official Website
-            </div>
+      {step >= 3 && (
+        <div className={styles.mockupAnswer}>
+          <span className={styles.line}>
+            Tuition: <strong>₹15,000</strong> per semester <em>[1]</em>
+          </span>
+          {step >= 4 && (
+            <span className={styles.line}>
+              Library: ₹2,000 · Lab: ₹3,000 <em>[2]</em>
+            </span>
           )}
         </div>
-      </BorderBeam>
+      )}
+
+      {step >= 5 && (
+        <div className={styles.mockupSources}>
+          <LogoMark size={13} />
+          Udai Pratap College — Official Website
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ position: "relative" }}>
+      {mounted ? (
+        <BorderBeam size="line" colorVariant="mono">{mockupCard}</BorderBeam>
+      ) : (
+        mockupCard
+      )}
     </div>
   );
 }
