@@ -7,7 +7,35 @@
  */
 import { readFileSync } from "node:fs";
 
-const pick = Number(process.argv[2] ?? 0);
+const arg1 = process.argv[2] ?? "";
+const pick = Number(arg1 || 0);
+
+// Models mode: node scripts/test-provider.mjs models [filter]
+// → lists every model id the key can access on the router.
+if (arg1 === "models") {
+  const filter = (process.argv[3] ?? "").toLowerCase();
+  const raw2 = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
+  const l2 = raw2.split(/\r?\n/).find((l) => l.trim().startsWith("AI_CUSTOM_PROVIDERS="));
+  if (!l2) {
+    console.log("AI_CUSTOM_PROVIDERS not found in .env.local");
+    process.exit(1);
+  }
+  const e = JSON.parse(l2.slice(l2.indexOf("=") + 1).trim())[0];
+  const res = await fetch(`${e.baseUrl.replace(/\/$/, "")}/models`, {
+    headers: { Authorization: `Bearer ${e.apiKey}` },
+  });
+  const body = await res.text();
+  if (!res.ok) {
+    console.log(`❌ ${res.status} → ${body.slice(0, 300)}`);
+    process.exit(1);
+  }
+  const ids = (JSON.parse(body).data ?? []).map((m) => m.id).sort();
+  const shown = filter ? ids.filter((id) => id.toLowerCase().includes(filter)) : ids;
+  console.log(`✅ ${shown.length}${filter ? ` of ${ids.length}` : ""} models available on ${new URL(e.baseUrl).host}:`);
+  for (const id of shown) console.log(`  ${id}`);
+  if (filter && shown.length === 0) console.log(`(none matched "${filter}" — try another search or drop the filter)`);
+  process.exit(0);
+}
 
 const raw = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
 const line = raw.split(/\r?\n/).find((l) => l.trim().startsWith("AI_CUSTOM_PROVIDERS="));
