@@ -176,7 +176,15 @@ function startOfIstDay(): Date {
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const claims = await requireAuth(req);
-    const body = bodySchema.parse(await req.json());
+    // An aborted upload (user hit Stop mid-image) arrives as an empty/truncated
+    // body — req.json() would throw SyntaxError and [unhandled]-crash the route.
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      return fail(new ApiError("VALIDATION_ERROR", "Request body was empty or incomplete."));
+    }
+    const body = bodySchema.parse(rawBody);
 
     const rl = await rateLimit(`msg:${claims.sub}`, 30, 60);
     if (!rl.allowed) throw new ApiError("RATE_LIMIT_EXCEEDED", "Too many messages. Please wait a moment.");

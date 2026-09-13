@@ -10,6 +10,12 @@ import { readFileSync } from "node:fs";
 const arg1 = process.argv[2] ?? "";
 const pick = Number(arg1 || 0);
 
+const withTimeout = (ms) => {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), ms);
+  return { signal: c.signal, done: () => clearTimeout(t) };
+};
+
 // Models mode: node scripts/test-provider.mjs models [filter]
 // → lists every model id the key can access on the router.
 if (arg1 === "models") {
@@ -37,6 +43,65 @@ if (arg1 === "models") {
   process.exit(0);
 }
 
+// Image mode: node scripts/test-provider.mjs image [entryNumber]
+// → sends a tiny image in the exact OpenAI wire format the app uses, so we
+//   learn whether the model can SEE pictures (text-only models hang/error here).
+if (arg1 === "image") {
+  const raw2 = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
+  const l2 = raw2.split(/\r?\n/).find((l) => l.trim().startsWith("AI_CUSTOM_PROVIDERS="));
+  if (!l2) {
+    console.log("AI_CUSTOM_PROVIDERS not found in .env.local");
+    process.exit(1);
+  }
+  const entries2 = JSON.parse(l2.slice(l2.indexOf("=") + 1).trim());
+  const e = entries2[Number(process.argv[3] ?? 1) - 1] ?? entries2[0];
+  if (!e) {
+    console.log("No such entry");
+    process.exit(1);
+  }
+  console.log(`=== ${e.name} | model=${e.model} | image test ===`);
+  // 1x1 red PNG
+  const tinyPng = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+  const t3 = withTimeout(45_000);
+  try {
+    const started = Date.now();
+    const res = await fetch(`${e.baseUrl.replace(/\/$/, "")}/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${e.apiKey}` },
+      body: JSON.stringify({
+        model: e.model,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "What color is this image? Answer in one word." },
+            { type: "image_url", image_url: { url: `data:image/png;base64,${tinyPng}` } },
+          ],
+        }],
+        max_tokens: 20,
+      }),
+      signal: t3.signal,
+    });
+    const body = await res.text();
+    t3.done();
+    if (res.ok) {
+      let text = "";
+      try {
+        text = JSON.parse(body).choices?.[0]?.message?.content ?? body.slice(0, 200);
+      } catch {
+        text = body.slice(0, 200);
+      }
+      console.log(`  ✅ VISION WORKS (${res.status} in ${Date.now() - started}ms) → "${String(text).slice(0, 120)}"`);
+    } else {
+      console.log(`  ❌ ${res.status} in ${Date.now() - started}ms → ${body.slice(0, 260)}`);
+      console.log(`  → if the error mentions image/multimodal/content, this model CANNOT see pictures — pick a vision-capable model (run: node scripts/test-provider.mjs models and look for vision variants)`);
+    }
+  } catch (err) {
+    t3.done();
+    console.log(`  ❌ ${err.name === "AbortError" ? "NO RESPONSE in 45s — the router hangs on image payloads (this is your thinking-forever cause)" : err.message}`);
+  }
+  process.exit(0);
+}
+
 const raw = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
 const line = raw.split(/\r?\n/).find((l) => l.trim().startsWith("AI_CUSTOM_PROVIDERS="));
 if (!line) {
@@ -55,12 +120,6 @@ if (!list.length) {
   console.log(`No entry #${pick} (you have ${entries.length})`);
   process.exit(1);
 }
-
-const withTimeout = (ms) => {
-  const c = new AbortController();
-  const t = setTimeout(() => c.abort(), ms);
-  return { signal: c.signal, done: () => clearTimeout(t) };
-};
 
 for (const e of list) {
   const host = new URL(e.baseUrl).host;
