@@ -113,7 +113,22 @@ export async function chainFor(tier: ModelTier): Promise<ProviderConfig[]> {
 
 /** Stream with failover. Yields normalized events; retries the chain on failure. */
 export async function* streamGenerate(opts: GenerateOptions): AsyncGenerator<StreamEvent> {
-  const chain = await chainFor(opts.tier);
+  let chain: ProviderConfig[];
+  try {
+    chain = await chainFor(opts.tier);
+  } catch (err) {
+    // A malformed provider config must degrade to a visible error event —
+    // throwing here kills the SSE connection and the client just sees a
+    // dead stream instead of a message it can act on.
+    console.error("[gateway] provider config failed:", err instanceof Error ? err.message : err);
+    yield {
+      type: "error",
+      code: "AI_PROVIDER_CONFIG",
+      message: "UPC AI is temporarily experiencing high demand. Please try again shortly.",
+      retrying: false,
+    };
+    return;
+  }
   if (chain.length === 0) {
     yield { type: "error", code: "AI_PROVIDER_UNAVAILABLE", message: "No AI provider configured", retrying: false };
     return;
