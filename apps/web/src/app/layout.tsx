@@ -59,6 +59,12 @@ export const metadata: Metadata = {
     description: "Official AI Study Agent for Udai Pratap College students.",
     images: ["https://upcai.app/og-image.png"],
   },
+  // Google Search Console ownership verification — GSC gives you this token
+  // ("google-site-verification=<token>"); set GOOGLE_SITE_VERIFICATION in
+  // Vercel env (+ .env.local) and redeploy, or paste the token here directly.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport: Viewport = {
