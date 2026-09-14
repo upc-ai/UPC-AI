@@ -4,8 +4,9 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "Accessibility",
+  title: "Accessibility — UPC AI | Udai Pratap College AI Assistant",
   description: "UPC AI's accessibility commitments and how to report issues.",
+  alternates: { canonical: "/accessibility" },
 };
 
 export default function AccessibilityPage() {

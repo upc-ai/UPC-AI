@@ -4,8 +4,9 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "The terms for using UPC AI.",
+  title: "Terms of Service — UPC AI | Udai Pratap College AI Assistant",
+  description: "The terms for using UPC AI, the official AI assistant of Udai Pratap College.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

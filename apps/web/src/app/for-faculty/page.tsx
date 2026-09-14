@@ -5,8 +5,10 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "For Faculty",
-  description: "How Udai Pratap College faculty and staff power the UPC AI knowledge base.",
+  title: "UPC AI for Faculty — Udai Pratap Autonomous College",
+  description:
+    "How Udai Pratap College faculty upload official documents, circulars and syllabi to UPC AI — one upload becomes the official answer for every student.",
+  alternates: { canonical: "/for-faculty" },
 };
 
 const ROWS = [

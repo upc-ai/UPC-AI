@@ -2,17 +2,21 @@ import type { Metadata } from "next";
 import { MarketingPage } from "../_components/MarketingPage";
 import { Reveal } from "../_components/Reveal";
 import { FAQS, FaqItem } from "../_components/FAQ";
+import { JsonLd, faqJsonLd } from "../_components/JsonLd";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "FAQ",
-  description: "Frequently asked questions about UPC AI.",
+  title: "FAQ — UPC AI, the AI Assistant of Udai Pratap College",
+  description:
+    "Frequently asked questions about UPC AI: is it free, how accurate are answers, Hindi support, phone use, and who maintains the knowledge base of Udai Pratap College.",
+  alternates: { canonical: "/faq" },
 };
 
 export default function FaqPage() {
   return (
     <MarketingPage>
       <main id="main">
+        <JsonLd data={faqJsonLd(FAQS)} />
         <section className={`${styles.container} ${styles.pageHeader}`}>
           <Reveal>
             <p className={styles.sectionKicker}>Help center</p>

@@ -759,6 +759,60 @@
   padding: clamp(48px, 8vw, 88px) 0 0;
 }
 
+/* College knowledge pages — link rows + document body */
+
+.collegeCatLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.docBody {
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--body);
+}
+
+.docBody h1, .docBody h2, .docBody h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--ink);
+  margin: var(--space-lg) 0 var(--space-xs);
+  line-height: 1.25;
+}
+
+.docBody h1 { font-size: 26px; }
+.docBody h2 { font-size: 22px; }
+.docBody h3 { font-size: 18px; }
+
+.docBody table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: var(--space-sm) 0;
+}
+
+.docBody th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--hairline);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.docBody td {
+  border-bottom: 1px solid var(--hairline);
+  padding: 8px 10px;
+  overflow-wrap: anywhere;
+}
+
 /* Subpage long-form article typography (about, legal pages) */
 .prose {
   max-width: 68ch;

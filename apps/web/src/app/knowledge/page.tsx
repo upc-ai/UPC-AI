@@ -5,8 +5,10 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "Knowledge",
-  description: "What's inside the UPC AI knowledge base and how citations work.",
+  title: "Knowledge Base — Udai Pratap College Fees, Syllabus & Notices in UPC AI",
+  description:
+    "What the UPC AI knowledge base covers for Udai Pratap Autonomous College: fees, timetables, syllabi, scholarships, previous papers, hostel rules and library — answered from official documents.",
+  alternates: { canonical: "/knowledge" },
 };
 
 const AREAS = [
@@ -49,6 +51,12 @@ export default function KnowledgePage() {
               </Reveal>
             ))}
           </div>
+          <Reveal>
+            <p className={styles.prose} style={{ marginTop: "var(--space-lg)" }}>
+              Browse the full library — every public college document as a readable page:{" "}
+              <Link href="/college">college knowledge library</Link>.
+            </p>
+          </Reveal>
         </section>
 
         <section className={`${styles.bandSoft} ${styles.section}`}>

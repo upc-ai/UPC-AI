@@ -5,8 +5,10 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "Study Tools",
-  description: "Quizzes and spaced-repetition flashcards built from your syllabus.",
+  title: "Study Tools — Quizzes & Flashcards for Udai Pratap College Students",
+  description:
+    "Quizzes generated from your Udai Pratap College syllabus and flashcards that schedule themselves with spaced repetition. Built into UPC AI, free for students.",
+  alternates: { canonical: "/study-tools" },
 };
 
 const TOOLS = [

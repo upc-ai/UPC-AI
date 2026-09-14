@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { JsonLd, SITE_JSONLD } from "./_components/JsonLd";
 
 // Self-hosted (Fontsource woff2) — no Google Fonts fetch at build/dev time,
 // which is unreachable on some networks and slowed compiles by minutes.
@@ -35,13 +36,16 @@ const notoDevanagari = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://upcai.app"),
   title: {
-    default: "UPC AI — The Smarter Way to Study with AI",
+    default: "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi",
     template: "%s | UPC AI",
   },
-  description: "Official AI Study Agent for Udai Pratap College students.",
+  description:
+    "Official AI Study Agent for Udai Pratap College students — fees, syllabus, admissions, notices and academic help, answered from approved college documents with citations.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "UPC AI — The Smarter Way to Study with AI",
-    description: "Official AI Study Agent for Udai Pratap College students.",
+    title: "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi",
+    description:
+      "Official AI Study Agent for Udai Pratap College students — fees, syllabus, admissions, notices and academic help, answered from approved college documents with citations.",
     type: "website",
     url: "https://upcai.app",
     images: [
@@ -49,14 +53,15 @@ export const metadata: Metadata = {
         url: "https://upcai.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "UPC AI — The Smarter Way to Study with AI",
+        alt: "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "UPC AI — The Smarter Way to Study with AI",
-    description: "Official AI Study Agent for Udai Pratap College students.",
+    title: "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi",
+    description:
+      "Official AI Study Agent for Udai Pratap College students — fees, syllabus, admissions, notices and academic help, answered from approved college documents with citations.",
     images: ["https://upcai.app/og-image.png"],
   },
   // Google Search Console ownership verification — GSC gives you this token
@@ -100,6 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem("upcai:theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}else if(t==="system"){document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}catch(e){}})();`,
           }}
         />
+        <JsonLd data={SITE_JSONLD} />
         {children}
       </body>
     </html>

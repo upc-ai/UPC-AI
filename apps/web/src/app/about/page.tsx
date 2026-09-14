@@ -5,8 +5,10 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "What UPC AI is, how it works, and the college behind it.",
+  title: "About UPC AI — AI Assistant for Udai Pratap College, Varanasi",
+  description:
+    "What UPC AI is and how it works: an AI assistant built for students of Udai Pratap Autonomous College, Varanasi — established 1909, first autonomous college in Uttar Pradesh.",
+  alternates: { canonical: "/about" },
 };
 
 const HOW_IT_WORKS = [

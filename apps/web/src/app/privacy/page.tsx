@@ -4,8 +4,9 @@ import { Reveal } from "../_components/Reveal";
 import styles from "../landing.module.css";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "What UPC AI collects, why, and how your data is protected.",
+  title: "Privacy Policy — UPC AI | Udai Pratap College AI Assistant",
+  description: "What UPC AI collects, why, and how student data is protected.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

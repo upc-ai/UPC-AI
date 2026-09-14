@@ -1,10 +1,22 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
 import { HeritageStats } from "./_components/HeritageStats";
 import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
 import { FAQS, FaqItem } from "./_components/FAQ";
+import { JsonLd, faqJsonLd } from "./_components/JsonLd";
+
+export const metadata: Metadata = {
+  title: {
+    absolute:
+      "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi | Fees, Syllabus, Notices",
+  },
+  description:
+    "Ask anything about Udai Pratap Autonomous College, Varanasi — fees, syllabus, admissions, exams, hostel, faculty — answered from approved college documents with citations. Free for students, English and Hindi.",
+  alternates: { canonical: "/" },
+};
 
 const FOR_STUDENTS = {
   label: "For students",
@@ -156,6 +168,12 @@ export default function LandingPage() {
                 </Reveal>
               ))}
             </div>
+            <Reveal>
+              <p className={styles.prose} style={{ marginTop: "var(--space-xl)" }}>
+                Browse every public document — fees, syllabi, notices, departments — as
+                readable pages in the <Link href="/college">college knowledge library</Link>.
+              </p>
+            </Reveal>
           </div>
         </section>
 
@@ -231,6 +249,7 @@ export default function LandingPage() {
           <Reveal>
             <h2 className={styles.sectionTitle} style={{ textAlign: "center" }}>Questions, answered.</h2>
           </Reveal>
+          <JsonLd data={faqJsonLd(FAQS)} />
           <div className={styles.faqList}>
             {FAQS.map((f, i) => (
               <Reveal key={f.q} delay={Math.min(i * 50, 200)}>
