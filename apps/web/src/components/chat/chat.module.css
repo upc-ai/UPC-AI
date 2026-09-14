@@ -253,6 +253,7 @@
 .messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* wide content scrolls inside tables/code, never the app */
   padding: var(--space-lg) var(--space-md);
   /* no smooth scrolling — it fires a smooth-scroll animation per streamed
      token (60fps), which reads as lag. Auto-scroll is instant. */
@@ -574,8 +575,13 @@
 }
 
 .aiMessage :global(table) {
+  /* Wide tables (student lists, many-column course data) must scroll inside
+     the message — never push the whole app sideways */
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
   border-collapse: collapse;
-  width: 100%;
   font-size: 14px;
   margin: var(--space-sm) 0;
 }
@@ -588,11 +594,13 @@
   color: var(--app-muted);
   border-bottom: 1px solid var(--app-hairline);
   padding: 8px 10px;
+  white-space: nowrap;
 }
 
 .aiMessage :global(td) {
   border-bottom: 1px solid var(--app-hairline);
   padding: 8px 10px;
+  overflow-wrap: anywhere;
 }
 
 .caret {
