@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { LogoMark } from "@upc/ui";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
 import { HeritageStats } from "./_components/HeritageStats";
@@ -31,14 +32,14 @@ const FOR_FACULTY = {
 };
 
 const KNOWLEDGE_TILES = [
-  { name: "Notices", count: "260+ documents", mono: "N" },
-  { name: "Fee Structure", count: "All courses", mono: "₹" },
-  { name: "Timetables", count: "Every section", mono: "T" },
-  { name: "Syllabus", count: "All subjects", mono: "S" },
-  { name: "Scholarships", count: "Latest schemes", mono: "Sch" },
-  { name: "Previous Papers", count: "Past papers", mono: "P" },
-  { name: "Hostel", count: "Rules & fees", mono: "H" },
-  { name: "Library", count: "Catalogue", mono: "L" },
+  { name: "Notices", count: "66 documents", mono: "N", href: "/college/notices" },
+  { name: "Fee Structure", count: "Ask the AI", mono: "₹", href: "/chat" },
+  { name: "Timetables", count: "Ask the AI", mono: "T", href: "/chat" },
+  { name: "Syllabus", count: "67 documents", mono: "S", href: "/college/syllabus" },
+  { name: "Scholarships", count: "Ask the AI", mono: "Sch", href: "/chat" },
+  { name: "Previous Papers", count: "6 papers", mono: "P", href: "/college/study-material" },
+  { name: "Hostel", count: "Ask the AI", mono: "H", href: "/chat" },
+  { name: "Library", count: "Ask the AI", mono: "L", href: "/chat" },
 ];
 
 export default function LandingPage() {
@@ -52,11 +53,12 @@ export default function LandingPage() {
               OFFICIAL · UDAI PRATAP COLLEGE
             </span>
             <h1 className={`${styles.heroItem} ${styles.d2} ${styles.heroTitle}`}>
-              Meet your thinking partner for campus.
+              The AI that knows your college.
             </h1>
             <p className={`${styles.heroItem} ${styles.d3} ${styles.heroSub}`}>
-              The official AI assistant that knows your courses, your campus, and your
-              curriculum — inside and out. Answers with citations, in English and Hindi.
+              Meet UPC AI — the official assistant of Udai Pratap College. It knows your
+              courses, your campus and your curriculum, answers with citations, in English
+              and Hindi.
             </p>
             <div className={`${styles.heroItem} ${styles.d4} ${styles.heroCtas}`}>
               <Link href="/signup" className={styles.btnPrimary}>
@@ -87,17 +89,15 @@ export default function LandingPage() {
           <div className={styles.proseSection}>
             <Reveal>
               <p className={styles.proseLead}>
-                UPC AI is an AI assistant made for Udai Pratap College. It works like the AI
-                tools you already know — ask anything, in plain English or Hindi, and it thinks,
-                searches and answers in seconds. What makes it different is what it knows:
-                your college, its documents, your syllabus.
+                UPC AI is an AI assistant made for Udai Pratap College. Ask anything in plain
+                English or Hindi — it thinks, searches and answers in seconds. What makes it
+                different is what it knows: your college, its documents, your syllabus.
               </p>
             </Reveal>
             <Reveal delay={70}>
               <p>
-                Studying with it is simple. Stuck on a derivation at midnight? It works through
-                the steps with you and shows its reasoning. Starting from zero, ask it to explain
-                simply; ready to be pushed, switch to Challenge Me. Photograph a problem or
+                Stuck on a derivation at midnight? It works through the steps with you and shows
+                its reasoning — from Explain Simply up to Challenge Me. Photograph a problem or
                 upload a PDF and it reads them directly in the chat.
               </p>
             </Reveal>
@@ -105,14 +105,8 @@ export default function LandingPage() {
               <p>
                 When a question touches the college — fees, exams, hostels, scholarships — it
                 answers only from official, approved documents and attaches the source. If the
-                evidence isn&apos;t there, it says so instead of guessing. No rumours, no
-                out-of-date PDFs, no waiting for office hours.
-              </p>
-            </Reveal>
-            <Reveal delay={210}>
-              <p>
-                It is free for every student and professor of the college, private by design,
-                and made for how UPC actually studies — including Hindi.
+                evidence isn&apos;t there, it says so instead of guessing. Free for every student
+                and professor of the college.
               </p>
             </Reveal>
           </div>
@@ -140,6 +134,14 @@ export default function LandingPage() {
                 <div><span className="ln">5</span>= x²eˣ − 2(xeˣ − eˣ) + C</div>
                 <div><span className="ln">6</span><span className="kw">return</span> eˣ(x² − <span className="num">2x</span> + <span className="num">2</span>) + C <span className="fn">✓ verified</span></div>
               </div>
+              <div className={styles.sourceChip} aria-label="Every college answer carries the official source">
+                <LogoMark size={14} />
+                <span>Udai Pratap College — Official Website</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              </div>
+              <p className={styles.sourceNote}>Every college answer carries this official source — or UPC AI says it doesn&apos;t know.</p>
             </Reveal>
           </div>
         </section>
@@ -157,14 +159,17 @@ export default function LandingPage() {
             <div className={styles.tileGrid}>
               {KNOWLEDGE_TILES.map((t, i) => (
                 <Reveal key={t.name} delay={(i % 4) * 60}>
-                  <div className={styles.tile}>
-                    <span className={styles.tileMono}>{t.mono}</span>
-                    <span>
-                      <span className={styles.tileName}>{t.name}</span>
-                      <br />
-                      <span className={styles.tileCount}>{t.count}</span>
-                    </span>
-                  </div>
+                  <Link href={t.href} className={styles.tileLink}>
+                    <div className={styles.tile}>
+                      <span className={styles.tileMono}>{t.mono}</span>
+                      <span>
+                        <span className={styles.tileName}>{t.name}</span>
+                        <br />
+                        <span className={styles.tileCount}>{t.count}</span>
+                      </span>
+                      <span className={styles.tileArrow} aria-hidden="true">→</span>
+                    </div>
+                  </Link>
                 </Reveal>
               ))}
             </div>

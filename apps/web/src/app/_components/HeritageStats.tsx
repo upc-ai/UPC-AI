@@ -34,12 +34,9 @@ const STATS: Stat[] = [
 
 /** rAF count-up from 0 to `to` over 900ms with a strong ease-out feel. */
 function useCountUp(to: number, active: boolean, reduced: boolean): number {
-  const [value, setValue] = useState(reduced ? to : 0);
+  const [value, setValue] = useState(to); // SSR + hydration show the FINAL value — never zeros
   useEffect(() => {
-    if (!active || reduced) {
-      setValue(to);
-      return;
-    }
+    if (!active || reduced) return; // already showing the final number; nothing to animate
     let raf = 0;
     const start = performance.now();
     const duration = 900;
@@ -66,7 +63,7 @@ function StatCell({ stat, active, reduced }: { stat: Stat; active: boolean; redu
       </span>
       <span className={styles.statLabel}>
         {stat.label}
-        {stat.sub ? <em className={styles.statSub}>{stat.sub}</em> : null}
+        {stat.sub ? <span className={styles.statSub}>{stat.sub}</span> : null}
       </span>
     </div>
   );
