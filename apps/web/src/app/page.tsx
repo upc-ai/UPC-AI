@@ -3,10 +3,9 @@ import type { Metadata } from "next";
 import { LogoMark } from "@upc/ui";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
-import { HeritageStats } from "./_components/HeritageStats";
 import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
-import { FAQS, FaqItem } from "./_components/FAQ";
+import { FAQS } from "./_components/FAQ";
 import { JsonLd, faqJsonLd } from "./_components/JsonLd";
 
 export const metadata: Metadata = {
@@ -72,15 +71,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ---------------- Trust strip (real college facts) ---------------- */}
-        <Reveal>
-          <div className={styles.strip}>
-            Established 1909 · First autonomous college in Uttar Pradesh · NAAC &apos;A&apos;
-            Accredited · 30 departments, 5 faculties
-          </div>
-        </Reveal>
-
-        {/* ---------------- What is UPC AI (editorial prose, no card grid) ---------------- */}
+        {/* ---------------- What is UPC AI (editorial prose) ---------------- */}
         <section id="about" className={`${styles.container} ${styles.section} ${styles.bandSoft}`}>
           <Reveal>
             <p className={styles.sectionKicker}>What is UPC AI</p>
@@ -156,29 +147,18 @@ export default function LandingPage() {
                 Browse the knowledge base directly, or let the AI find it for you.
               </p>
             </Reveal>
-            <div className={styles.tileGrid}>
-              {KNOWLEDGE_TILES.map((t, i) => (
-                <Reveal key={t.name} delay={(i % 4) * 60}>
-                  <Link href={t.href} className={styles.tileLink}>
-                    <div className={styles.tile}>
-                      <span className={styles.tileMono}>{t.mono}</span>
-                      <span>
-                        <span className={styles.tileName}>{t.name}</span>
-                        <br />
-                        <span className={styles.tileCount}>{t.count}</span>
-                      </span>
-                      <span className={styles.tileArrow} aria-hidden="true">→</span>
+            <div className={styles.aboutList} style={{ maxWidth: "100%" }}>
+              {KNOWLEDGE_TILES.map((t) => (
+                <Reveal key={t.name}>
+                  <Link href={t.href} className={styles.collegeCatLink}>
+                    <div className={styles.aboutRow}>
+                      <span className={styles.aboutLabel}>{t.name}</span>
+                      <p className={styles.aboutText}>{t.count} →</p>
                     </div>
                   </Link>
                 </Reveal>
               ))}
             </div>
-            <Reveal>
-              <p className={styles.prose} style={{ marginTop: "var(--space-xl)" }}>
-                Browse every public document — fees, syllabi, notices, departments — as
-                readable pages in the <Link href="/college">college knowledge library</Link>.
-              </p>
-            </Reveal>
           </div>
         </section>
 
@@ -220,17 +200,16 @@ export default function LandingPage() {
           </Reveal>
         </section>
 
-        {/* ---------------- Heritage — real milestones (replaces the old placeholder testimonial) ---------------- */}
+        {/* ---------------- Heritage (one quiet line + the founder's words) ---------------- */}
         <section id="heritage" className={`${styles.container} ${styles.section}`}>
           <Reveal>
             <p className={styles.sectionKicker}>A century of learning</p>
             <h2 className={styles.sectionTitle}>The college behind the AI.</h2>
             <p className={styles.sectionSub}>
-              Udai Pratap College has stood in Varanasi since 1909 — the knowledge base behind
-              every answer is its own.
+              Established 1909 · First autonomous college in Uttar Pradesh · NAAC &apos;A&apos;
+              accredited · 30 departments, 5 faculties · 100-acre campus in Varanasi.
             </p>
           </Reveal>
-          <HeritageStats />
         </section>
 
         {/* ---------------- Founder quote (real words, from the college archives) ---------------- */}
@@ -255,13 +234,12 @@ export default function LandingPage() {
             <h2 className={styles.sectionTitle} style={{ textAlign: "center" }}>Questions, answered.</h2>
           </Reveal>
           <JsonLd data={faqJsonLd(FAQS)} />
-          <div className={styles.faqList}>
-            {FAQS.map((f, i) => (
-              <Reveal key={f.q} delay={Math.min(i * 50, 200)}>
-                <FaqItem q={f.q} a={f.a} defaultOpen={i === 0} />
-              </Reveal>
-            ))}
-          </div>
+          <Reveal>
+            <p className={styles.prose} style={{ margin: "0 auto", textAlign: "center" }}>
+              Everything students and faculty ask — <Link href="/faq">read the full FAQ</Link>,
+              or <Link href="/chat">just ask UPC AI</Link>.
+            </p>
+          </Reveal>
         </section>
 
         {/* ---------------- CTA band (dark glass panel) ---------------- */}
