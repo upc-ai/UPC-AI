@@ -37,6 +37,27 @@ export const TOP_K = 6;
  *  support in the other) — single-list keyword noise stays under it. */
 export const EVIDENCE_THRESHOLD = 0.016;
 
+/** Words that appear in almost every college document — boosting them would
+ *  surface noise, so they never count as "hard tokens". */
+const HARD_TOKEN_STOP = new Set([
+  "udai", "pratap", "college", "department", "dept", "professor", "prof",
+  "student", "students", "hod", "list", "details", "detail", "varanasi",
+  "who", "what", "when", "where", "which", "why", "how", "tell", "give",
+  "show", "find", "about", "name", "hello", "hii", "please", "there",
+]);
+
+/**
+ * Hard tokens: capitalized names and alphanumeric ids ("Shashikant",
+ * "UGM20230123", "BSc"). Semantic embedding handles these poorly — a person's
+ * name has no vector meaning — so they get an exact-match retrieval pass.
+ */
+function hardTokens(query: string): string[] {
+  const tokens = new Set<string>();
+  for (const m of query.matchAll(/\b[A-Z][a-z]{2,}\b/g)) tokens.add(m[0]);
+  for (const m of query.matchAll(/\b(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{4,}\b/g)) tokens.add(m[0]);
+  return [...tokens].filter((t) => !HARD_TOKEN_STOP.has(t.toLowerCase())).slice(0, 6);
+}
+
 /** Query-side embedder: managed/env config + Gemini fallback from AI_CUSTOM_PROVIDERS. */
 async function queryEmbedConfig(): Promise<EmbedConfig | null> {
   const env = getEnv();
@@ -126,6 +147,37 @@ export async function retrieve(
         LIMIT ${BM25_CANDIDATES}
       `)) as unknown as Record<string, unknown>[]);
 
+  // ---- Stage 1c: exact hard-token match (names, roll numbers, ids) ----
+  // A chunk containing the searched NAME is the answer even when embeddings
+  // rank it low — names carry no semantic meaning. Weight 2 in the fusion
+  // lets an exact hit clear the evidence threshold on its own.
+  const tokens = hardTokens(`${query} ${effectiveQuery}`);
+  const exactRows: Record<string, unknown>[] = [];
+  if (tokens.length > 0) {
+    const like = (t: string) => `%${t}%`;
+    const anyMatch = sql.join(
+      tokens.map((t) => sql`c.content ILIKE ${like(t)}`),
+      sql` OR `,
+    );
+    const hitCount = sql.join(
+      tokens.map((t) => sql`(CASE WHEN c.content ILIKE ${like(t)} THEN 1 ELSE 0 END)`),
+      sql` + `,
+    );
+    exactRows.push(
+      ...((await db.execute(sql`
+        SELECT c.id, c.content, c.document_id, c.page_number, c.hierarchy_path, c.metadata,
+               d.title AS document_title, d.version AS document_version,
+               ${hitCount} AS score
+        FROM chunks c
+        JOIN documents d ON d.id = c.document_id
+        WHERE ${VISIBLE_DOC_FILTER}
+          AND (${anyMatch})
+        ORDER BY score DESC
+        LIMIT 20
+      `)) as unknown as Record<string, unknown>[]),
+    );
+  }
+
   // ---- Stage 2: Reciprocal Rank Fusion ----
   const K = 60;
   const fused = new Map<string, { row: Record<string, unknown>; score: number }>();
@@ -140,6 +192,22 @@ export async function retrieve(
   };
   addRanking(vectorRows);
   addRanking(bm25Rows);
+  addRanking(exactRows, 2);
+
+  // Evidence-threshold guard: the threshold reads row.score, but a chunk that
+  // entered via BM25 carries a raw ts_rank (often < 0.016) and one that ONLY
+  // the exact stage found carries its hit-count. When the stored score would
+  // fail the threshold but the chunk has an exact-name hit, upgrade the score
+  // — an exact hit IS evidence, whatever rank it fused at.
+  for (const r of exactRows) {
+    const f = fused.get(r.id as string);
+    if (!f) continue;
+    const stored = Number((f.row as Record<string, unknown>).score);
+    const exact = Number(r.score);
+    if (!(stored >= EVIDENCE_THRESHOLD) && exact > stored) {
+      f.row = { ...f.row, score: exact };
+    }
+  }
 
   const ranked = [...fused.values()].sort((a, b) => b.score - a.score);
 
