@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { LogoMark } from "@upc/ui";
+import { Markdown } from "@/components/chat/Markdown";
 import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
 import { Reveal } from "./_components/Reveal";
@@ -31,14 +32,12 @@ const FOR_FACULTY = {
 };
 
 const KNOWLEDGE_TILES = [
-  { name: "Notices", count: "66 documents", mono: "N", href: "/college/notices" },
-  { name: "Fee Structure", count: "Ask the AI", mono: "₹", href: "/chat" },
-  { name: "Timetables", count: "Ask the AI", mono: "T", href: "/chat" },
-  { name: "Syllabus", count: "67 documents", mono: "S", href: "/college/syllabus" },
-  { name: "Scholarships", count: "Ask the AI", mono: "Sch", href: "/chat" },
-  { name: "Previous Papers", count: "6 papers", mono: "P", href: "/college/study-material" },
-  { name: "Hostel", count: "Ask the AI", mono: "H", href: "/chat" },
-  { name: "Library", count: "Ask the AI", mono: "L", href: "/chat" },
+  { name: "Notices & Circulars", count: "66 official documents" },
+  { name: "Syllabus", count: "67 subject-wise syllabi" },
+  { name: "Fee Structure", count: "Course-wise, from the official schedule" },
+  { name: "Admissions", count: "Process, eligibility, dates" },
+  { name: "Faculty & Departments", count: "All 30 departments" },
+  { name: "Exams, Hostel & Library", count: "Rules, timings, papers" },
 ];
 
 export default function LandingPage() {
@@ -137,25 +136,24 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ---------------- Knowledge tiles ---------------- */}
+        {/* ---------------- Product: receipts ---------------- */}
         <section id="knowledge" className={`${styles.bandSoft} ${styles.section}`}>
           <div className={styles.container}>
             <Reveal>
-              <p className={styles.sectionKicker}>College knowledge</p>
+              <p className={styles.sectionKicker}>Answers with receipts</p>
               <h2 className={styles.sectionTitle}>The whole campus, searchable.</h2>
               <p className={styles.sectionSub}>
-                Browse the knowledge base directly, or let the AI find it for you.
+                Every college answer comes from the approved documents — and carries the
+                official source. No rumours, no guesswork.
               </p>
             </Reveal>
             <div className={styles.aboutList} style={{ maxWidth: "100%" }}>
               {KNOWLEDGE_TILES.map((t) => (
                 <Reveal key={t.name}>
-                  <Link href={t.href} className={styles.collegeCatLink}>
-                    <div className={styles.aboutRow}>
-                      <span className={styles.aboutLabel}>{t.name}</span>
-                      <p className={styles.aboutText}>{t.count} →</p>
-                    </div>
-                  </Link>
+                  <div className={styles.aboutRow}>
+                    <span className={styles.aboutLabel}>{t.name}</span>
+                    <p className={styles.aboutText}>{t.count}</p>
+                  </div>
                 </Reveal>
               ))}
             </div>
@@ -182,6 +180,58 @@ export default function LandingPage() {
                 <span className={styles.aboutLabel}>{FOR_FACULTY.label}</span>
                 <p className={styles.aboutText}>
                   <strong>{FOR_FACULTY.lead}</strong> {FOR_FACULTY.text}
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ---------------- Product: step-by-step math ---------------- */}
+        <section id="math" className={`${styles.bandDark} ${styles.section}`}>
+          <div className={`${styles.container} ${styles.productGrid}`}>
+            <Reveal>
+              <p className={styles.sectionKicker}>Real understanding</p>
+              <h2 className={styles.sectionTitle}>Solutions, step by step.</h2>
+              <p className={styles.sectionSub}>
+                UPC AI doesn&apos;t just give the final answer — it works the derivation with
+                you, shows every step, and explains the reasoning behind it.
+              </p>
+            </Reveal>
+            <Reveal delay={90}>
+              <div className={styles.mockup}>
+                <div className={styles.mockupUser}>Solve: ∫ x²·eˣ dx</div>
+                <Markdown content={"By parts — let **u = x²** and **dv = eˣdx**:\n\n$$\\int x^2 e^x\\,dx = e^x(x^2 - 2x + 2) + C$$\n\nDifferentiate the result and it collapses back to the integrand — verified."} />
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ---------------- Product: photo solving ---------------- */}
+        <section id="photo" className={`${styles.container} ${styles.section}`}>
+          <div className={styles.productGrid}>
+            <Reveal>
+              <div className={styles.mockup}>
+                <div className={styles.msgChip}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /></svg>
+                  <span>mechanics-problem.jpg</span>
+                </div>
+                <div className={styles.mockupUser}>Solve this problem.</div>
+                <div className={styles.mockupAnswer}>
+                  <span className={styles.line}>
+                    Reading the problem: a point mass on an inclined plane, friction
+                    coefficient μ — set up Newton&apos;s laws along the slope…
+                  </span>
+                  <span className={styles.line}>a = g(sin θ − μcos θ) <strong>✓ step-by-step solution follows</strong></span>
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={90}>
+              <div style={{ alignSelf: "center" }}>
+                <p className={styles.sectionKicker}>Show it a photo</p>
+                <h2 className={styles.sectionTitle}>Snap the problem. Get the method.</h2>
+                <p className={styles.sectionSub}>
+                  Photograph a handwritten problem or upload a PDF — UPC AI reads it and
+                  teaches the solution the way a good teacher would: method first, answer last.
                 </p>
               </div>
             </Reveal>

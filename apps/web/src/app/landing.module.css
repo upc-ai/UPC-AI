@@ -378,6 +378,22 @@
   animation: mockupFadeIn 300ms var(--ease-out-strong);
 }
 
+.msgChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 85%;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: #d4d4d4;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: var(--space-md);
+  animation: mockupFadeIn 300ms var(--ease-out-strong);
+}
+
 .mockupStatus {
   display: flex;
   align-items: center;

@@ -53,8 +53,8 @@ export default function KnowledgePage() {
           </div>
           <Reveal>
             <p className={styles.prose} style={{ marginTop: "var(--space-lg)" }}>
-              Browse the full library — every public college document as a readable page:{" "}
-              <Link href="/college">college knowledge library</Link>.
+              Want to search it conversationally? <Link href="/chat">Ask UPC AI</Link> — it
+              knows these documents and answers with citations.
             </p>
           </Reveal>
         </section>

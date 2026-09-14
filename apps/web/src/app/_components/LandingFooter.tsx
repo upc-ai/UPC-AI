@@ -9,9 +9,19 @@ const COLUMNS: {
   {
     h: "Product",
     links: [
-      { label: "Features", href: "/#about" },
-      { label: "Knowledge", href: "/knowledge" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Guide", href: "/guide" },
+      { label: "Changelog", href: "/blog" },
       { label: "Study Tools", href: "/study-tools" },
+    ],
+  },
+  {
+    h: "Trust",
+    links: [
+      { label: "Security", href: "/security" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Accessibility", href: "/accessibility" },
     ],
   },
   {
@@ -28,14 +38,6 @@ const COLUMNS: {
       { label: "Help Center", href: "/faq" },
       { label: "About", href: "/about" },
       { label: "Contact", href: "mailto:hello@upcai.app", external: true },
-    ],
-  },
-  {
-    h: "Legal",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Accessibility", href: "/accessibility" },
     ],
   },
 ];

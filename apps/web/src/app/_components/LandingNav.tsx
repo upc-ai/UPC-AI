@@ -6,9 +6,10 @@ import { Wordmark } from "@upc/ui";
 import styles from "../landing.module.css";
 
 const NAV_LINKS = [
-  { label: "About", href: "/about" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Knowledge", href: "/knowledge" },
-  { label: "Study Tools", href: "/study-tools" },
+  { label: "Guide", href: "/guide" },
+  { label: "Blog", href: "/blog" },
   { label: "For Faculty", href: "/for-faculty" },
   { label: "FAQ", href: "/faq" },
 ];
