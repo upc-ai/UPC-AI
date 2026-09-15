@@ -47,9 +47,6 @@ export default function LandingPage() {
         {/* ---------------- Hero (staggered entrance) ---------------- */}
         <section className={`${styles.container} ${styles.hero}`}>
           <div>
-            <span className={`${styles.heroItem} ${styles.d1} ${styles.heroBadge}`}>
-              OFFICIAL · UDAI PRATAP COLLEGE
-            </span>
             <h1 className={`${styles.heroItem} ${styles.d2} ${styles.heroTitle}`}>
               The AI that knows your college.
             </h1>
