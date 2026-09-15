@@ -2,9 +2,9 @@ import { ImageResponse } from "next/og";
 
 /**
  * Serves the social-sharing card at exactly https://upcai.app/og-image.png.
- * 1200×630, UPC AI monochrome brand. The tagline appears ONCE here; metadata
- * text lives in layout.tsx. Rendered on-request (next/og) — no static asset
- * to regenerate when the brand changes.
+ * 1200×630, light-theme brand card: white canvas, black constructed-"U" mark
+ * + UPC AI wordmark, grey tagline. Rendered on-request (next/og) — no static
+ * asset to regenerate when the brand changes.
  */
 export const runtime = "nodejs";
 // On-request, never prerendered: @vercel/og crashes during Windows builds
@@ -27,36 +27,49 @@ export async function GET() {
           alignItems: "center",
           justifyContent: "center",
           position: "relative",
-          background: "linear-gradient(160deg, #202020 0%, #141414 60%, #101010 100%)",
+          background: "#ffffff",
         }}
       >
-        {/* Subtle ambient fields — echoes the landing's radial glows */}
+        {/* Whisper-soft grey fields so the white card has depth on any chat app */}
         <div
           style={{
             position: "absolute",
-            top: -180,
-            right: -120,
-            width: 560,
-            height: 560,
-            borderRadius: 9999,
-            background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0))",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -220,
-            left: -140,
+            top: -200,
+            right: -140,
             width: 620,
             height: 620,
             borderRadius: 9999,
-            background: "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0))",
+            background: "linear-gradient(180deg, rgba(0,0,0,0.045), rgba(0,0,0,0))",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -240,
+            left: -160,
+            width: 680,
+            height: 680,
+            borderRadius: 9999,
+            background: "linear-gradient(180deg, rgba(0,0,0,0.035), rgba(0,0,0,0))",
           }}
         />
 
-        {/* Lockup: the constructed "U" mark + wordmark */}
+        {/* Hairline card frame — the premium white-card touch */}
+        <div
+          style={{
+            position: "absolute",
+            top: 28,
+            left: 28,
+            right: 28,
+            bottom: 28,
+            border: "1px solid #ececec",
+            borderRadius: 24,
+          }}
+        />
+
+        {/* Lockup: the constructed "U" mark + wordmark, brand black */}
         <div style={{ display: "flex", alignItems: "center" }}>
-          <svg width={116} height={145} viewBox="272 212 480 600" fill="#ececec">
+          <svg width={116} height={145} viewBox="272 212 480 600" fill="#0d0d0d">
             <rect x="272" y="212" width="120" height="600" />
             <rect x="632" y="212" width="120" height="420" />
             <rect x="452" y="692" width="300" height="120" />
@@ -64,7 +77,7 @@ export async function GET() {
           <div
             style={{
               marginLeft: 26,
-              color: "#ececec",
+              color: "#0d0d0d",
               fontSize: 92,
               fontWeight: 650,
               letterSpacing: "-4px",
@@ -80,28 +93,28 @@ export async function GET() {
         <div
           style={{
             marginTop: 26,
-            color: "#b4b4b4",
-            fontSize: 38,
+            color: "#6e6e6e",
+            fontSize: 36,
             fontWeight: 500,
             letterSpacing: "-0.5px",
             display: "flex",
           }}
         >
-          The Smarter Way to Study with AI
+          The official AI assistant of Udai Pratap College
         </div>
 
         {/* Footer line */}
         <div
           style={{
             position: "absolute",
-            bottom: 46,
-            color: "#6e6e6e",
+            bottom: 52,
+            color: "#98989d",
             fontSize: 22,
             display: "flex",
             letterSpacing: "0.5px",
           }}
         >
-          upcai.app · Udai Pratap College, Varanasi
+          upcai.app · Free for every UPC student
         </div>
       </div>
     ),
