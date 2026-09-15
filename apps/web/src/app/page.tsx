@@ -6,7 +6,7 @@ import styles from "./landing.module.css";
 import { HeroChatDemo } from "./_components/HeroChatDemo";
 import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
-import { FAQS } from "./_components/FAQ";
+import { FAQS, FaqItem } from "./_components/FAQ";
 import { JsonLd, faqJsonLd } from "./_components/JsonLd";
 
 export const metadata: Metadata = {
@@ -284,10 +284,16 @@ export default function LandingPage() {
             <h2 className={styles.sectionTitle} style={{ textAlign: "center" }}>Questions, answered.</h2>
           </Reveal>
           <JsonLd data={faqJsonLd(FAQS)} />
+          <div className={styles.faqList}>
+            {FAQS.map((f, i) => (
+              <Reveal key={f.q} delay={Math.min(i * 50, 200)}>
+                <FaqItem q={f.q} a={f.a} defaultOpen={i === 0} />
+              </Reveal>
+            ))}
+          </div>
           <Reveal>
-            <p className={styles.prose} style={{ margin: "0 auto", textAlign: "center" }}>
-              Everything students and faculty ask — <Link href="/faq">read the full FAQ</Link>,
-              or <Link href="/chat">just ask UPC AI</Link>.
+            <p className={styles.prose} style={{ margin: "var(--space-lg) auto 0", textAlign: "center" }}>
+              More questions? <Link href="/faq">Visit the full help center</Link>.
             </p>
           </Reveal>
         </section>
