@@ -1220,26 +1220,19 @@
   transform: scale(0.97);
 }
 
-/* Footer — compact, two-sided: brand left, links right */
+/* Footer — Cursor-style: brand left, spacious link columns, controls bottom */
 
 .footer {
   background: var(--surface-soft);
   border-top: 1px solid var(--hairline);
-  padding: var(--space-xl) 0 var(--space-lg);
+  padding: 64px 0 36px;
 }
 
 .footerGrid {
   display: grid;
-  grid-template-columns: 1.1fr 1.4fr;
-  gap: var(--space-xxl);
+  grid-template-columns: 1.5fr repeat(4, minmax(0, 1fr));
+  gap: 48px 32px;
   align-items: start;
-}
-
-/* Link columns live in their own 2×2 block on the right side */
-.footerLinks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg) var(--space-xl);
 }
 
 .footerBrand {
@@ -1247,28 +1240,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  padding-right: var(--space-md);
 }
 
 .footerCollege {
   font-size: var(--text-body-sm);
-  color: var(--body);
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .footerSocial {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
   margin-top: var(--space-xs);
 }
 
 .footerSocial a {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   color: var(--muted);
-  font-size: 12.5px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 450;
 }
 
 .footerSocial a:hover {
@@ -1276,12 +1271,11 @@
 }
 
 .footerCol h4 {
-  font-size: 12px;
-  font-weight: 550;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   color: var(--muted);
-  margin: 0 0 var(--space-xs);
+  margin: 0 0 16px;
 }
 
 .footerCol ul {
@@ -1290,23 +1284,21 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
 }
 
 .footerCol a {
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--ink);
+  font-size: 15px;
 }
 
 .footerCol a:hover {
-  color: var(--ink);
+  color: var(--muted);
 }
 
 .footerBottom {
-  border-top: 1px solid var(--hairline);
-  margin-top: var(--space-xl);
-  padding-top: var(--space-md);
-  font-size: 12px;
+  margin-top: 56px;
+  font-size: 13px;
   color: var(--muted);
   display: flex;
   justify-content: space-between;
@@ -1389,6 +1381,13 @@
     grid-template-columns: 1fr;
     padding: var(--space-xxl) 0;
   }
+  .footerGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 24px;
+  }
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
   .productGrid,
   .compareGrid {
     grid-template-columns: 1fr;
@@ -1430,11 +1429,15 @@
     padding-bottom: 4px;
   }
   .footerGrid {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 24px;
   }
-  .footerLinks {
-    gap: var(--space-md) var(--space-lg);
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
+  .footerBottom {
+    flex-direction: column;
+    gap: 4px;
   }
   .quote {
     font-size: 22px;

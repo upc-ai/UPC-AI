@@ -43,10 +43,9 @@ const COLUMNS: {
   },
 ];
 
-/** Marketing footer — shared by every page via MarketingPage. Two-sided:
- *  brand + socials on the left, link columns in a 2×2 on the right, bottom
- *  bar spanning both. Internal links are next/link routes; mailtos stay
- *  plain anchors. */
+/** Marketing footer — Cursor-style: brand + socials, then spacious link
+ *  columns (4 across desktop, 2×2 on mobile), preference controls at the
+ *  bottom. Internal links are next/link routes; mailtos stay plain anchors. */
 export function LandingFooter() {
   return (
     <footer className={styles.footer}>
@@ -78,24 +77,22 @@ export function LandingFooter() {
               </a>
             </div>
           </div>
-          <div className={styles.footerLinks}>
-            {COLUMNS.map((col) => (
-              <div key={col.h} className={styles.footerCol}>
-                <h4>{col.h}</h4>
-                <ul>
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      {l.external ? (
-                        <a href={l.href}>{l.label}</a>
-                      ) : (
-                        <Link href={l.href}>{l.label}</Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          {COLUMNS.map((col) => (
+            <div key={col.h} className={styles.footerCol}>
+              <h4>{col.h}</h4>
+              <ul>
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    {l.external ? (
+                      <a href={l.href}>{l.label}</a>
+                    ) : (
+                      <Link href={l.href}>{l.label}</Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
         <div className={styles.footerBottom}>
           <span>© {new Date().getFullYear()} UPC AI · Udai Pratap College, Varanasi</span>
