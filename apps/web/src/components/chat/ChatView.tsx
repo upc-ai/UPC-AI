@@ -24,7 +24,7 @@ function initialLanguage(): "en" | "hi" | "auto" {
 function initialModel(): ModelId {
   if (typeof window === "undefined") return "upc-1-plus";
   const saved = window.localStorage.getItem(MODEL_STORAGE_KEY);
-  return saved === "upc-1" || saved === "upc-1-plus" || saved === "upc-1-pro" ? saved : "upc-1-plus";
+  return saved === "upc-1" || saved === "upc-1-plus" || saved === "upc-1-pro" ? saved : "upc-1";
 }
 
 /** Welcome state (new chat): greeting + composer, centered. */

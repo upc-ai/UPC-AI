@@ -34,7 +34,7 @@ interface MeResponse {
 }
 
 const DEFAULTS: Preferences = {
-  theme: "dark",
+  theme: "system",
   language: "en",
   response_length: "detailed",
   difficulty: "intermediate",

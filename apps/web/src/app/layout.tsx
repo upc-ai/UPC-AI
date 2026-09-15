@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             users can switch to light (or System) in Settings. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("upcai:theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}else if(t==="system"){document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("upcai:theme");if(t==="light"||t==="dark"||t==="system"){document.documentElement.dataset.theme=t==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):t}else{document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}catch(e){}})();`,
           }}
         />
         <JsonLd data={SITE_JSONLD} />
