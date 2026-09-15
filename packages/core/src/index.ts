@@ -57,6 +57,9 @@ export const envSchema = z.object({
   // Direct Gemini key (optional — the AI_CUSTOM_PROVIDERS fallback covers
   // the common setup; this lets ops set a dedicated embeddings key)
   GEMINI_API_KEY: z.string().default(""),
+  VAPID_PUBLIC_KEY: z.string().default(""),
+  VAPID_PRIVATE_KEY: z.string().default(""),
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().default(""),
 
   // Object storage
   S3_ENDPOINT: z.string().default(""),

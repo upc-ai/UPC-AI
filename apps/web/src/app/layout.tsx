@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { JsonLd, SITE_JSONLD } from "./_components/JsonLd";
+import { PwaRegister } from "./_components/PwaRegister";
 
 // Self-hosted (Fontsource woff2) — no Google Fonts fetch at build/dev time,
 // which is unreachable on some networks and slowed compiles by minutes.
@@ -106,6 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <JsonLd data={SITE_JSONLD} />
+        <PwaRegister />
         {children}
       </body>
     </html>

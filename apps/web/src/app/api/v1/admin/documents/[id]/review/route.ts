@@ -7,6 +7,7 @@ import { ApiError } from "@upc/core";
 import { canPublish } from "@upc/ingest";
 import { ok, fail } from "@/lib/api";
 import { requireAuth, canReviewDocuments } from "@/lib/auth/guard";
+import { sendPushToAll } from "@/lib/push";
 
 const actionSchema = z.object({
   action: z.enum(["approve", "reject", "publish"]),
@@ -65,6 +66,24 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       resourceId: doc.id,
       changeSummary: `${body.action}d "${doc.title}"${body.notes ? ` — ${body.notes}` : ""}`,
     });
+
+    await db.insert(auditLogs).values({
+      actorId: claims.sub,
+      action: body.action,
+      resourceType: "document",
+      resourceId: doc.id,
+      changeSummary: `${body.action}d "${doc.title}"${body.notes ? ` — ${body.notes}` : ""}`,
+    });
+
+    // Push: notify subscribers when a new document goes live (fire-and-forget —
+    // dispatch must never fail the publish)
+    if (body.action === "publish") {
+      void sendPushToAll({
+        title: "New on UPC AI",
+        body: `New document published: ${doc.title}`,
+        url: "/chat",
+      }).catch(() => undefined);
+    }
 
     return ok({ document_id: doc.id, status: body.action === "reject" ? "draft" : "published" });
   } catch (err) {

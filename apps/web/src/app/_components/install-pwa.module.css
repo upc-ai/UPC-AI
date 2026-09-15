@@ -1,0 +1,16 @@
+/* Install App hero button (ghost style, matches heroSecondary) */
+
+.installBtn {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 2px;
+  font-family: var(--font-body);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}

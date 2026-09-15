@@ -8,6 +8,7 @@ import { Reveal } from "./_components/Reveal";
 import { MarketingPage } from "./_components/MarketingPage";
 import { FAQS, FaqItem } from "./_components/FAQ";
 import { JsonLd, faqJsonLd } from "./_components/JsonLd";
+import { InstallAppButton } from "./_components/InstallAppButton";
 
 export const metadata: Metadata = {
   title: { absolute: "UPC AI" },
@@ -57,6 +58,7 @@ export default function LandingPage() {
                 Get Started Free
               </Link>
               <a href="#product" className={styles.heroSecondary}>See it in action →</a>
+              <InstallAppButton />
             </div>
           </div>
           <div className={`${styles.heroItem} ${styles.d5}`}>
