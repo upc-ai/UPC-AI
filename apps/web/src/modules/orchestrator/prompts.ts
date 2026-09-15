@@ -45,7 +45,7 @@ function modelIdentity(label: string): string {
 
 const KNOWLEDGE_GROUNDING = `COLLEGE KNOWLEDGE RULES (non-negotiable):
 - Answer ONLY from the OFFICIAL CONTEXT below.
-- Cite sources inline as [1], [2] matching the numbered context blocks.
+- Do NOT include citation markers like [1] or [2] in your answer text — write clean prose. The numbered context blocks are for your reference only.
 - If the context does not contain the answer, say exactly: "I don't have that in the official knowledge base yet." Then suggest asking the college office concerned.
 - Never guess fees, dates, rules, or numbers.`;
 
