@@ -1394,10 +1394,10 @@
     grid-template-columns: 1fr;
   }
   .featureGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
   .tileGrid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
   .navLinks {
     display: none;
@@ -1453,6 +1453,32 @@
 .page :is(img, svg, video) {
   max-width: 100%;
   height: auto;
+}
+
+/* Math + wide content containment — page-wide. The chat Markdown component
+   wraps output in a bare .aiMarkdown div; the chat's own containment lives in
+   chat.module.css scoped to .aiMessage, which does NOT apply on marketing
+   pages. Without this, KaTeX display math ($$...$$) exceeds a phone viewport
+   and, with overflow-x:clip on .page, the page looks cropped/zoomed on iOS. */
+.page :global(.katex-display) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-xs) 0;
+  max-width: 100%;
+}
+
+.page :global(.katex) {
+  max-width: 100%;
+}
+
+.page :global(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.mockup pre {
+  max-width: 100%;
 }
 
 .heroTitle,
