@@ -1,0 +1,78 @@
+/* Footer preference controls (theme pills + language) — Cursor-style */
+
+.footerPrefs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-top: var(--space-md);
+}
+
+.themeGroup {
+  display: inline-flex;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 2px;
+}
+
+.themeBtn {
+  background: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+  width: 34px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.themeBtn:hover {
+  color: var(--ink);
+}
+
+.themeBtnActive,
+.themeBtnActive:hover {
+  background: var(--canvas);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.langWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: var(--radius-pill);
+  padding: 0 12px;
+  height: 36px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.langSelect {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding-right: 2px;
+  outline: none;
+}
+
+.langSelect option {
+  color: initial;
+  background: var(--canvas);
+}
+
+.langChevron {
+  pointer-events: none;
+  color: var(--muted);
+}

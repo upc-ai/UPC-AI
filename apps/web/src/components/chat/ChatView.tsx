@@ -11,6 +11,16 @@ import styles from "@/components/chat/chat.module.css";
 
 const MODEL_STORAGE_KEY = "upcai:model";
 
+/** Footer language selector fallback: visitors without a server preference
+ *  still get the language they picked on the marketing site. */
+function initialLanguage(): "en" | "hi" | "auto" {
+  try {
+    return localStorage.getItem("upcai:lang") === "hi" ? "hi" : "en";
+  } catch {
+    return "en";
+  }
+}
+
 function initialModel(): ModelId {
   if (typeof window === "undefined") return "upc-1-plus";
   const saved = window.localStorage.getItem(MODEL_STORAGE_KEY);
@@ -20,7 +30,7 @@ function initialModel(): ModelId {
 /** Welcome state (new chat): greeting + composer, centered. */
 export function WelcomeChat({ onSessionCreated }: { onSessionCreated: (sessionId: string, firstMessage: string, studyMode: StudyMode, language: "en" | "hi" | "auto", attachments: PendingAttachment[]) => void }) {
   const [studyMode, setStudyMode] = useState<StudyMode>("learn");
-  const [language, setLanguage] = useState<"en" | "hi" | "auto">("en");
+  const [language, setLanguage] = useState<"en" | "hi" | "auto">(initialLanguage);
   const [model, setModel] = useState<ModelId>(initialModel);
   const [creating, setCreating] = useState(false);
   const toast = useToast();
@@ -93,7 +103,7 @@ export function SessionChat({ sessionId }: { sessionId: string }) {
   const [title, setTitle] = useState<string | null>(null);
   const [sources, setSources] = useState<{ open: boolean; list: Citation[]; activeOrder: number | null }>({ open: false, list: [], activeOrder: null });
   const [studyMode, setStudyMode] = useState<StudyMode>("learn");
-  const [language, setLanguage] = useState<"en" | "hi" | "auto">("en");
+  const [language, setLanguage] = useState<"en" | "hi" | "auto">(initialLanguage);
   const [model, setModel] = useState<ModelId>(initialModel);
   const [feedbackState, setFeedbackState] = useState<Record<string, FeedbackType>>({});
   const toast = useToast();

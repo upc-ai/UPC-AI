@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@upc/ui";
+import { FooterPrefs } from "./footer-prefs";
 import styles from "../landing.module.css";
 
 const COLUMNS: {
@@ -100,6 +101,7 @@ export function LandingFooter() {
           <span>© {new Date().getFullYear()} UPC AI · Udai Pratap College, Varanasi</span>
           <span>upcai.app · Made with care for students</span>
         </div>
+        <FooterPrefs />
       </div>
     </footer>
   );
