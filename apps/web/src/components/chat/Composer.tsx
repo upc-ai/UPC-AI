@@ -409,7 +409,7 @@ export function Composer({
           )}
         </div>
       </div>
-      <p className={styles.disclaimer}>UPC AI can make mistakes. · Founder &amp; Developer: Vishnu Jaiswal</p>
+      <p className={styles.disclaimer}>UPC AI can make mistakes. Please double-check important details.</p>
     </div>
   );
 }
