@@ -10,10 +10,7 @@ import { FAQS, FaqItem } from "./_components/FAQ";
 import { JsonLd, faqJsonLd } from "./_components/JsonLd";
 
 export const metadata: Metadata = {
-  title: {
-    absolute:
-      "UPC AI — Official AI Assistant of Udai Pratap College, Varanasi | Fees, Syllabus, Notices",
-  },
+  title: { absolute: "UPC AI" },
   description:
     "Ask anything about Udai Pratap Autonomous College, Varanasi — fees, syllabus, admissions, exams, hostel, faculty — answered from approved college documents with citations. Free for students, English and Hindi.",
   alternates: { canonical: "/" },
@@ -48,7 +45,7 @@ export default function LandingPage() {
         <section className={`${styles.container} ${styles.hero}`}>
           <div>
             <h1 className={`${styles.heroItem} ${styles.d2} ${styles.heroTitle}`}>
-              The AI that knows your college.
+              The Smarter Way to Study with AI.
             </h1>
             <p className={`${styles.heroItem} ${styles.d3} ${styles.heroSub}`}>
               Meet UPC AI — the official assistant of Udai Pratap College. It knows your
